@@ -19,6 +19,22 @@
   "launch_handler": {
     "client_mode": "navigate-existing"
   },
+  "protocol_handlers": [
+    {
+      "protocol": "web+pyhub",
+      "url": "./index.html?protocol=%s"
+    }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "scope_extensions": [],
   "icons": [
     {
       "src": "icons/icon-72.png",
