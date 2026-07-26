@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker + Helm + Kubernetes</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link active" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+<div class="site-header">
+  <div class="level-badge">DevOps</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Docker + Helm + Kubernetes</h1>
+  <p>The complete container toolkit — Docker builds, multi-stage images, Docker Compose, Kubernetes resources, Helm charts, ArgoCD GitOps, and production best practices.</p>
+</div>
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+<script>
+const topics = [
+  {
+    id:'docker-basics',icon:'🐳',title:'Docker Basics',
+    desc:'images, containers, run, build, Dockerfile, layers, tags.',
+    content(){return `
+<div class="detail-header"><span class="icon">🐳</span>
+<h2>Docker Basics</h2>
+<p><strong>Docker</strong> packages your app and its dependencies into a portable container. Same image runs identically on your laptop, CI server, and production. Install: <a href="https://docs.docker.com/get-docker/" target="_blank">docs.docker.com</a></p></div>
+
+<div class="section-block"><h4>Core Commands</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Pull and run an image</span>
+<span class="cm"># docker pull python:3.11-slim</span>
+<span class="cm"># docker run python:3.11-slim python --version</span>
+<span class="cm"># docker run -it python:3.11-slim bash     ← interactive shell</span>
+<span class="cm"># docker run -d -p 8000:8000 my-app        ← detached, port mapping</span>
+<span class="cm">#</span>
+<span class="cm"># List / stop / remove</span>
+<span class="cm"># docker ps                  ← running containers</span>
+<span class="cm"># docker ps -a               ← all containers</span>
+<span class="cm"># docker stop &lt;id&gt;</span>
+<span class="cm"># docker rm &lt;id&gt;</span>
+<span class="cm"># docker images              ← local images</span>
+<span class="cm"># docker rmi &lt;image&gt;</span>
+<span class="cm"># docker logs &lt;id&gt;           ← container logs</span>
+<span class="cm"># docker exec -it &lt;id&gt; bash  ← shell into running container</span></pre>
+<div class="out-label">Output</div><pre class="output">$ docker run python:3.11-slim python --version
+Python 3.11.9
+
+$ docker ps
+CONTAINER ID  IMAGE         STATUS         PORTS
+a1b2c3d4e5f6  my-app:latest Up 2 minutes   0.0.0.0:8000->8000/tcp</pre></div>
+
+<div class="section-block"><h4>Basic Dockerfile</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Dockerfile</span>
+<span class="cm"># FROM python:3.11-slim               ← base image</span>
+<span class="cm"># WORKDIR /app                         ← working directory</span>
+<span class="cm"># COPY requirements.txt .              ← copy deps file first (layer cache)</span>
+<span class="cm"># RUN pip install --no-cache-dir -r requirements.txt</span>
+<span class="cm"># COPY . .                             ← copy app code</span>
+<span class="cm"># EXPOSE 8000                          ← document port</span>
+<span class="cm"># ENV PYTHONDONTWRITEBYTECODE=1 \</span>
+<span class="cm">#     PYTHONUNBUFFERED=1</span>
+<span class="cm"># CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]</span>
+
+<span class="cm"># Build and run</span>
+<span class="cm"># docker build -t my-app:1.0 .</span>
+<span class="cm"># docker run -p 8000:8000 -e DATABASE_URL=... my-app:1.0</span></pre>
+<div class="out-label">Output</div><pre class="output">$ docker build -t my-app:1.0 .
+Step 1/7 : FROM python:3.11-slim
+Step 2/7 : WORKDIR /app
+...
+Successfully built a1b2c3d4
+Successfully tagged my-app:1.0</pre>
+<div class="example-note">COPY requirements.txt before COPY . . — Docker caches each layer. If only your code changes (not deps), the pip install layer is reused and builds are much faster.</div></div>
+
+<div class="section-block"><h4>Image Layers &amp; Tags</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># View layer history</span>
+<span class="cm"># docker history my-app:1.0</span>
+<span class="cm">#</span>
+<span class="cm"># Tag for a registry</span>
+<span class="cm"># docker tag my-app:1.0 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:1.0</span>
+<span class="cm"># docker tag my-app:1.0 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:latest</span>
+<span class="cm">#</span>
+<span class="cm"># Push to ECR</span>
+<span class="cm"># aws ecr get-login-password | docker login --username AWS \</span>
+<span class="cm">#   --password-stdin 123456.dkr.ecr.ap-south-1.amazonaws.com</span>
+<span class="cm"># docker push 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:1.0</span>
+
+<span class="cm"># Inspect image size</span>
+<span class="cm"># docker image ls my-app</span></pre>
+<div class="out-label">Output</div><pre class="output">$ docker image ls my-app
+REPOSITORY  TAG    IMAGE ID     SIZE
+my-app      1.0    a1b2c3d4     142MB
+my-app      latest a1b2c3d4     142MB</pre></div>
+`;}
+  },
+  {
+    id:'multistage',icon:'🏗️',title:'Multi-stage Builds',
+    desc:'multi-stage Dockerfile, builder pattern, minimal production image, .dockerignore.',
+    content(){return `
+<div class="detail-header"><span class="icon">🏗️</span>
+<h2>Multi-stage Builds</h2>
+<p>Multi-stage builds separate the build environment from the runtime image — the final image contains only what's needed to run, not compilers, dev tools, or build artifacts.</p></div>
+
+<div class="section-block"><h4>Multi-stage Dockerfile</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Dockerfile — multi-stage Python app</span>
+<span class="cm">#</span>
+<span class="cm"># ---- Stage 1: builder ----</span>
+<span class="cm"># FROM python:3.11 AS builder</span>
+<span class="cm"># WORKDIR /build</span>
+<span class="cm"># COPY requirements.txt .</span>
+<span class="cm"># RUN pip install --user --no-cache-dir -r requirements.txt</span>
+<span class="cm">#</span>
+<span class="cm"># ---- Stage 2: runtime ----</span>
+<span class="cm"># FROM python:3.11-slim</span>
+<span class="cm"># WORKDIR /app</span>
+<span class="cm"># # Copy only installed packages from builder</span>
+<span class="cm"># COPY --from=builder /root/.local /root/.local</span>
+<span class="cm"># COPY . .</span>
+<span class="cm"># ENV PATH=/root/.local/bin:$PATH</span>
+<span class="cm"># CMD ["python", "app.py"]</span>
+<span class="fn">print</span>(<span class="st">"Builder stage installs deps; runtime stage only copies the result"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Without multi-stage: 1.2 GB (full python + build tools)
+With multi-stage:    142 MB (slim runtime only)
+Reduction: 88%</pre>
+<div class="example-note">The builder stage can have gcc, pip, and all build tools. The final image gets none of that — just the .local packages needed to run. Smaller images = faster pulls, smaller attack surface.</div></div>
+
+<div class="section-block"><h4>.dockerignore</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># .dockerignore — exclude files from build context</span>
+<span class="cm">#</span>
+<span class="cm"># __pycache__/</span>
+<span class="cm"># *.pyc</span>
+<span class="cm"># .git/</span>
+<span class="cm"># .env</span>
+<span class="cm"># .env.*</span>
+<span class="cm"># tests/</span>
+<span class="cm"># docs/</span>
+<span class="cm"># *.md</span>
+<span class="cm"># node_modules/</span>
+<span class="cm"># .venv/</span>
+<span class="cm"># coverage.xml</span>
+<span class="fn">print</span>(<span class="st">"Always add .env to .dockerignore — never let secrets into image"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Build context without .dockerignore: 450 MB
+Build context with .dockerignore:    2.1 MB
+Faster transfers to Docker daemon</pre></div>
+
+<div class="section-block"><h4>Distroless &amp; Minimal Images</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Use distroless for maximum security</span>
+<span class="cm"># FROM python:3.11 AS builder</span>
+<span class="cm"># ... install deps ...</span>
+<span class="cm">#</span>
+<span class="cm"># FROM gcr.io/distroless/python3-debian12</span>
+<span class="cm"># COPY --from=builder /app /app</span>
+<span class="cm"># CMD ["/app/main.py"]</span>
+<span class="cm">#</span>
+<span class="cm"># Image size comparison:</span>
+<span class="cm"># python:3.11         → 1.0  GB</span>
+<span class="cm"># python:3.11-slim    → 142  MB</span>
+<span class="cm"># python:3.11-alpine  → 52   MB (musl libc — some packages won't work)</span>
+<span class="cm"># distroless/python3  → 52   MB (no shell, no package manager — safest)</span>
+<span class="fn">print</span>(<span class="st">"Prefer slim > alpine for Python (musl compat issues), distroless for prod"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Prefer slim > alpine for Python (musl compat issues), distroless for prod</pre></div>
+`;}
+  },
+  {
+    id:'docker-compose',icon:'🎼',title:'Docker Compose',
+    desc:'services, networks, volumes, depends_on, env files, override files.',
+    content(){return `
+<div class="detail-header"><span class="icon">🎼</span>
+<h2>Docker Compose</h2>
+<p><strong>Docker Compose</strong> defines and runs multi-container applications. One YAML file describes your app + database + cache + worker — start everything with <code>docker compose up</code>.</p></div>
+
+<div class="section-block"><h4>docker-compose.yml</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># docker-compose.yml</span>
+<span class="cm">#</span>
+<span class="cm"># services:</span>
+<span class="cm">#   app:</span>
+<span class="cm">#     build: .</span>
+<span class="cm">#     ports: ["8000:8000"]</span>
+<span class="cm">#     environment:</span>
+<span class="cm">#       - DATABASE_URL=postgresql://user:pass@db:5432/myapp</span>
+<span class="cm">#       - REDIS_URL=redis://cache:6379</span>
+<span class="cm">#     depends_on:</span>
+<span class="cm">#       db:    { condition: service_healthy }</span>
+<span class="cm">#       cache: { condition: service_started }</span>
+<span class="cm">#     volumes: ["./:/app"]       # mount code for hot reload</span>
+<span class="cm">#</span>
+<span class="cm">#   db:</span>
+<span class="cm">#     image: postgres:15-alpine</span>
+<span class="cm">#     environment: { POSTGRES_PASSWORD: pass, POSTGRES_DB: myapp }</span>
+<span class="cm">#     volumes: ["pg_data:/var/lib/postgresql/data"]</span>
+<span class="cm">#     healthcheck:</span>
+<span class="cm">#       test: ["CMD", "pg_isready", "-U", "user"]</span>
+<span class="cm">#       interval: 5s</span>
+<span class="cm">#</span>
+<span class="cm">#   cache:</span>
+<span class="cm">#     image: redis:7-alpine</span>
+<span class="cm">#</span>
+<span class="cm"># volumes:</span>
+<span class="cm">#   pg_data:</span></pre>
+<div class="out-label">Output</div><pre class="output">$ docker compose up
+[+] Running 3/3
+ ✓ Container db     Started
+ ✓ Container cache  Started
+ ✓ Container app    Started</pre></div>
+
+<div class="section-block"><h4>Common Commands</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Start all services (build if needed)</span>
+<span class="cm"># docker compose up --build</span>
+<span class="cm">#</span>
+<span class="cm"># Start in background</span>
+<span class="cm"># docker compose up -d</span>
+<span class="cm">#</span>
+<span class="cm"># Stop and remove containers</span>
+<span class="cm"># docker compose down</span>
+<span class="cm">#</span>
+<span class="cm"># Wipe volumes too (reset DB)</span>
+<span class="cm"># docker compose down -v</span>
+<span class="cm">#</span>
+<span class="cm"># Shell into a service</span>
+<span class="cm"># docker compose exec app bash</span>
+<span class="cm">#</span>
+<span class="cm"># Run one-off command</span>
+<span class="cm"># docker compose run --rm app python manage.py migrate</span>
+<span class="cm">#</span>
+<span class="cm"># View logs</span>
+<span class="cm"># docker compose logs -f app</span>
+<span class="cm"># docker compose logs --tail=50 db</span></pre>
+<div class="out-label">Output</div><pre class="output">$ docker compose logs -f app
+app  | [INFO] Gunicorn running on 0.0.0.0:8000
+app  | [INFO] Worker booted pid:14</pre></div>
+
+<div class="section-block"><h4>Override Files &amp; Env Files</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># docker-compose.override.yml — auto-merged for local dev</span>
+<span class="cm"># services:</span>
+<span class="cm">#   app:</span>
+<span class="cm">#     command: flask run --reload  # override CMD for dev</span>
+<span class="cm">#     volumes: ["./:/app"]</span>
+<span class="cm">#     environment: [DEBUG=true]</span>
+<span class="cm">#</span>
+<span class="cm"># .env file — auto-loaded by compose</span>
+<span class="cm"># DATABASE_URL=postgresql://user:pass@db:5432/myapp</span>
+<span class="cm"># SECRET_KEY=dev-secret</span>
+<span class="cm">#</span>
+<span class="cm"># Production: use a separate file</span>
+<span class="cm"># docker compose -f docker-compose.yml -f docker-compose.prod.yml up</span>
+<span class="fn">print</span>(<span class="st">"override.yml adds dev settings without touching production compose file"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">override.yml adds dev settings without touching production compose file</pre></div>
+`;}
+  },
+  {
+    id:'k8s-core',icon:'☸️',title:'Kubernetes Core',
+    desc:'Pod, Deployment, Service, Namespace, kubectl commands, resource limits.',
+    content(){return `
+<div class="detail-header"><span class="icon">☸️</span>
+<h2>Kubernetes Core Concepts</h2>
+<p><strong>Kubernetes</strong> (K8s) orchestrates containers at scale. It handles scheduling, self-healing, rolling deployments, and service discovery. Install kubectl + minikube for local dev.</p></div>
+
+<div class="section-block"><h4>kubectl Essentials</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Context and cluster</span>
+<span class="cm"># kubectl config get-contexts</span>
+<span class="cm"># kubectl config use-context prod-cluster</span>
+<span class="cm">#</span>
+<span class="cm"># Get resources</span>
+<span class="cm"># kubectl get pods                      ← list pods in default namespace</span>
+<span class="cm"># kubectl get pods -n kube-system       ← in a specific namespace</span>
+<span class="cm"># kubectl get pods -o wide              ← with node and IP info</span>
+<span class="cm"># kubectl get all                       ← everything in namespace</span>
+<span class="cm">#</span>
+<span class="cm"># Describe / logs</span>
+<span class="cm"># kubectl describe pod my-pod-abc123</span>
+<span class="cm"># kubectl logs my-pod-abc123</span>
+<span class="cm"># kubectl logs -f my-pod-abc123         ← follow (like tail -f)</span>
+<span class="cm"># kubectl logs my-pod --previous        ← previous crashed container</span>
+<span class="cm">#</span>
+<span class="cm"># Execute into pod</span>
+<span class="cm"># kubectl exec -it my-pod -- bash</span></pre>
+<div class="out-label">Output</div><pre class="output">$ kubectl get pods
+NAME                     READY  STATUS   RESTARTS  AGE
+my-app-6d4f9c-xk2p9     1/1    Running  0         2d
+my-app-6d4f9c-m7n8r     1/1    Running  0         2d
+my-app-6d4f9c-p3q4s     1/1    Running  0         2d</pre></div>
+
+<div class="section-block"><h4>Deployment YAML</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># deployment.yaml</span>
+<span class="cm">#</span>
+<span class="cm"># apiVersion: apps/v1</span>
+<span class="cm"># kind: Deployment</span>
+<span class="cm"># metadata:</span>
+<span class="cm">#   name: my-app</span>
+<span class="cm">#   namespace: production</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   replicas: 3</span>
+<span class="cm">#   selector:</span>
+<span class="cm">#     matchLabels: { app: my-app }</span>
+<span class="cm">#   strategy:</span>
+<span class="cm">#     type: RollingUpdate</span>
+<span class="cm">#     rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }</span>
+<span class="cm">#   template:</span>
+<span class="cm">#     metadata: { labels: { app: my-app } }</span>
+<span class="cm">#     spec:</span>
+<span class="cm">#       containers:</span>
+<span class="cm">#       - name: app</span>
+<span class="cm">#         image: 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:1.0</span>
+<span class="cm">#         ports: [{ containerPort: 8000 }]</span>
+<span class="cm">#         resources:</span>
+<span class="cm">#           requests: { cpu: "100m", memory: "128Mi" }</span>
+<span class="cm">#           limits:   { cpu: "500m", memory: "512Mi" }</span>
+<span class="cm">#         livenessProbe:</span>
+<span class="cm">#           httpGet: { path: /health, port: 8000 }</span>
+<span class="cm">#           initialDelaySeconds: 10</span>
+<span class="cm">#         readinessProbe:</span>
+<span class="cm">#           httpGet: { path: /ready, port: 8000 }</span>
+<span class="cm">#</span>
+<span class="cm"># kubectl apply -f deployment.yaml</span>
+<span class="cm"># kubectl rollout status deployment/my-app</span>
+<span class="cm"># kubectl rollout undo deployment/my-app    ← rollback</span></pre>
+<div class="out-label">Output</div><pre class="output">$ kubectl apply -f deployment.yaml
+deployment.apps/my-app configured
+$ kubectl rollout status deployment/my-app
+Waiting for rollout to finish: 1 out of 3 new replicas updated...
+deployment "my-app" successfully rolled out</pre></div>
+
+<div class="section-block"><h4>Service &amp; Namespace</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># service.yaml</span>
+<span class="cm"># apiVersion: v1</span>
+<span class="cm"># kind: Service</span>
+<span class="cm"># metadata: { name: my-app-svc }</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   selector: { app: my-app }   ← routes to pods with this label</span>
+<span class="cm">#   ports: [{ port: 80, targetPort: 8000 }]</span>
+<span class="cm">#   type: ClusterIP              ← internal only</span>
+<span class="cm">#   # type: LoadBalancer         ← creates AWS NLB</span>
+<span class="cm">#   # type: NodePort             ← exposes on each node</span>
+<span class="cm">#</span>
+<span class="cm"># Namespaces — logical isolation</span>
+<span class="cm"># kubectl create namespace production</span>
+<span class="cm"># kubectl create namespace staging</span>
+<span class="cm"># kubectl get pods -n production</span>
+<span class="cm"># kubectl config set-context --current --namespace=production</span></pre>
+<div class="out-label">Output</div><pre class="output">$ kubectl get svc
+NAME        TYPE       CLUSTER-IP    PORT(S)
+my-app-svc  ClusterIP  10.100.50.20  80/TCP
+
+Pods reach each other by service name:
+http://my-app-svc  (within same namespace)
+http://my-app-svc.production.svc.cluster.local</pre></div>
+`;}
+  },
+  {
+    id:'k8s-config',icon:'⚙️',title:'K8s Config & Storage',
+    desc:'ConfigMap, Secret, PersistentVolume, PVC, HPA, resource quotas.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>K8s Config &amp; Storage</h2>
+<p>ConfigMaps and Secrets inject configuration into pods. PersistentVolumes store data that survives pod restarts. HPA auto-scales based on CPU/memory.</p></div>
+
+<div class="section-block"><h4>ConfigMap &amp; Secret</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># ConfigMap — non-sensitive config</span>
+<span class="cm"># apiVersion: v1</span>
+<span class="cm"># kind: ConfigMap</span>
+<span class="cm"># metadata: { name: app-config }</span>
+<span class="cm"># data:</span>
+<span class="cm">#   LOG_LEVEL: "INFO"</span>
+<span class="cm">#   STAGE: "production"</span>
+<span class="cm">#   config.yaml: |</span>
+<span class="cm">#     timeout: 30</span>
+<span class="cm">#     retries: 3</span>
+<span class="cm">#</span>
+<span class="cm"># Secret — sensitive (base64 encoded, encrypted at rest)</span>
+<span class="cm"># apiVersion: v1</span>
+<span class="cm"># kind: Secret</span>
+<span class="cm"># metadata: { name: app-secret }</span>
+<span class="cm"># type: Opaque</span>
+<span class="cm"># stringData:             ← auto-encodes to base64</span>
+<span class="cm">#   DB_PASSWORD: "mysecret"</span>
+<span class="cm">#   JWT_SECRET: "jwt-key"</span>
+<span class="cm">#</span>
+<span class="cm"># Use in pod:</span>
+<span class="cm"># envFrom:</span>
+<span class="cm"># - configMapRef: { name: app-config }</span>
+<span class="cm"># - secretRef:    { name: app-secret }</span>
+<span class="fn">print</span>(<span class="st">"envFrom injects all ConfigMap/Secret keys as env vars"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">envFrom injects all ConfigMap/Secret keys as env vars</pre>
+<div class="example-note">In production, use External Secrets Operator to sync from AWS Secrets Manager into K8s Secrets automatically — no manual kubectl create secret needed.</div></div>
+
+<div class="section-block"><h4>Horizontal Pod Autoscaler (HPA)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># hpa.yaml</span>
+<span class="cm"># apiVersion: autoscaling/v2</span>
+<span class="cm"># kind: HorizontalPodAutoscaler</span>
+<span class="cm"># metadata: { name: my-app-hpa }</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   scaleTargetRef:</span>
+<span class="cm">#     apiVersion: apps/v1</span>
+<span class="cm">#     kind: Deployment</span>
+<span class="cm">#     name: my-app</span>
+<span class="cm">#   minReplicas: 2</span>
+<span class="cm">#   maxReplicas: 20</span>
+<span class="cm">#   metrics:</span>
+<span class="cm">#   - type: Resource</span>
+<span class="cm">#     resource:</span>
+<span class="cm">#       name: cpu</span>
+<span class="cm">#       target: { type: Utilization, averageUtilization: 60 }</span>
+<span class="cm">#</span>
+<span class="cm"># kubectl apply -f hpa.yaml</span>
+<span class="cm"># kubectl get hpa</span></pre>
+<div class="out-label">Output</div><pre class="output">$ kubectl get hpa
+NAME        REFERENCE           TARGETS   MINPODS  MAXPODS  REPLICAS
+my-app-hpa  Deployment/my-app  45%/60%   2        20       3</pre>
+<div class="example-note">HPA requires metrics-server to be installed in the cluster. EKS includes it. When CPU > 60%, K8s adds pods; when CPU drops, it removes them (with a cooldown).</div></div>
+
+<div class="section-block"><h4>PersistentVolume &amp; PVC</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># PersistentVolumeClaim — request storage</span>
+<span class="cm"># apiVersion: v1</span>
+<span class="cm"># kind: PersistentVolumeClaim</span>
+<span class="cm"># metadata: { name: data-pvc }</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   accessModes: [ReadWriteOnce]</span>
+<span class="cm">#   storageClassName: gp3              ← EKS storage class</span>
+<span class="cm">#   resources:</span>
+<span class="cm">#     requests: { storage: 20Gi }</span>
+<span class="cm">#</span>
+<span class="cm"># Mount in pod:</span>
+<span class="cm"># volumes:</span>
+<span class="cm"># - name: data</span>
+<span class="cm">#   persistentVolumeClaim: { claimName: data-pvc }</span>
+<span class="cm"># containers:</span>
+<span class="cm"># - volumeMounts:</span>
+<span class="cm">#   - name: data</span>
+<span class="cm">#     mountPath: /data</span>
+<span class="fn">print</span>(<span class="st">"EKS auto-creates EBS volume when PVC is created with gp3 storage class"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">EKS auto-creates EBS volume when PVC is created with gp3 storage class</pre></div>
+`;}
+  },
+  {
+    id:'k8s-ingress',icon:'🌐',title:'Ingress & Networking',
+    desc:'Ingress, ALB Ingress Controller, TLS, path routing, NetworkPolicy.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌐</span>
+<h2>K8s Ingress &amp; Networking</h2>
+<p>Ingress routes external HTTP/HTTPS traffic to internal services. On EKS, the <strong>AWS Load Balancer Controller</strong> creates an ALB per Ingress resource automatically.</p></div>
+
+<div class="section-block"><h4>Ingress with ALB Controller</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># ingress.yaml</span>
+<span class="cm"># apiVersion: networking.k8s.io/v1</span>
+<span class="cm"># kind: Ingress</span>
+<span class="cm"># metadata:</span>
+<span class="cm">#   name: app-ingress</span>
+<span class="cm">#   annotations:</span>
+<span class="cm">#     kubernetes.io/ingress.class: alb</span>
+<span class="cm">#     alb.ingress.kubernetes.io/scheme: internet-facing</span>
+<span class="cm">#     alb.ingress.kubernetes.io/target-type: ip</span>
+<span class="cm">#     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:...:certificate/abc</span>
+<span class="cm">#     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'</span>
+<span class="cm">#     alb.ingress.kubernetes.io/ssl-redirect: "443"</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   rules:</span>
+<span class="cm">#   - host: api.myapp.com</span>
+<span class="cm">#     http:</span>
+<span class="cm">#       paths:</span>
+<span class="cm">#       - path: /api</span>
+<span class="cm">#         pathType: Prefix</span>
+<span class="cm">#         backend: { service: { name: api-svc, port: { number: 80 } } }</span>
+<span class="cm">#       - path: /admin</span>
+<span class="cm">#         pathType: Prefix</span>
+<span class="cm">#         backend: { service: { name: admin-svc, port: { number: 80 } } }</span></pre>
+<div class="out-label">Output</div><pre class="output">kubectl apply -f ingress.yaml
+→ ALB created: app-ingress-xyz.ap-south-1.elb.amazonaws.com
+→ HTTPS redirect enabled
+→ /api → api-svc, /admin → admin-svc</pre></div>
+
+<div class="section-block"><h4>NetworkPolicy — Pod-level Firewall</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># network-policy.yaml — allow only app pods to reach db pods</span>
+<span class="cm"># apiVersion: networking.k8s.io/v1</span>
+<span class="cm"># kind: NetworkPolicy</span>
+<span class="cm"># metadata: { name: allow-app-to-db }</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   podSelector: { matchLabels: { app: postgres } }</span>
+<span class="cm">#   ingress:</span>
+<span class="cm">#   - from:</span>
+<span class="cm">#     - podSelector: { matchLabels: { app: my-app } }</span>
+<span class="cm">#     ports: [{ protocol: TCP, port: 5432 }]</span>
+<span class="cm">#   policyTypes: [Ingress]</span>
+<span class="fn">print</span>(<span class="st">"NetworkPolicy: only pods labeled app=my-app can reach postgres on 5432"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">NetworkPolicy: only pods labeled app=my-app can reach postgres on 5432
+All other pods → postgres:5432 → BLOCKED</pre>
+<div class="example-note">NetworkPolicies are K8s firewalls at the pod level. By default all pods can talk to each other — NetworkPolicies add deny-by-default rules. Requires a CNI that supports NetworkPolicy (Calico, Cilium).</div></div>
+`;}
+  },
+  {
+    id:'helm',icon:'⎈',title:'Helm',
+    desc:'charts, values.yaml, install, upgrade, rollback, templating, Helm repos.',
+    content(){return `
+<div class="detail-header"><span class="icon">⎈</span>
+<h2>Helm — Kubernetes Package Manager</h2>
+<p><strong>Helm</strong> packages Kubernetes YAML files into reusable <strong>charts</strong>. Install apps with one command, override values per environment, and rollback if anything breaks. Install: <code>brew install helm</code></p></div>
+
+<div class="section-block"><h4>Core Commands</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Add a chart repository</span>
+<span class="cm"># helm repo add bitnami https://charts.bitnami.com/bitnami</span>
+<span class="cm"># helm repo update</span>
+<span class="cm">#</span>
+<span class="cm"># Search for charts</span>
+<span class="cm"># helm search repo bitnami/redis</span>
+<span class="cm">#</span>
+<span class="cm"># Install a chart</span>
+<span class="cm"># helm install my-redis bitnami/redis \</span>
+<span class="cm">#   --namespace production \</span>
+<span class="cm">#   --set auth.password=mysecret \</span>
+<span class="cm">#   --set replica.replicaCount=2</span>
+<span class="cm">#</span>
+<span class="cm"># List releases</span>
+<span class="cm"># helm list -n production</span>
+<span class="cm">#</span>
+<span class="cm"># Upgrade a release</span>
+<span class="cm"># helm upgrade my-redis bitnami/redis --set replica.replicaCount=3</span>
+<span class="cm">#</span>
+<span class="cm"># Rollback to previous version</span>
+<span class="cm"># helm rollback my-redis 1</span>
+<span class="cm">#</span>
+<span class="cm"># Uninstall</span>
+<span class="cm"># helm uninstall my-redis -n production</span></pre>
+<div class="out-label">Output</div><pre class="output">$ helm list -n production
+NAME      NAMESPACE   REVISION  STATUS    CHART
+my-redis  production  3         deployed  redis-18.0.0</pre></div>
+
+<div class="section-block"><h4>Create Your Own Chart</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># helm create my-app</span>
+<span class="cm"># Creates:</span>
+<span class="cm"># my-app/</span>
+<span class="cm">#   Chart.yaml          ← chart metadata</span>
+<span class="cm">#   values.yaml         ← default values</span>
+<span class="cm">#   templates/</span>
+<span class="cm">#     deployment.yaml   ← templated K8s resources</span>
+<span class="cm">#     service.yaml</span>
+<span class="cm">#     ingress.yaml</span>
+<span class="cm">#     hpa.yaml</span>
+<span class="cm">#     _helpers.tpl      ← reusable template functions</span>
+<span class="cm">#</span>
+<span class="cm"># values.yaml:</span>
+<span class="cm"># replicaCount: 3</span>
+<span class="cm"># image:</span>
+<span class="cm">#   repository: 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app</span>
+<span class="cm">#   tag: "1.0"</span>
+<span class="cm"># service: { port: 80 }</span>
+<span class="cm"># ingress: { enabled: true, host: api.myapp.com }</span>
+<span class="cm"># resources:</span>
+<span class="cm">#   requests: { cpu: 100m, memory: 128Mi }</span>
+<span class="fn">print</span>(<span class="st">"helm create generates a starter chart with all standard resources"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">$ helm create my-app
+Creating my-app</pre></div>
+
+<div class="section-block"><h4>Templating &amp; Per-environment Values</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># templates/deployment.yaml (excerpt)</span>
+<span class="cm"># replicas: {{ .Values.replicaCount }}</span>
+<span class="cm"># image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"</span>
+<span class="cm"># {{- if .Values.ingress.enabled }}</span>
+<span class="cm"># ...ingress resource...</span>
+<span class="cm"># {{- end }}</span>
+<span class="cm">#</span>
+<span class="cm"># values-staging.yaml</span>
+<span class="cm"># replicaCount: 1</span>
+<span class="cm"># image: { tag: "latest" }</span>
+<span class="cm"># resources: { requests: { cpu: 50m } }</span>
+<span class="cm">#</span>
+<span class="cm"># Deploy to staging with override:</span>
+<span class="cm"># helm upgrade --install my-app ./my-app \</span>
+<span class="cm">#   -f values-staging.yaml \</span>
+<span class="cm">#   --namespace staging</span>
+<span class="cm">#</span>
+<span class="cm"># Preview rendered templates without deploying:</span>
+<span class="cm"># helm template my-app ./my-app -f values-staging.yaml</span>
+<span class="fn">print</span>(<span class="st">"helm template: dry-run to preview what K8s YAML will be generated"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">helm template outputs fully rendered YAML:
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 1
+  ...</pre></div>
+`;}
+  },
+  {
+    id:'argocd',icon:'🔄',title:'ArgoCD — GitOps',
+    desc:'GitOps workflow, install ArgoCD, Application CRD, sync, auto-sync, rollback.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔄</span>
+<h2>ArgoCD — GitOps</h2>
+<p><strong>GitOps</strong>: Git is the single source of truth for cluster state. <strong>ArgoCD</strong> watches a Git repo and automatically syncs K8s to match. Deployment = git push.</p></div>
+
+<div class="section-block"><h4>Install ArgoCD</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Install ArgoCD in EKS</span>
+<span class="cm"># kubectl create namespace argocd</span>
+<span class="cm"># kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml</span>
+<span class="cm">#</span>
+<span class="cm"># Access UI</span>
+<span class="cm"># kubectl port-forward svc/argocd-server -n argocd 8080:443</span>
+<span class="cm"># open https://localhost:8080</span>
+<span class="cm">#</span>
+<span class="cm"># Get initial admin password</span>
+<span class="cm"># kubectl -n argocd get secret argocd-initial-admin-secret \</span>
+<span class="cm">#   -o jsonpath="{.data.password}" | base64 -d</span>
+<span class="cm">#</span>
+<span class="cm"># Login via CLI</span>
+<span class="cm"># argocd login localhost:8080</span>
+<span class="fn">print</span>(<span class="st">"ArgoCD installed — UI at localhost:8080"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">ArgoCD installed — UI at localhost:8080
+Login: admin / &lt;generated-password&gt;</pre></div>
+
+<div class="section-block"><h4>Application CRD — Deploy from Git</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># argocd-app.yaml</span>
+<span class="cm"># apiVersion: argoproj.io/v1alpha1</span>
+<span class="cm"># kind: Application</span>
+<span class="cm"># metadata:</span>
+<span class="cm">#   name: my-app</span>
+<span class="cm">#   namespace: argocd</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   project: default</span>
+<span class="cm">#   source:</span>
+<span class="cm">#     repoURL: https://github.com/myorg/k8s-configs.git</span>
+<span class="cm">#     targetRevision: main</span>
+<span class="cm">#     path: apps/my-app/production     ← folder with K8s YAML / Helm chart</span>
+<span class="cm">#   destination:</span>
+<span class="cm">#     server: https://kubernetes.default.svc</span>
+<span class="cm">#     namespace: production</span>
+<span class="cm">#   syncPolicy:</span>
+<span class="cm">#     automated:                        ← auto-sync on git push</span>
+<span class="cm">#       prune: true                     ← delete resources removed from git</span>
+<span class="cm">#       selfHeal: true                  ← auto-fix manual kubectl changes</span>
+<span class="cm">#     syncOptions: [CreateNamespace=true]</span>
+<span class="cm">#</span>
+<span class="cm"># kubectl apply -f argocd-app.yaml</span></pre>
+<div class="out-label">Output</div><pre class="output">Application 'my-app' created
+Status: Synced ✓  Health: Healthy ✓
+Last sync: triggered by commit abc123 "Update image to v1.5"</pre>
+<div class="example-note">With selfHeal=true, if someone runs kubectl edit directly in production, ArgoCD reverts it within minutes — Git stays the source of truth.</div></div>
+
+<div class="section-block"><h4>Sync &amp; Rollback</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Sync manually</span>
+<span class="cm"># argocd app sync my-app</span>
+<span class="cm">#</span>
+<span class="cm"># Check sync status</span>
+<span class="cm"># argocd app get my-app</span>
+<span class="cm">#</span>
+<span class="cm"># View sync history</span>
+<span class="cm"># argocd app history my-app</span>
+<span class="cm">#</span>
+<span class="cm"># Rollback to previous revision</span>
+<span class="cm"># argocd app rollback my-app 3</span>
+<span class="cm">#</span>
+<span class="cm"># GitOps deployment flow:</span>
+<span class="cm"># 1. Developer pushes code → CI builds image → pushes to ECR</span>
+<span class="cm"># 2. CI updates image tag in k8s-configs repo (values.yaml)</span>
+<span class="cm"># 3. ArgoCD detects git change → auto-syncs to cluster</span>
+<span class="cm"># 4. New pods roll out, old pods terminate</span>
+<span class="fn">print</span>(<span class="st">"Deployment = git push to k8s-configs repo"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">$ argocd app history my-app
+ID  DATE                  REVISION  MESSAGE
+4   2026-07-25 10:30:00   abc123    Update image to v1.5
+3   2026-07-24 15:00:00   def456    Scale to 5 replicas
+2   2026-07-23 09:00:00   ghi789    Initial deploy</pre></div>
+`;}
+  },
+  {
+    id:'k8s-troubleshoot',icon:'🔧',title:'K8s Troubleshooting',
+    desc:'CrashLoopBackOff, OOMKilled, Pending pods, ImagePullBackOff, debug commands.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔧</span>
+<h2>Kubernetes Troubleshooting</h2>
+<p>K8s issues follow patterns. Learn to read pod status, events, and logs to diagnose problems quickly. These debug skills separate senior engineers from juniors.</p></div>
+
+<div class="section-block"><h4>CrashLoopBackOff</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Symptom: Pod keeps restarting</span>
+<span class="cm"># kubectl get pods → STATUS: CrashLoopBackOff</span>
+<span class="cm">#</span>
+<span class="cm"># Step 1: Check logs of crashed container</span>
+<span class="cm"># kubectl logs my-pod --previous</span>
+<span class="cm">#</span>
+<span class="cm"># Step 2: Describe pod for events</span>
+<span class="cm"># kubectl describe pod my-pod</span>
+<span class="cm">#</span>
+<span class="cm"># Common causes:</span>
+<span class="cm"># - App crashes on startup (missing env var, wrong DB URL)</span>
+<span class="cm"># - Wrong CMD in Dockerfile</span>
+<span class="cm"># - Liveness probe failing too fast (increase initialDelaySeconds)</span>
+<span class="cm"># - OOMKilled — container exceeding memory limit</span>
+<span class="cm">#</span>
+<span class="cm"># Fix OOMKilled — increase memory limit:</span>
+<span class="cm"># resources:</span>
+<span class="cm">#   limits: { memory: "1Gi" }    ← was 512Mi</span></pre>
+<div class="out-label">Output</div><pre class="output">$ kubectl describe pod my-pod | grep -A5 "Last State"
+Last State: Terminated
+  Reason: OOMKilled
+  Exit Code: 137
+  → increase memory limit</pre></div>
+
+<div class="section-block"><h4>Pending Pod</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Symptom: Pod stuck in Pending state</span>
+<span class="cm"># kubectl describe pod my-pod → Events section</span>
+<span class="cm">#</span>
+<span class="cm"># Common causes + fixes:</span>
+<span class="cm"># "Insufficient cpu"  → node doesn't have enough CPU</span>
+<span class="cm">#    Fix: reduce requests, or add nodes to cluster</span>
+<span class="cm">#</span>
+<span class="cm"># "no nodes match node selector"</span>
+<span class="cm">#    Fix: check nodeSelector / affinity in pod spec</span>
+<span class="cm">#</span>
+<span class="cm"># "pod has unbound PersistentVolumeClaims"</span>
+<span class="cm">#    Fix: check PVC status: kubectl get pvc</span>
+<span class="cm">#</span>
+<span class="cm"># Check node capacity</span>
+<span class="cm"># kubectl describe nodes | grep -A5 "Allocated resources"</span></pre>
+<div class="out-label">Output</div><pre class="output">Events:
+Warning  FailedScheduling  0/3 nodes available:
+  3 Insufficient cpu.
+→ kubectl describe nodes | grep cpu
+  CPU requests: 2850m/3000m (95%)</pre></div>
+
+<div class="section-block"><h4>ImagePullBackOff &amp; Debug Pod</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># ImagePullBackOff — K8s can't pull the Docker image</span>
+<span class="cm"># kubectl describe pod → Events: Failed to pull image</span>
+<span class="cm">#</span>
+<span class="cm"># Causes:</span>
+<span class="cm"># - Wrong image tag</span>
+<span class="cm"># - Private ECR — missing imagePullSecret</span>
+<span class="cm"># - ECR IAM role not attached to node group</span>
+<span class="cm">#</span>
+<span class="cm"># Fix for ECR:</span>
+<span class="cm"># Attach AmazonEC2ContainerRegistryReadOnly policy to node IAM role</span>
+<span class="cm">#</span>
+<span class="cm"># Debug with ephemeral container (K8s 1.23+)</span>
+<span class="cm"># kubectl debug -it my-pod --image=busybox --target=app</span>
+<span class="cm">#</span>
+<span class="cm"># Run a temporary debug pod in the cluster</span>
+<span class="cm"># kubectl run debug --rm -it --image=python:3.11-slim -- bash</span></pre>
+<div class="out-label">Output</div><pre class="output">$ kubectl run debug --rm -it --image=python:3.11-slim -- bash
+root@debug:/# curl http://my-app-svc/health
+{"status":"ok"}
+root@debug:/# exit
+pod "debug" deleted</pre>
+<div class="example-note">Temporary debug pods let you test connectivity, DNS resolution, and service reachability from inside the cluster — essential for network troubleshooting.</div></div>
+`;}
+  },
+  {
+    id:'k8s-rbac',icon:'🔐',title:'RBAC & Security',
+    desc:'ServiceAccount, Role, ClusterRole, RoleBinding, Pod Security Standards.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔐</span>
+<h2>K8s RBAC &amp; Security</h2>
+<p><strong>RBAC</strong> (Role-Based Access Control) controls who can do what in the cluster. Always follow least-privilege — pods, users, and CI systems should only have the permissions they need.</p></div>
+
+<div class="section-block"><h4>ServiceAccount + Role + RoleBinding</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Create ServiceAccount for your app</span>
+<span class="cm"># apiVersion: v1</span>
+<span class="cm"># kind: ServiceAccount</span>
+<span class="cm"># metadata: { name: my-app-sa, namespace: production }</span>
+<span class="cm">#</span>
+<span class="cm"># Role — permissions within a namespace</span>
+<span class="cm"># apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="cm"># kind: Role</span>
+<span class="cm"># metadata: { name: read-secrets, namespace: production }</span>
+<span class="cm"># rules:</span>
+<span class="cm"># - apiGroups: [""]</span>
+<span class="cm">#   resources: ["secrets"]</span>
+<span class="cm">#   verbs: ["get", "list"]</span>
+<span class="cm">#</span>
+<span class="cm"># Bind role to service account</span>
+<span class="cm"># apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="cm"># kind: RoleBinding</span>
+<span class="cm"># metadata: { name: my-app-read-secrets, namespace: production }</span>
+<span class="cm"># subjects:</span>
+<span class="cm"># - kind: ServiceAccount</span>
+<span class="cm">#   name: my-app-sa</span>
+<span class="cm">#   namespace: production</span>
+<span class="cm"># roleRef:</span>
+<span class="cm">#   kind: Role</span>
+<span class="cm">#   name: read-secrets</span>
+<span class="cm">#   apiGroup: rbac.authorization.k8s.io</span>
+<span class="fn">print</span>(<span class="st">"App pod can only read secrets in production namespace — nothing else"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">App pod can only read secrets in production namespace — nothing else</pre></div>
+
+<div class="section-block"><h4>IRSA — IAM Roles for Service Accounts (EKS)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># IRSA: give a K8s pod AWS permissions without static credentials</span>
+<span class="cm">#</span>
+<span class="cm"># 1. Create IAM role with trust policy for the service account</span>
+<span class="cm"># 2. Annotate K8s ServiceAccount with IAM role ARN</span>
+<span class="cm">#</span>
+<span class="cm"># apiVersion: v1</span>
+<span class="cm"># kind: ServiceAccount</span>
+<span class="cm"># metadata:</span>
+<span class="cm">#   name: s3-reader</span>
+<span class="cm">#   namespace: production</span>
+<span class="cm">#   annotations:</span>
+<span class="cm">#     eks.amazonaws.com/role-arn: arn:aws:iam::123456:role/S3ReaderRole</span>
+<span class="cm">#</span>
+<span class="cm"># Pods using this SA automatically get AWS credentials via OIDC</span>
+<span class="cm"># No AWS_ACCESS_KEY_ID needed — credentials injected automatically</span>
+<span class="fn">print</span>(<span class="st">"IRSA: pods get AWS credentials via OIDC — no static keys"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">IRSA: pods get AWS credentials via OIDC — no static keys
+boto3.client("s3") works automatically inside the pod</pre>
+<div class="example-note">IRSA is the EKS equivalent of EC2 Instance Profiles — the pod assumes an IAM role without any credentials in code or environment variables.</div></div>
+`;}
+  },
+  {
+    id:'k8s-monitoring',icon:'📊',title:'K8s Monitoring',
+    desc:'Prometheus, Grafana, metrics-server, kube-state-metrics, alerts.',
+    content(){return `
+<div class="detail-header"><span class="icon">📊</span>
+<h2>K8s Monitoring with Prometheus &amp; Grafana</h2>
+<p>The standard K8s observability stack: <strong>Prometheus</strong> scrapes metrics, <strong>Grafana</strong> visualises them. Deploy via the <code>kube-prometheus-stack</code> Helm chart — one command gives you everything.</p></div>
+
+<div class="section-block"><h4>Install kube-prometheus-stack</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Install complete monitoring stack via Helm</span>
+<span class="cm"># helm repo add prometheus-community https://prometheus-community.github.io/helm-charts</span>
+<span class="cm"># helm repo update</span>
+<span class="cm">#</span>
+<span class="cm"># helm install monitoring prometheus-community/kube-prometheus-stack \</span>
+<span class="cm">#   --namespace monitoring --create-namespace \</span>
+<span class="cm">#   --set grafana.adminPassword=admin123 \</span>
+<span class="cm">#   --set prometheus.prometheusSpec.retention=15d</span>
+<span class="cm">#</span>
+<span class="cm"># Installs:</span>
+<span class="cm"># - Prometheus          ← metrics collection</span>
+<span class="cm"># - Grafana             ← dashboards (pre-loaded K8s dashboards)</span>
+<span class="cm"># - AlertManager        ← alerting</span>
+<span class="cm"># - metrics-server      ← kubectl top nodes/pods</span>
+<span class="cm"># - kube-state-metrics  ← cluster state metrics</span>
+<span class="cm"># - node-exporter       ← node-level metrics</span>
+<span class="cm">#</span>
+<span class="cm"># Access Grafana</span>
+<span class="cm"># kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80</span></pre>
+<div class="out-label">Output</div><pre class="output">$ helm install monitoring prometheus-community/kube-prometheus-stack ...
+Release "monitoring" deployed
+Grafana at localhost:3000 — pre-loaded dashboards:
+  - Kubernetes / Cluster Overview
+  - Kubernetes / Pod Details
+  - Node Exporter / Full</pre></div>
+
+<div class="section-block"><h4>Custom App Metrics</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># pip install prometheus-client</span>
+<span class="kw">from</span> prometheus_client <span class="kw">import</span> Counter, Histogram, start_http_server
+<span class="kw">import</span> time, random
+
+<span class="cm"># Define metrics</span>
+REQUEST_COUNT <span class="op">=</span> <span class="bi">Counter</span>(<span class="st">"http_requests_total"</span>, <span class="st">"Total HTTP requests"</span>,
+                         [<span class="st">"method"</span>, <span class="st">"endpoint"</span>, <span class="st">"status"</span>])
+REQUEST_LATENCY <span class="op">=</span> <span class="bi">Histogram</span>(<span class="st">"http_request_duration_seconds"</span>,
+                              <span class="st">"Request latency"</span>, [<span class="st">"endpoint"</span>])
+
+<span class="cm"># Expose metrics on :9090/metrics</span>
+start_http_server(<span class="nm">9090</span>)
+
+<span class="kw">def</span> <span class="fn">handle_request</span>(endpoint):
+    <span class="kw">with</span> REQUEST_LATENCY.<span class="fn">labels</span>(endpoint).<span class="fn">time</span>():
+        time.<span class="fn">sleep</span>(random.<span class="fn">uniform</span>(<span class="nm">0.01</span>, <span class="nm">0.1</span>))
+    REQUEST_COUNT.<span class="fn">labels</span>(<span class="st">"GET"</span>, endpoint, <span class="st">"200"</span>).<span class="fn">inc</span>()
+
+<span class="fn">handle_request</span>(<span class="st">"/api/users"</span>)
+<span class="fn">print</span>(<span class="st">"Metrics at :9090/metrics — Prometheus scrapes this"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Metrics at :9090/metrics — Prometheus scrapes this
+# HELP http_requests_total Total HTTP requests
+http_requests_total{endpoint="/api/users",method="GET",status="200"} 1.0
+http_request_duration_seconds_sum{endpoint="/api/users"} 0.047</pre></div>
+
+<div class="section-block"><h4>PrometheusRule — Alerting</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># alert-rules.yaml</span>
+<span class="cm"># apiVersion: monitoring.coreos.com/v1</span>
+<span class="cm"># kind: PrometheusRule</span>
+<span class="cm"># metadata:</span>
+<span class="cm">#   name: my-app-alerts</span>
+<span class="cm">#   namespace: monitoring</span>
+<span class="cm"># spec:</span>
+<span class="cm">#   groups:</span>
+<span class="cm">#   - name: my-app</span>
+<span class="cm">#     rules:</span>
+<span class="cm">#     - alert: HighErrorRate</span>
+<span class="cm">#       expr: rate(http_requests_total{status="500"}[5m]) > 0.05</span>
+<span class="cm">#       for: 2m</span>
+<span class="cm">#       labels: { severity: critical }</span>
+<span class="cm">#       annotations:</span>
+<span class="cm">#         summary: "High error rate on {{ $labels.endpoint }}"</span>
+<span class="cm">#     - alert: HighLatency</span>
+<span class="cm">#       expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1.0</span>
+<span class="cm">#       annotations:</span>
+<span class="cm">#         summary: "p95 latency > 1s"</span>
+<span class="fn">print</span>(<span class="st">"PrometheusRule fires Slack/PagerDuty alert when conditions met"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">PrometheusRule fires Slack/PagerDuty alert when conditions met
+AlertManager routes: critical → PagerDuty, warning → Slack</pre></div>
+`;}
+  },
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

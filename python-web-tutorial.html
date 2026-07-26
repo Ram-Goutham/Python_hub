@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Web</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link active" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+<div class="site-header">
+  <div class="level-badge">Level 6</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Python Web</h1>
+  <p>Flask, FastAPI, Django, SQLAlchemy, REST APIs, WebSockets, authentication, testing, caching, deployment — the complete web development stack in Python.</p>
+</div>
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+<script>
+const topics = [
+  {
+    id:'http-basics',icon:'🌐',title:'HTTP Basics',
+    desc:'HTTP methods, status codes, headers, request/response cycle.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌐</span>
+<h2>HTTP Basics</h2>
+<p>HTTP (HyperText Transfer Protocol) is the foundation of the web. Every web request/response follows this protocol — understanding it is essential before building web apps.</p></div>
+
+<div class="section-block"><h4>HTTP Methods</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+<span class="cm"># GET — retrieve data</span>
+r <span class="op">=</span> requests.<span class="fn">get</span>(<span class="st">"https://httpbin.org/get"</span>)
+<span class="fn">print</span>(<span class="st">"GET:"</span>, r.status_code)
+
+<span class="cm"># POST — send data to create</span>
+r <span class="op">=</span> requests.<span class="fn">post</span>(<span class="st">"https://httpbin.org/post"</span>, json<span class="op">=</span>{<span class="st">"name"</span>:<span class="st">"Ravi"</span>})
+<span class="fn">print</span>(<span class="st">"POST:"</span>, r.status_code)
+
+<span class="cm"># PUT — replace resource</span>
+r <span class="op">=</span> requests.<span class="fn">put</span>(<span class="st">"https://httpbin.org/put"</span>, json<span class="op">=</span>{<span class="st">"id"</span>:<span class="nm">1</span>})
+<span class="fn">print</span>(<span class="st">"PUT:"</span>, r.status_code)
+
+<span class="cm"># DELETE — remove resource</span>
+r <span class="op">=</span> requests.<span class="fn">delete</span>(<span class="st">"https://httpbin.org/delete"</span>)
+<span class="fn">print</span>(<span class="st">"DELETE:"</span>, r.status_code)</pre>
+<div class="out-label">Output</div><pre class="output">GET: 200
+POST: 200
+PUT: 200
+DELETE: 200</pre></div>
+
+<div class="section-block"><h4>Status Codes</h4>
+<div class="code-label">Code</div>
+<pre class="code">codes <span class="op">=</span> {
+    <span class="nm">200</span>: <span class="st">"OK — success"</span>,
+    <span class="nm">201</span>: <span class="st">"Created — resource created"</span>,
+    <span class="nm">204</span>: <span class="st">"No Content — success, no body"</span>,
+    <span class="nm">301</span>: <span class="st">"Moved Permanently — redirect"</span>,
+    <span class="nm">400</span>: <span class="st">"Bad Request — invalid input"</span>,
+    <span class="nm">401</span>: <span class="st">"Unauthorized — not authenticated"</span>,
+    <span class="nm">403</span>: <span class="st">"Forbidden — authenticated but no permission"</span>,
+    <span class="nm">404</span>: <span class="st">"Not Found — resource missing"</span>,
+    <span class="nm">422</span>: <span class="st">"Unprocessable — validation failed"</span>,
+    <span class="nm">500</span>: <span class="st">"Internal Server Error"</span>,
+}
+<span class="kw">for</span> code, desc <span class="kw">in</span> codes.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="st">f"{code}: {desc}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">200: OK — success
+201: Created — resource created
+204: No Content — success, no body
+301: Moved Permanently — redirect
+400: Bad Request — invalid input
+401: Unauthorized — not authenticated
+403: Forbidden — authenticated but no permission
+404: Not Found — resource missing
+422: Unprocessable — validation failed
+500: Internal Server Error</pre></div>
+
+<div class="section-block"><h4>Headers</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+r <span class="op">=</span> requests.<span class="fn">get</span>(
+    <span class="st">"https://httpbin.org/headers"</span>,
+    headers<span class="op">=</span>{
+        <span class="st">"Accept"</span>: <span class="st">"application/json"</span>,
+        <span class="st">"Authorization"</span>: <span class="st">"Bearer mytoken123"</span>,
+        <span class="st">"X-Custom-Header"</span>: <span class="st">"value"</span>,
+    }
+)
+<span class="fn">print</span>(r.<span class="fn">json</span>()[<span class="st">"headers"</span>][<span class="st">"Authorization"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Bearer mytoken123</pre>
+<div class="example-note">Headers carry metadata: Content-Type (body format), Authorization (auth token), Accept (desired response format), Cache-Control (caching rules).</div></div>
+
+<div class="section-block"><h4>Request/Response Cycle</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+r <span class="op">=</span> requests.<span class="fn">get</span>(<span class="st">"https://httpbin.org/json"</span>)
+
+<span class="cm"># Request side</span>
+<span class="fn">print</span>(<span class="st">"Method:"</span>, r.request.method)
+<span class="fn">print</span>(<span class="st">"URL:"</span>, r.request.url)
+
+<span class="cm"># Response side</span>
+<span class="fn">print</span>(<span class="st">"Status:"</span>, r.status_code)
+<span class="fn">print</span>(<span class="st">"Content-Type:"</span>, r.headers[<span class="st">"content-type"</span>])
+<span class="fn">print</span>(<span class="st">"Body keys:"</span>, <span class="fn">list</span>(r.<span class="fn">json</span>().<span class="fn">keys</span>()))</pre>
+<div class="out-label">Output</div><pre class="output">Method: GET
+URL: https://httpbin.org/json
+Status: 200
+Content-Type: application/json
+Body keys: ['slideshow']</pre></div>
+`;}
+  },
+  {
+    id:'flask-basics',icon:'🌱',title:'Flask Basics',
+    desc:'app, routes, run, debug, returning responses.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌱</span>
+<h2>Flask Basics</h2>
+<p><strong>Flask</strong> is a lightweight Python web framework. Install: <code>pip install flask</code>. A Flask app can be as small as a single file.</p></div>
+
+<div class="section-block"><h4>Creating the App &amp; Routes</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/"</span>)
+<span class="kw">def</span> <span class="fn">home</span>():
+    <span class="kw">return</span> <span class="st">"Hello, Flask!"</span>
+
+<span class="dec">@app.route</span>(<span class="st">"/about"</span>)
+<span class="kw">def</span> <span class="fn">about</span>():
+    <span class="kw">return</span> <span class="st">"About page"</span>
+
+<span class="dec">@app.route</span>(<span class="st">"/user/&lt;name&gt;"</span>)
+<span class="kw">def</span> <span class="fn">user</span>(name):
+    <span class="kw">return</span> <span class="st">f"Hello, {name}!"</span>
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">"__main__"</span>:
+    app.<span class="fn">run</span>(debug<span class="op">=</span><span class="kw">True</span>)</pre>
+<div class="out-label">Output</div><pre class="output"> * Running on http://127.0.0.1:5000
+GET /          → "Hello, Flask!"
+GET /user/Ravi → "Hello, Ravi!"</pre>
+<div class="example-note">@app.route() registers a URL. &lt;name&gt; is a dynamic segment captured as a function argument. debug=True enables hot reload and detailed error pages.</div></div>
+
+<div class="section-block"><h4>Route Methods</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/submit"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>, <span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">submit</span>():
+    <span class="kw">if</span> request.method <span class="op">==</span> <span class="st">"POST"</span>:
+        <span class="kw">return</span> <span class="st">"Data received"</span>, <span class="nm">201</span>
+    <span class="kw">return</span> <span class="st">"Send a POST request"</span></pre>
+<div class="out-label">Output</div><pre class="output">GET  /submit → "Send a POST request"  (200)
+POST /submit → "Data received"         (201)</pre></div>
+
+<div class="section-block"><h4>Returning Responses</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify, redirect, url_for, make_response
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/json"</span>)
+<span class="kw">def</span> <span class="fn">as_json</span>():
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"status"</span>: <span class="st">"ok"</span>, <span class="st">"count"</span>: <span class="nm">42</span>})
+
+<span class="dec">@app.route</span>(<span class="st">"/old"</span>)
+<span class="kw">def</span> <span class="fn">old_page</span>():
+    <span class="kw">return</span> <span class="fn">redirect</span>(<span class="fn">url_for</span>(<span class="st">"as_json"</span>))
+
+<span class="dec">@app.route</span>(<span class="st">"/custom"</span>)
+<span class="kw">def</span> <span class="fn">custom</span>():
+    resp <span class="op">=</span> <span class="fn">make_response</span>(<span class="st">"OK"</span>, <span class="nm">200</span>)
+    resp.headers[<span class="st">"X-Custom"</span>] <span class="op">=</span> <span class="st">"value"</span>
+    <span class="kw">return</span> resp</pre>
+<div class="out-label">Output</div><pre class="output">GET /json   → {"status":"ok","count":42}
+GET /old    → 302 redirect → /json
+GET /custom → 200 with X-Custom header</pre></div>
+`;}
+  },
+  {
+    id:'flask-templates',icon:'🎨',title:'Flask Templates',
+    desc:'Jinja2, render_template, template inheritance, filters.',
+    content(){return `
+<div class="detail-header"><span class="icon">🎨</span>
+<h2>Flask Templates</h2>
+<p>Flask uses <strong>Jinja2</strong> as its template engine. Templates live in a <code>templates/</code> folder. They separate HTML from Python logic.</p></div>
+
+<div class="section-block"><h4>render_template</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># app.py</span>
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, render_template
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/profile/&lt;name&gt;"</span>)
+<span class="kw">def</span> <span class="fn">profile</span>(name):
+    <span class="kw">return</span> <span class="fn">render_template</span>(<span class="st">"profile.html"</span>, name<span class="op">=</span>name, score<span class="op">=</span><span class="nm">95</span>)
+
+<span class="cm"># templates/profile.html</span>
+<span class="cm"># &lt;h1&gt;Hello, {{ name }}!&lt;/h1&gt;</span>
+<span class="cm"># &lt;p&gt;Score: {{ score }}&lt;/p&gt;</span></pre>
+<div class="out-label">Output</div><pre class="output">&lt;h1&gt;Hello, Ravi!&lt;/h1&gt;
+&lt;p&gt;Score: 95&lt;/p&gt;</pre></div>
+
+<div class="section-block"><h4>Jinja2 Syntax</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm">{# templates/items.html #}
+{# Variables: {{ var }} #}
+{# If/else: #}
+{% if score >= 90 %}
+  &lt;span&gt;Excellent&lt;/span&gt;
+{% elif score >= 70 %}
+  &lt;span&gt;Good&lt;/span&gt;
+{% else %}
+  &lt;span&gt;Needs improvement&lt;/span&gt;
+{% endif %}
+
+{# For loop: #}
+&lt;ul&gt;
+{% for item in items %}
+  &lt;li&gt;{{ loop.index }}. {{ item }}&lt;/li&gt;
+{% endfor %}
+&lt;/ul&gt;</span></pre>
+<div class="out-label">Output</div><pre class="output">&lt;span&gt;Excellent&lt;/span&gt;
+&lt;ul&gt;
+  &lt;li&gt;1. Apple&lt;/li&gt;
+  &lt;li&gt;2. Banana&lt;/li&gt;
+&lt;/ul&gt;</pre></div>
+
+<div class="section-block"><h4>Template Inheritance</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm">{# templates/base.html #}
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;{% block title %}Site{% endblock %}&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+  &lt;nav&gt;Home | About&lt;/nav&gt;
+  {% block content %}{% endblock %}
+  &lt;footer&gt;© 2026&lt;/footer&gt;
+&lt;/body&gt;&lt;/html&gt;
+
+{# templates/home.html #}
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+  &lt;h1&gt;Welcome!&lt;/h1&gt;
+{% endblock %}</span></pre>
+<div class="out-label">Output</div><pre class="output">&lt;nav&gt;Home | About&lt;/nav&gt;
+&lt;h1&gt;Welcome!&lt;/h1&gt;
+&lt;footer&gt;© 2026&lt;/footer&gt;</pre>
+<div class="example-note">Inheritance keeps nav, footer and boilerplate in one base file. Child templates only override the blocks they need to change.</div></div>
+
+<div class="section-block"><h4>Filters</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm">{# Built-in Jinja2 filters #}
+{{ name | upper }}           → RAVI
+{{ price | round(2) }}       → 3.14
+{{ items | length }}         → 5
+{{ text | truncate(30) }}    → Hello world...
+{{ html | safe }}            → renders HTML (no escaping)
+{{ date | default("N/A") }}  → N/A if date is falsy
+
+{# Custom filter in app.py #}
+@app.template_filter("inr")
+def inr_filter(value):
+    return f"₹{value:,.2f}"
+{# usage: {{ 50000 | inr }} → ₹50,000.00 #}</span></pre>
+<div class="out-label">Output</div><pre class="output">RAVI
+3.14
+5
+Hello world...
+₹50,000.00</pre></div>
+`;}
+  },
+  {
+    id:'flask-forms',icon:'📝',title:'Flask Forms',
+    desc:'request.form, GET/POST handling, validation, flash messages.',
+    content(){return `
+<div class="detail-header"><span class="icon">📝</span>
+<h2>Flask Forms</h2>
+<p>Forms submit data via GET (query string) or POST (request body). Flask exposes this through <code>request.form</code> and <code>request.args</code>.</p></div>
+
+<div class="section-block"><h4>request.form &amp; GET/POST</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, render_template_string
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+FORM <span class="op">=</span> <span class="st">"""&lt;form method="POST"&gt;
+  &lt;input name="username"&gt;
+  &lt;input type="password" name="password"&gt;
+  &lt;button type="submit"&gt;Login&lt;/button&gt;
+&lt;/form&gt;"""</span>
+
+<span class="dec">@app.route</span>(<span class="st">"/login"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>, <span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">login</span>():
+    <span class="kw">if</span> request.method <span class="op">==</span> <span class="st">"POST"</span>:
+        user <span class="op">=</span> request.form.<span class="fn">get</span>(<span class="st">"username"</span>)
+        <span class="kw">return</span> <span class="st">f"Welcome, {user}!"</span>
+    <span class="kw">return</span> <span class="fn">render_template_string</span>(FORM)</pre>
+<div class="out-label">Output</div><pre class="output">GET  /login → renders the form HTML
+POST /login → "Welcome, Ravi!"</pre></div>
+
+<div class="section-block"><h4>Validation</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="kw">def</span> <span class="fn">validate_register</span>(data):
+    errors <span class="op">=</span> {}
+    <span class="kw">if not</span> data.<span class="fn">get</span>(<span class="st">"username"</span>):
+        errors[<span class="st">"username"</span>] <span class="op">=</span> <span class="st">"Required"</span>
+    <span class="kw">if</span> <span class="fn">len</span>(data.<span class="fn">get</span>(<span class="st">"password"</span>, <span class="st">""</span>)) <span class="op">&lt;</span> <span class="nm">8</span>:
+        errors[<span class="st">"password"</span>] <span class="op">=</span> <span class="st">"Min 8 chars"</span>
+    <span class="kw">return</span> errors
+
+<span class="dec">@app.route</span>(<span class="st">"/register"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">register</span>():
+    data <span class="op">=</span> request.form
+    errors <span class="op">=</span> <span class="fn">validate_register</span>(data)
+    <span class="kw">if</span> errors:
+        <span class="kw">return</span> <span class="fn">jsonify</span>(errors), <span class="nm">400</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"msg"</span>: <span class="st">"registered"</span>}), <span class="nm">201</span></pre>
+<div class="out-label">Output</div><pre class="output">POST /register (no data) → 400 {"password":"Min 8 chars","username":"Required"}
+POST /register (valid)   → 201 {"msg":"registered"}</pre></div>
+
+<div class="section-block"><h4>flash Messages</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, flash, redirect, url_for, get_flashed_messages
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+app.secret_key <span class="op">=</span> <span class="st">"dev-secret"</span>
+
+<span class="dec">@app.route</span>(<span class="st">"/save"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">save</span>():
+    <span class="fn">flash</span>(<span class="st">"Saved successfully!"</span>, <span class="st">"success"</span>)
+    <span class="kw">return</span> <span class="fn">redirect</span>(<span class="fn">url_for</span>(<span class="st">"home"</span>))
+
+<span class="cm">{# In template: #}
+{% for category, msg in get_flashed_messages(with_categories=True) %}
+  &lt;div class="alert {{ category }}"&gt;{{ msg }}&lt;/div&gt;
+{% endfor %}</span></pre>
+<div class="out-label">Output</div><pre class="output">&lt;div class="alert success"&gt;Saved successfully!&lt;/div&gt;</pre>
+<div class="example-note">Flash messages survive exactly one redirect — they are stored in session and consumed once displayed. Requires secret_key to be set.</div></div>
+`;}
+  },
+  {
+    id:'flask-api',icon:'🔌',title:'Flask REST API',
+    desc:'jsonify, request.json, status codes, error handlers.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔌</span>
+<h2>Flask REST API</h2>
+<p>Flask makes it simple to build REST APIs that return JSON. Use <code>jsonify()</code> for responses, <code>request.json</code> for incoming JSON bodies.</p></div>
+
+<div class="section-block"><h4>jsonify &amp; request.json</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify, request
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+users <span class="op">=</span> [{<span class="st">"id"</span>:<span class="nm">1</span>,<span class="st">"name"</span>:<span class="st">"Ravi"</span>},{<span class="st">"id"</span>:<span class="nm">2</span>,<span class="st">"name"</span>:<span class="st">"Ana"</span>}]
+
+<span class="dec">@app.route</span>(<span class="st">"/users"</span>)
+<span class="kw">def</span> <span class="fn">get_users</span>():
+    <span class="kw">return</span> <span class="fn">jsonify</span>(users)
+
+<span class="dec">@app.route</span>(<span class="st">"/users"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">create_user</span>():
+    data <span class="op">=</span> request.<span class="fn">get_json</span>()
+    new_user <span class="op">=</span> {<span class="st">"id"</span>: <span class="fn">len</span>(users)<span class="op">+</span><span class="nm">1</span>, <span class="st">"name"</span>: data[<span class="st">"name"</span>]}
+    users.<span class="fn">append</span>(new_user)
+    <span class="kw">return</span> <span class="fn">jsonify</span>(new_user), <span class="nm">201</span></pre>
+<div class="out-label">Output</div><pre class="output">GET  /users  → [{"id":1,"name":"Ravi"},{"id":2,"name":"Ana"}]
+POST /users  → {"id":3,"name":"Bob"}  (201)</pre></div>
+
+<div class="section-block"><h4>Status Codes in Responses</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/items/&lt;int:item_id&gt;"</span>)
+<span class="kw">def</span> <span class="fn">get_item</span>(item_id):
+    items <span class="op">=</span> {<span class="nm">1</span>: <span class="st">"Widget"</span>, <span class="nm">2</span>: <span class="st">"Gadget"</span>}
+    <span class="kw">if</span> item_id <span class="kw">not in</span> items:
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"Not found"</span>}), <span class="nm">404</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"id"</span>: item_id, <span class="st">"name"</span>: items[item_id]})</pre>
+<div class="out-label">Output</div><pre class="output">GET /items/1 → {"id":1,"name":"Widget"}  (200)
+GET /items/9 → {"error":"Not found"}      (404)</pre></div>
+
+<div class="section-block"><h4>Error Handlers</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.errorhandler</span>(<span class="nm">404</span>)
+<span class="kw">def</span> <span class="fn">not_found</span>(e):
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"Resource not found"</span>, <span class="st">"code"</span>: <span class="nm">404</span>}), <span class="nm">404</span>
+
+<span class="dec">@app.errorhandler</span>(<span class="nm">500</span>)
+<span class="kw">def</span> <span class="fn">server_error</span>(e):
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"Internal server error"</span>}), <span class="nm">500</span>
+
+<span class="dec">@app.errorhandler</span>(<span class="bi">Exception</span>)
+<span class="kw">def</span> <span class="fn">handle_exception</span>(e):
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="fn">str</span>(e)}), <span class="nm">500</span></pre>
+<div class="out-label">Output</div><pre class="output">Any 404 → {"code":404,"error":"Resource not found"}
+Any 500 → {"error":"Internal server error"}</pre>
+<div class="example-note">@app.errorhandler catches errors globally — much cleaner than try/except in every route. The catch-all Exception handler is a safety net.</div></div>
+`;}
+  },
+  {
+    id:'flask-auth',icon:'🔐',title:'Flask Auth',
+    desc:'session, login_required decorator, password hashing, JWT.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔐</span>
+<h2>Flask Auth</h2>
+<p>Authentication verifies who a user is. Flask uses <strong>session</strong> for cookie-based auth. For APIs, <strong>JWT</strong> (JSON Web Tokens) is standard. Always hash passwords — never store plain text.</p></div>
+
+<div class="section-block"><h4>session</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, session, request, jsonify
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+app.secret_key <span class="op">=</span> <span class="st">"super-secret"</span>
+
+<span class="dec">@app.route</span>(<span class="st">"/login"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">login</span>():
+    session[<span class="st">"user_id"</span>] <span class="op">=</span> <span class="nm">42</span>
+    session[<span class="st">"username"</span>] <span class="op">=</span> <span class="st">"Ravi"</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"msg"</span>: <span class="st">"logged in"</span>})
+
+<span class="dec">@app.route</span>(<span class="st">"/me"</span>)
+<span class="kw">def</span> <span class="fn">me</span>():
+    user <span class="op">=</span> session.<span class="fn">get</span>(<span class="st">"username"</span>)
+    <span class="kw">if not</span> user:
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"not logged in"</span>}), <span class="nm">401</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"user"</span>: user})</pre>
+<div class="out-label">Output</div><pre class="output">POST /login → {"msg":"logged in"}
+GET  /me    → {"user":"Ravi"}</pre></div>
+
+<div class="section-block"><h4>login_required Decorator</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> functools <span class="kw">import</span> wraps
+<span class="kw">from</span> flask <span class="kw">import</span> session, jsonify
+
+<span class="kw">def</span> <span class="fn">login_required</span>(f):
+    <span class="dec">@wraps</span>(f)
+    <span class="kw">def</span> <span class="fn">decorated</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs):
+        <span class="kw">if</span> <span class="st">"user_id"</span> <span class="kw">not in</span> session:
+            <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"Login required"</span>}), <span class="nm">401</span>
+        <span class="kw">return</span> <span class="fn">f</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs)
+    <span class="kw">return</span> decorated
+
+<span class="dec">@app.route</span>(<span class="st">"/dashboard"</span>)
+<span class="dec">@login_required</span>
+<span class="kw">def</span> <span class="fn">dashboard</span>():
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"data"</span>: <span class="st">"secret stuff"</span>})</pre>
+<div class="out-label">Output</div><pre class="output">GET /dashboard (no session) → 401 {"error":"Login required"}
+GET /dashboard (logged in)  → 200 {"data":"secret stuff"}</pre></div>
+
+<div class="section-block"><h4>Password Hashing</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> werkzeug.security <span class="kw">import</span> generate_password_hash, check_password_hash
+
+password <span class="op">=</span> <span class="st">"mysecret123"</span>
+hashed <span class="op">=</span> <span class="fn">generate_password_hash</span>(password)
+<span class="fn">print</span>(<span class="st">"Hash:"</span>, hashed[:<span class="nm">40</span>] <span class="op">+</span> <span class="st">"..."</span>)
+
+<span class="fn">print</span>(<span class="fn">check_password_hash</span>(hashed, <span class="st">"mysecret123"</span>))
+<span class="fn">print</span>(<span class="fn">check_password_hash</span>(hashed, <span class="st">"wrongpass"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Hash: pbkdf2:sha256:260000$abc123...
+True
+False</pre>
+<div class="example-note">werkzeug uses PBKDF2 with SHA256 and a random salt. Never store plain-text passwords — always hash before saving to database.</div></div>
+
+<div class="section-block"><h4>JWT</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> jwt, datetime
+
+SECRET <span class="op">=</span> <span class="st">"jwt-secret-key"</span>
+
+<span class="kw">def</span> <span class="fn">create_token</span>(user_id):
+    payload <span class="op">=</span> {
+        <span class="st">"sub"</span>: user_id,
+        <span class="st">"exp"</span>: datetime.datetime.<span class="fn">utcnow</span>() <span class="op">+</span> datetime.timedelta(hours<span class="op">=</span><span class="nm">24</span>)
+    }
+    <span class="kw">return</span> jwt.<span class="fn">encode</span>(payload, SECRET, algorithm<span class="op">=</span><span class="st">"HS256"</span>)
+
+<span class="kw">def</span> <span class="fn">decode_token</span>(token):
+    <span class="kw">return</span> jwt.<span class="fn">decode</span>(token, SECRET, algorithms<span class="op">=</span>[<span class="st">"HS256"</span>])
+
+token <span class="op">=</span> <span class="fn">create_token</span>(<span class="nm">42</span>)
+<span class="fn">print</span>(<span class="st">"Token:"</span>, token[:<span class="nm">30</span>] <span class="op">+</span> <span class="st">"..."</span>)
+<span class="fn">print</span>(<span class="st">"Decoded:"</span>, <span class="fn">decode_token</span>(token)[<span class="st">"sub"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Token: eyJhbGciOiJIUzI1NiIsInR5cCI6...
+Decoded: 42</pre>
+<div class="example-note">Install: pip install pyjwt. JWT tokens are self-contained — the server doesn't need to store sessions. "sub" is the subject (user ID), "exp" is expiry.</div></div>
+`;}
+  },
+  {
+    id:'sqlalchemy',icon:'🗄️',title:'SQLAlchemy',
+    desc:'models, create_all, session CRUD, query, relationships.',
+    content(){return `
+<div class="detail-header"><span class="icon">🗄️</span>
+<h2>SQLAlchemy</h2>
+<p><strong>SQLAlchemy</strong> is Python's most popular ORM — it maps Python classes to database tables. Install: <code>pip install sqlalchemy flask-sqlalchemy</code>.</p></div>
+
+<div class="section-block"><h4>Model Definition</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask
+<span class="kw">from</span> flask_sqlalchemy <span class="kw">import</span> SQLAlchemy
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+app.config[<span class="st">"SQLALCHEMY_DATABASE_URI"</span>] <span class="op">=</span> <span class="st">"sqlite:///app.db"</span>
+db <span class="op">=</span> <span class="bi">SQLAlchemy</span>(app)
+
+<span class="kw">class</span> <span class="bi">User</span>(db.<span class="bi">Model</span>):
+    id    <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">Integer</span>, primary_key<span class="op">=</span><span class="kw">True</span>)
+    name  <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">String</span>(<span class="nm">80</span>), nullable<span class="op">=</span><span class="kw">False</span>)
+    email <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">String</span>(<span class="nm">120</span>), unique<span class="op">=</span><span class="kw">True</span>)
+    active <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">Boolean</span>, default<span class="op">=</span><span class="kw">True</span>)
+
+    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="st">f"&lt;User {self.name}&gt;"</span></pre>
+<div class="out-label">Output</div><pre class="output">Model defined: users table with id, name, email, active columns</pre></div>
+
+<div class="section-block"><h4>create_all &amp; CRUD</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">with</span> app.<span class="fn">app_context</span>():
+    db.<span class="fn">create_all</span>()  <span class="cm"># creates tables</span>
+
+    <span class="cm"># Create</span>
+    u <span class="op">=</span> <span class="bi">User</span>(name<span class="op">=</span><span class="st">"Ravi"</span>, email<span class="op">=</span><span class="st">"r@x.com"</span>)
+    db.session.<span class="fn">add</span>(u)
+    db.session.<span class="fn">commit</span>()
+
+    <span class="cm"># Update</span>
+    u.name <span class="op">=</span> <span class="st">"Ravi K"</span>
+    db.session.<span class="fn">commit</span>()
+
+    <span class="cm"># Delete</span>
+    db.session.<span class="fn">delete</span>(u)
+    db.session.<span class="fn">commit</span>()
+    <span class="fn">print</span>(<span class="st">"CRUD done"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">CRUD done</pre></div>
+
+<div class="section-block"><h4>Query</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">with</span> app.<span class="fn">app_context</span>():
+    <span class="cm"># All users</span>
+    all_users <span class="op">=</span> <span class="bi">User</span>.query.<span class="fn">all</span>()
+
+    <span class="cm"># Filter</span>
+    active <span class="op">=</span> <span class="bi">User</span>.query.<span class="fn">filter_by</span>(active<span class="op">=</span><span class="kw">True</span>).<span class="fn">all</span>()
+
+    <span class="cm"># Get by id</span>
+    user <span class="op">=</span> db.session.<span class="fn">get</span>(<span class="bi">User</span>, <span class="nm">1</span>)
+
+    <span class="cm"># Custom filter + order</span>
+    results <span class="op">=</span> <span class="bi">User</span>.query\
+        .<span class="fn">filter</span>(<span class="bi">User</span>.name.<span class="fn">like</span>(<span class="st">"%Ravi%"</span>))\
+        .<span class="fn">order_by</span>(<span class="bi">User</span>.name)\
+        .<span class="fn">limit</span>(<span class="nm">10</span>).<span class="fn">all</span>()
+    <span class="fn">print</span>(<span class="st">f"Found {len(results)} users"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Found 1 users</pre></div>
+
+<div class="section-block"><h4>Relationships</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Post</span>(db.<span class="bi">Model</span>):
+    id      <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">Integer</span>, primary_key<span class="op">=</span><span class="kw">True</span>)
+    title   <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">String</span>(<span class="nm">200</span>))
+    user_id <span class="op">=</span> db.<span class="bi">Column</span>(db.<span class="bi">Integer</span>, db.<span class="bi">ForeignKey</span>(<span class="st">"user.id"</span>))
+    author  <span class="op">=</span> db.<span class="fn">relationship</span>(<span class="st">"User"</span>, backref<span class="op">=</span><span class="st">"posts"</span>)
+
+<span class="cm"># Usage:</span>
+<span class="cm"># user.posts  → list of Post objects</span>
+<span class="cm"># post.author → User object</span>
+<span class="fn">print</span>(<span class="st">"One-to-many: one User has many Posts"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">One-to-many: one User has many Posts</pre>
+<div class="example-note">backref="posts" adds a virtual .posts attribute to User. SQLAlchemy handles the JOIN automatically when you access user.posts.</div></div>
+`;}
+  },
+  {
+    id:'fastapi-basics',icon:'⚡',title:'FastAPI Basics',
+    desc:'app, path operations, path/query params, response models.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚡</span>
+<h2>FastAPI Basics</h2>
+<p><strong>FastAPI</strong> is a modern, fast framework for building APIs with Python type hints. Install: <code>pip install fastapi uvicorn</code>. Auto-generates interactive docs at /docs.</p></div>
+
+<div class="section-block"><h4>App &amp; Path Operations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="dec">@app.get</span>(<span class="st">"/"</span>)
+<span class="kw">def</span> <span class="fn">root</span>():
+    <span class="kw">return</span> {<span class="st">"message"</span>: <span class="st">"Hello FastAPI"</span>}
+
+<span class="dec">@app.post</span>(<span class="st">"/items"</span>)
+<span class="kw">def</span> <span class="fn">create_item</span>():
+    <span class="kw">return</span> {<span class="st">"created"</span>: <span class="kw">True</span>}
+
+<span class="dec">@app.delete</span>(<span class="st">"/items/{item_id}"</span>)
+<span class="kw">def</span> <span class="fn">delete_item</span>(item_id: <span class="bi">int</span>):
+    <span class="kw">return</span> {<span class="st">"deleted"</span>: item_id}
+
+<span class="cm"># Run: uvicorn main:app --reload</span></pre>
+<div class="out-label">Output</div><pre class="output">GET  /        → {"message":"Hello FastAPI"}
+POST /items   → {"created":true}
+DELETE /items/5 → {"deleted":5}</pre></div>
+
+<div class="section-block"><h4>Path &amp; Query Params</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="dec">@app.get</span>(<span class="st">"/users/{user_id}"</span>)
+<span class="kw">def</span> <span class="fn">get_user</span>(
+    user_id: <span class="bi">int</span>,                    <span class="cm"># path param</span>
+    include_posts: <span class="bi">bool</span> <span class="op">=</span> <span class="kw">False</span>,     <span class="cm"># query param with default</span>
+    search: Optional[<span class="bi">str</span>] <span class="op">=</span> <span class="kw">None</span>    <span class="cm"># optional query param</span>
+):
+    <span class="kw">return</span> {
+        <span class="st">"user_id"</span>: user_id,
+        <span class="st">"include_posts"</span>: include_posts,
+        <span class="st">"search"</span>: search
+    }</pre>
+<div class="out-label">Output</div><pre class="output">GET /users/42?include_posts=true&search=ravi
+→ {"user_id":42,"include_posts":true,"search":"ravi"}</pre>
+<div class="example-note">FastAPI automatically validates types. Passing user_id="abc" returns a 422 Unprocessable Entity with a clear error message — no manual validation needed.</div></div>
+
+<div class="section-block"><h4>Response Models</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="kw">class</span> <span class="bi">UserOut</span>(<span class="bi">BaseModel</span>):
+    id: <span class="bi">int</span>
+    name: <span class="bi">str</span>
+    <span class="cm"># password NOT included — never leak secrets</span>
+
+<span class="dec">@app.get</span>(<span class="st">"/users/{uid}"</span>, response_model<span class="op">=</span><span class="bi">UserOut</span>)
+<span class="kw">def</span> <span class="fn">get_user</span>(uid: <span class="bi">int</span>):
+    <span class="kw">return</span> {<span class="st">"id"</span>: uid, <span class="st">"name"</span>: <span class="st">"Ravi"</span>, <span class="st">"password"</span>: <span class="st">"secret"</span>}</pre>
+<div class="out-label">Output</div><pre class="output">GET /users/1 → {"id":1,"name":"Ravi"}
+(password is stripped by response_model)</pre>
+<div class="example-note">response_model filters the output — only fields defined in UserOut are returned. The password field is silently excluded even though the dict contains it.</div></div>
+`;}
+  },
+  {
+    id:'fastapi-adv',icon:'🚀',title:'FastAPI Advanced',
+    desc:'Pydantic models, dependency injection, async endpoints, auto docs.',
+    content(){return `
+<div class="detail-header"><span class="icon">🚀</span>
+<h2>FastAPI Advanced</h2>
+<p>FastAPI's power comes from Pydantic for validation, dependency injection for shared logic, and first-class async support — all auto-documented at /docs.</p></div>
+
+<div class="section-block"><h4>Pydantic Models</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, EmailStr, validator
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="kw">class</span> <span class="bi">UserCreate</span>(<span class="bi">BaseModel</span>):
+    name: <span class="bi">str</span>
+    email: <span class="bi">str</span>
+    age: <span class="bi">int</span>
+
+    <span class="dec">@validator</span>(<span class="st">"age"</span>)
+    <span class="kw">def</span> <span class="fn">age_must_be_positive</span>(<span class="bi">cls</span>, v):
+        <span class="kw">if</span> v <span class="op">&lt;</span> <span class="nm">0</span>: <span class="kw">raise</span> <span class="bi">ValueError</span>(<span class="st">"age must be positive"</span>)
+        <span class="kw">return</span> v
+
+<span class="dec">@app.post</span>(<span class="st">"/users"</span>)
+<span class="kw">def</span> <span class="fn">create</span>(user: <span class="bi">UserCreate</span>):
+    <span class="kw">return</span> {<span class="st">"created"</span>: user.name}</pre>
+<div class="out-label">Output</div><pre class="output">POST /users {"name":"Ravi","email":"r@x.com","age":25}
+→ {"created":"Ravi"}
+
+POST /users {"name":"Ravi","email":"r@x.com","age":-1}
+→ 422 {"detail":[{"msg":"age must be positive"}]}</pre></div>
+
+<div class="section-block"><h4>Dependency Injection</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Depends, Header, HTTPException
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="kw">def</span> <span class="fn">get_current_user</span>(authorization: str <span class="op">=</span> <span class="fn">Header</span>(<span class="kw">None</span>)):
+    <span class="kw">if not</span> authorization <span class="kw">or</span> authorization <span class="op">!=</span> <span class="st">"Bearer valid-token"</span>:
+        <span class="kw">raise</span> <span class="bi">HTTPException</span>(status_code<span class="op">=</span><span class="nm">401</span>, detail<span class="op">=</span><span class="st">"Invalid token"</span>)
+    <span class="kw">return</span> {<span class="st">"user_id"</span>: <span class="nm">42</span>}
+
+<span class="dec">@app.get</span>(<span class="st">"/protected"</span>)
+<span class="kw">def</span> <span class="fn">protected</span>(user <span class="op">=</span> <span class="fn">Depends</span>(get_current_user)):
+    <span class="kw">return</span> {<span class="st">"msg"</span>: <span class="st">"secret"</span>, <span class="st">"user"</span>: user}</pre>
+<div class="out-label">Output</div><pre class="output">GET /protected (no token)    → 401 {"detail":"Invalid token"}
+GET /protected (valid token) → {"msg":"secret","user":{"user_id":42}}</pre>
+<div class="example-note">Depends() injects shared logic (auth, DB session, rate limits) into any route. The dependency runs before the route function and its result is passed as an argument.</div></div>
+
+<div class="section-block"><h4>Async Endpoints</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> asyncio
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="dec">@app.get</span>(<span class="st">"/slow"</span>)
+<span class="kw">async def</span> <span class="fn">slow_endpoint</span>():
+    <span class="kw">await</span> asyncio.<span class="fn">sleep</span>(<span class="nm">0.1</span>)   <span class="cm"># non-blocking I/O</span>
+    <span class="kw">return</span> {<span class="st">"result"</span>: <span class="st">"done"</span>}
+
+<span class="dec">@app.get</span>(<span class="st">"/fast"</span>)
+<span class="kw">def</span> <span class="fn">fast_endpoint</span>():             <span class="cm"># sync is fine for CPU tasks</span>
+    <span class="kw">return</span> {<span class="st">"result"</span>: <span class="st">"instant"</span>}</pre>
+<div class="out-label">Output</div><pre class="output">GET /slow → {"result":"done"}  (after 0.1s, non-blocking)
+GET /fast → {"result":"instant"}</pre></div>
+
+<div class="section-block"><h4>Auto Docs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>(title<span class="op">=</span><span class="st">"My API"</span>, version<span class="op">=</span><span class="st">"1.0"</span>, description<span class="op">=</span><span class="st">"Docs example"</span>)
+
+<span class="kw">class</span> <span class="bi">Item</span>(<span class="bi">BaseModel</span>):
+    <span class="st">"""An item in the store."""</span>
+    name: <span class="bi">str</span>
+    price: <span class="bi">float</span>
+
+<span class="dec">@app.post</span>(<span class="st">"/items"</span>, summary<span class="op">=</span><span class="st">"Create an item"</span>, tags<span class="op">=</span>[<span class="st">"items"</span>])
+<span class="kw">def</span> <span class="fn">create_item</span>(item: <span class="bi">Item</span>):
+    <span class="st">"""Create a new item with a name and price."""</span>
+    <span class="kw">return</span> item
+
+<span class="cm"># Visit http://localhost:8000/docs for Swagger UI
+# Visit http://localhost:8000/redoc for ReDoc</span>
+<span class="fn">print</span>(<span class="st">"Docs at /docs and /redoc — generated automatically"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Docs at /docs and /redoc — generated automatically</pre>
+<div class="example-note">FastAPI generates OpenAPI/Swagger docs automatically from your type hints and docstrings — no manual documentation needed.</div></div>
+`;}
+  },
+  {
+    id:'file-uploads',icon:'📁',title:'File Uploads',
+    desc:'request.files, save, validation, size limits.',
+    content(){return `
+<div class="detail-header"><span class="icon">📁</span>
+<h2>File Uploads</h2>
+<p>File uploads are handled differently in Flask vs FastAPI — but both support multipart form data. Always validate file type and size before saving.</p></div>
+
+<div class="section-block"><h4>Flask — request.files</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+<span class="kw">import</span> os
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+UPLOAD_DIR <span class="op">=</span> <span class="st">"uploads"</span>
+os.<span class="fn">makedirs</span>(UPLOAD_DIR, exist_ok<span class="op">=</span><span class="kw">True</span>)
+
+<span class="dec">@app.route</span>(<span class="st">"/upload"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">upload</span>():
+    f <span class="op">=</span> request.files.<span class="fn">get</span>(<span class="st">"file"</span>)
+    <span class="kw">if not</span> f:
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"No file"</span>}), <span class="nm">400</span>
+    f.<span class="fn">save</span>(os.path.<span class="fn">join</span>(UPLOAD_DIR, f.filename))
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"saved"</span>: f.filename})</pre>
+<div class="out-label">Output</div><pre class="output">POST /upload (with file) → {"saved":"report.pdf"}</pre></div>
+
+<div class="section-block"><h4>Validation — type &amp; size</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+<span class="kw">import</span> os
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+ALLOWED <span class="op">=</span> {<span class="st">"png"</span>, <span class="st">"jpg"</span>, <span class="st">"jpeg"</span>, <span class="st">"pdf"</span>}
+MAX_SIZE <span class="op">=</span> <span class="nm">5</span> <span class="op">*</span> <span class="nm">1024</span> <span class="op">*</span> <span class="nm">1024</span>   <span class="cm"># 5 MB</span>
+
+<span class="kw">def</span> <span class="fn">allowed</span>(filename):
+    <span class="kw">return</span> <span class="st">"."</span> <span class="kw">in</span> filename <span class="kw">and</span> filename.<span class="fn">rsplit</span>(<span class="st">"."</span>, <span class="nm">1</span>)[<span class="nm">1</span>].<span class="fn">lower</span>() <span class="kw">in</span> ALLOWED
+
+<span class="dec">@app.route</span>(<span class="st">"/upload"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">upload</span>():
+    f <span class="op">=</span> request.files.<span class="fn">get</span>(<span class="st">"file"</span>)
+    <span class="kw">if not</span> <span class="fn">allowed</span>(f.filename):
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"Type not allowed"</span>}), <span class="nm">400</span>
+    f.seek(<span class="nm">0</span>, <span class="nm">2</span>)  <span class="cm"># seek to end</span>
+    <span class="kw">if</span> f.tell() <span class="op">&gt;</span> MAX_SIZE:
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"File too large"</span>}), <span class="nm">413</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"ok"</span>: <span class="kw">True</span>})</pre>
+<div class="out-label">Output</div><pre class="output">POST (exe file) → 400 {"error":"Type not allowed"}
+POST (6MB pdf)  → 413 {"error":"File too large"}
+POST (valid)    → {"ok":true}</pre></div>
+
+<div class="section-block"><h4>FastAPI File Upload</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, UploadFile, File, HTTPException
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="dec">@app.post</span>(<span class="st">"/upload"</span>)
+<span class="kw">async def</span> <span class="fn">upload</span>(file: <span class="bi">UploadFile</span> <span class="op">=</span> <span class="fn">File</span>(...)):
+    content <span class="op">=</span> <span class="kw">await</span> file.<span class="fn">read</span>()
+    <span class="kw">if</span> <span class="fn">len</span>(content) <span class="op">&gt;</span> <span class="nm">5</span><span class="op">*</span><span class="nm">1024</span><span class="op">*</span><span class="nm">1024</span>:
+        <span class="kw">raise</span> <span class="bi">HTTPException</span>(<span class="nm">413</span>, <span class="st">"Too large"</span>)
+    <span class="kw">return</span> {<span class="st">"filename"</span>: file.filename, <span class="st">"size"</span>: <span class="fn">len</span>(content)}</pre>
+<div class="out-label">Output</div><pre class="output">POST /upload → {"filename":"report.pdf","size":24576}</pre></div>
+`;}
+  },
+  {
+    id:'middleware',icon:'🔄',title:'Middleware & Hooks',
+    desc:'WSGI, before_request, after_request, CORS, custom middleware.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔄</span>
+<h2>Middleware &amp; Hooks</h2>
+<p>Middleware runs before or after every request — for logging, auth, CORS, timing, and more. Flask uses hooks; FastAPI uses middleware classes.</p></div>
+
+<div class="section-block"><h4>before_request &amp; after_request</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, g
+<span class="kw">import</span> time
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.before_request</span>
+<span class="kw">def</span> <span class="fn">start_timer</span>():
+    g.start <span class="op">=</span> time.<span class="fn">time</span>()
+
+<span class="dec">@app.after_request</span>
+<span class="kw">def</span> <span class="fn">log_request</span>(response):
+    elapsed <span class="op">=</span> time.<span class="fn">time</span>() <span class="op">-</span> g.start
+    <span class="fn">print</span>(<span class="st">f"{request.method} {request.path} {response.status_code} {elapsed:.3f}s"</span>)
+    <span class="kw">return</span> response</pre>
+<div class="out-label">Output</div><pre class="output">GET /users 200 0.002s
+POST /items 201 0.005s</pre>
+<div class="example-note">g is Flask's request-scoped storage — data put in g in before_request is available throughout the request. after_request MUST return the response.</div></div>
+
+<div class="section-block"><h4>CORS</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Flask CORS — pip install flask-cors</span>
+<span class="kw">from</span> flask <span class="kw">import</span> Flask
+<span class="kw">from</span> flask_cors <span class="kw">import</span> CORS
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+<span class="fn">CORS</span>(app, origins<span class="op">=</span>[<span class="st">"https://mysite.com"</span>])
+
+<span class="cm"># FastAPI CORS</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> fastapi.middleware.cors <span class="kw">import</span> CORSMiddleware
+
+app2 <span class="op">=</span> <span class="bi">FastAPI</span>()
+app2.<span class="fn">add_middleware</span>(<span class="bi">CORSMiddleware</span>,
+    allow_origins<span class="op">=</span>[<span class="st">"*"</span>], allow_methods<span class="op">=</span>[<span class="st">"*"</span>], allow_headers<span class="op">=</span>[<span class="st">"*"</span>])
+<span class="fn">print</span>(<span class="st">"CORS configured"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">CORS configured</pre>
+<div class="example-note">CORS (Cross-Origin Resource Sharing) must be enabled when your frontend on domain-A calls your API on domain-B. allow_origins=["*"] is fine for public APIs, dangerous for authenticated ones.</div></div>
+
+<div class="section-block"><h4>Custom Middleware (FastAPI)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Request
+<span class="kw">import</span> time
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="dec">@app.middleware</span>(<span class="st">"http"</span>)
+<span class="kw">async def</span> <span class="fn">timing_middleware</span>(request: <span class="bi">Request</span>, call_next):
+    start <span class="op">=</span> time.<span class="fn">time</span>()
+    response <span class="op">=</span> <span class="kw">await</span> <span class="fn">call_next</span>(request)
+    elapsed <span class="op">=</span> time.<span class="fn">time</span>() <span class="op">-</span> start
+    response.headers[<span class="st">"X-Process-Time"</span>] <span class="op">=</span> <span class="st">f"{elapsed:.4f}"</span>
+    <span class="kw">return</span> response</pre>
+<div class="out-label">Output</div><pre class="output">Every response now includes: X-Process-Time: 0.0023</pre></div>
+`;}
+  },
+  {
+    id:'testing-flask',icon:'🧪',title:'Testing Flask',
+    desc:'test client, fixtures, assert responses, mocking.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧪</span>
+<h2>Testing Flask</h2>
+<p>Flask's test client simulates HTTP requests without running a real server. Combine with <strong>pytest</strong> for fixtures, parametrize, and clean test isolation.</p></div>
+
+<div class="section-block"><h4>Test Client</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># app.py</span>
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/ping"</span>)
+<span class="kw">def</span> <span class="fn">ping</span>(): <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"status"</span>: <span class="st">"ok"</span>})
+
+<span class="cm"># test_app.py</span>
+<span class="kw">def</span> <span class="fn">test_ping</span>():
+    client <span class="op">=</span> app.<span class="fn">test_client</span>()
+    r <span class="op">=</span> client.<span class="fn">get</span>(<span class="st">"/ping"</span>)
+    <span class="kw">assert</span> r.status_code <span class="op">==</span> <span class="nm">200</span>
+    <span class="kw">assert</span> r.<span class="fn">get_json</span>() <span class="op">==</span> {<span class="st">"status"</span>: <span class="st">"ok"</span>}
+    <span class="fn">print</span>(<span class="st">"test passed"</span>)
+
+<span class="fn">test_ping</span>()</pre>
+<div class="out-label">Output</div><pre class="output">test passed</pre></div>
+
+<div class="section-block"><h4>pytest Fixtures</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pytest
+<span class="kw">from</span> app <span class="kw">import</span> app <span class="kw">as</span> flask_app
+
+<span class="dec">@pytest.fixture</span>
+<span class="kw">def</span> <span class="fn">client</span>():
+    flask_app.config[<span class="st">"TESTING"</span>] <span class="op">=</span> <span class="kw">True</span>
+    flask_app.config[<span class="st">"SQLALCHEMY_DATABASE_URI"</span>] <span class="op">=</span> <span class="st">"sqlite:///:memory:"</span>
+    <span class="kw">with</span> flask_app.<span class="fn">test_client</span>() <span class="kw">as</span> c:
+        <span class="kw">yield</span> c
+
+<span class="kw">def</span> <span class="fn">test_get_users</span>(client):
+    r <span class="op">=</span> client.<span class="fn">get</span>(<span class="st">"/users"</span>)
+    <span class="kw">assert</span> r.status_code <span class="op">==</span> <span class="nm">200</span>
+    <span class="kw">assert</span> <span class="fn">isinstance</span>(r.<span class="fn">get_json</span>(), list)</pre>
+<div class="out-label">Output</div><pre class="output">test_get_users PASSED</pre>
+<div class="example-note">Use sqlite:///:memory: for tests — an in-memory database that resets between tests. TESTING=True disables error catching so exceptions bubble up clearly.</div></div>
+
+<div class="section-block"><h4>Assert Responses &amp; Mocking</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> unittest.mock <span class="kw">import</span> patch
+
+<span class="kw">def</span> <span class="fn">test_create_user</span>(client):
+    r <span class="op">=</span> client.<span class="fn">post</span>(<span class="st">"/users"</span>,
+        json<span class="op">=</span>{<span class="st">"name"</span>: <span class="st">"Ravi"</span>, <span class="st">"email"</span>: <span class="st">"r@x.com"</span>},
+        content_type<span class="op">=</span><span class="st">"application/json"</span>)
+    <span class="kw">assert</span> r.status_code <span class="op">==</span> <span class="nm">201</span>
+    data <span class="op">=</span> r.<span class="fn">get_json</span>()
+    <span class="kw">assert</span> data[<span class="st">"name"</span>] <span class="op">==</span> <span class="st">"Ravi"</span>
+
+<span class="kw">def</span> <span class="fn">test_with_mock</span>(client):
+    <span class="kw">with</span> <span class="fn">patch</span>(<span class="st">"app.send_welcome_email"</span>) <span class="kw">as</span> mock_email:
+        client.<span class="fn">post</span>(<span class="st">"/register"</span>, json<span class="op">=</span>{<span class="st">"email"</span>:<span class="st">"r@x.com"</span>})
+        mock_email.<span class="fn">assert_called_once</span>()</pre>
+<div class="out-label">Output</div><pre class="output">test_create_user PASSED
+test_with_mock PASSED</pre></div>
+`;}
+  },
+  {
+    id:'deployment',icon:'🚀',title:'Deployment',
+    desc:'gunicorn, uvicorn, env vars, Dockerfile.',
+    content(){return `
+<div class="detail-header"><span class="icon">🚀</span>
+<h2>Deployment</h2>
+<p>Flask's built-in server is for development only. Use <strong>gunicorn</strong> for Flask in production, <strong>uvicorn</strong> for FastAPI. Container with Docker for portability.</p></div>
+
+<div class="section-block"><h4>gunicorn (Flask)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Install: pip install gunicorn
+# Run Flask app with gunicorn:</span>
+<span class="cm"># gunicorn -w 4 -b 0.0.0.0:8000 app:app
+#
+# -w 4     → 4 worker processes
+# -b       → bind address
+# app:app  → module:callable</span>
+
+<span class="cm"># With config file (gunicorn.conf.py):</span>
+workers <span class="op">=</span> <span class="nm">4</span>
+bind <span class="op">=</span> <span class="st">"0.0.0.0:8000"</span>
+worker_class <span class="op">=</span> <span class="st">"gthread"</span>
+threads <span class="op">=</span> <span class="nm">2</span>
+timeout <span class="op">=</span> <span class="nm">120</span>
+accesslog <span class="op">=</span> <span class="st">"-"</span>  <span class="cm"># log to stdout</span>
+<span class="fn">print</span>(<span class="st">"gunicorn config ready"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">gunicorn config ready
+[INFO] Listening at: http://0.0.0.0:8000</pre></div>
+
+<div class="section-block"><h4>uvicorn (FastAPI)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Install: pip install uvicorn[standard]
+# Run FastAPI:
+# uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+#
+# With gunicorn + uvicorn workers (recommended for production):
+# gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
+#
+# For development with hot reload:
+# uvicorn main:app --reload</span>
+
+<span class="kw">import</span> uvicorn
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">"__main__"</span>:
+    uvicorn.<span class="fn">run</span>(<span class="st">"main:app"</span>, host<span class="op">=</span><span class="st">"0.0.0.0"</span>, port<span class="op">=</span><span class="nm">8000</span>, reload<span class="op">=</span><span class="kw">True</span>)</pre>
+<div class="out-label">Output</div><pre class="output">INFO: Uvicorn running on http://0.0.0.0:8000</pre></div>
+
+<div class="section-block"><h4>env vars</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># config.py — read all settings from env</span>
+<span class="kw">import</span> os
+
+<span class="kw">class</span> <span class="bi">Config</span>:
+    SECRET_KEY <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"SECRET_KEY"</span>, <span class="st">"dev-only"</span>)
+    DATABASE_URL <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"DATABASE_URL"</span>, <span class="st">"sqlite:///dev.db"</span>)
+    DEBUG <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"DEBUG"</span>, <span class="st">"false"</span>).<span class="fn">lower</span>() <span class="op">==</span> <span class="st">"true"</span>
+    PORT <span class="op">=</span> <span class="fn">int</span>(os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"PORT"</span>, <span class="st">"8000"</span>))
+
+<span class="fn">print</span>(<span class="bi">Config</span>.PORT, <span class="bi">Config</span>.DEBUG)</pre>
+<div class="out-label">Output</div><pre class="output">8000 False</pre></div>
+
+<div class="section-block"><h4>Dockerfile</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Dockerfile</span>
+<span class="cm"># FROM python:3.11-slim</span>
+<span class="cm"># WORKDIR /app</span>
+<span class="cm"># COPY requirements.txt .</span>
+<span class="cm"># RUN pip install --no-cache-dir -r requirements.txt</span>
+<span class="cm"># COPY . .</span>
+<span class="cm"># EXPOSE 8000</span>
+<span class="cm"># CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]</span>
+
+<span class="cm"># Build and run:</span>
+<span class="cm"># docker build -t myapp .</span>
+<span class="cm"># docker run -p 8000:8000 -e DATABASE_URL=... myapp</span>
+<span class="fn">print</span>(<span class="st">"Container listens on port 8000"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Container listens on port 8000</pre>
+<div class="example-note">python:3.11-slim keeps the image small (~50MB vs ~1GB for the full image). Pass secrets via -e flags or Docker secrets, never bake them into the image.</div></div>
+`;}
+  },
+  {
+    id:'webhooks',icon:'🔔',title:'Webhooks',
+    desc:'receive webhooks, validate signature, send webhooks, retry logic.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔔</span>
+<h2>Webhooks</h2>
+<p>Webhooks are HTTP callbacks — a service calls your endpoint when an event happens (payment, push, form submit). Always validate the signature to verify the sender.</p></div>
+
+<div class="section-block"><h4>Receiving Webhooks</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+
+<span class="dec">@app.route</span>(<span class="st">"/webhook/payment"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">payment_webhook</span>():
+    event <span class="op">=</span> request.<span class="fn">get_json</span>()
+    event_type <span class="op">=</span> event.<span class="fn">get</span>(<span class="st">"type"</span>)
+
+    <span class="kw">if</span> event_type <span class="op">==</span> <span class="st">"payment.success"</span>:
+        amount <span class="op">=</span> event[<span class="st">"data"</span>][<span class="st">"amount"</span>]
+        <span class="fn">print</span>(<span class="st">f"Payment received: ₹{amount}"</span>)
+    <span class="kw">elif</span> event_type <span class="op">==</span> <span class="st">"payment.failed"</span>:
+        <span class="fn">print</span>(<span class="st">"Payment failed"</span>)
+
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"received"</span>: <span class="kw">True</span>}), <span class="nm">200</span></pre>
+<div class="out-label">Output</div><pre class="output">Payment received: ₹5000
+→ {"received":true}</pre></div>
+
+<div class="section-block"><h4>Validate Signature</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> hmac, hashlib
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, request, jsonify
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+SECRET <span class="op">=</span> <span class="st">b"my-webhook-secret"</span>
+
+<span class="kw">def</span> <span class="fn">verify_signature</span>(payload, signature):
+    expected <span class="op">=</span> hmac.<span class="fn">new</span>(SECRET, payload, hashlib.sha256).<span class="fn">hexdigest</span>()
+    <span class="kw">return</span> hmac.<span class="fn">compare_digest</span>(expected, signature)
+
+<span class="dec">@app.route</span>(<span class="st">"/webhook"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">webhook</span>():
+    sig <span class="op">=</span> request.headers.<span class="fn">get</span>(<span class="st">"X-Signature"</span>, <span class="st">""</span>)
+    <span class="kw">if not</span> <span class="fn">verify_signature</span>(request.data, sig):
+        <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"error"</span>: <span class="st">"Invalid signature"</span>}), <span class="nm">403</span>
+    <span class="kw">return</span> <span class="fn">jsonify</span>({<span class="st">"ok"</span>: <span class="kw">True</span>})</pre>
+<div class="out-label">Output</div><pre class="output">POST (wrong sig) → 403 {"error":"Invalid signature"}
+POST (valid sig) → {"ok":true}</pre>
+<div class="example-note">Always use hmac.compare_digest (not ==) to prevent timing attacks. The sender signs the body with a shared secret; you verify it matches.</div></div>
+
+<div class="section-block"><h4>Sending Webhooks with Retry</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests, time
+
+<span class="kw">def</span> <span class="fn">send_webhook</span>(url, payload, max_retries<span class="op">=</span><span class="nm">3</span>):
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_retries):
+        <span class="kw">try</span>:
+            r <span class="op">=</span> requests.<span class="fn">post</span>(url, json<span class="op">=</span>payload, timeout<span class="op">=</span><span class="nm">5</span>)
+            r.<span class="fn">raise_for_status</span>()
+            <span class="fn">print</span>(<span class="st">f"Sent on attempt {attempt+1}"</span>)
+            <span class="kw">return</span> <span class="kw">True</span>
+        <span class="kw">except</span> requests.<span class="bi">RequestException</span> <span class="kw">as</span> e:
+            wait <span class="op">=</span> <span class="nm">2</span> <span class="op">**</span> attempt  <span class="cm"># exponential backoff</span>
+            <span class="fn">print</span>(<span class="st">f"Attempt {attempt+1} failed, retry in {wait}s"</span>)
+            time.<span class="fn">sleep</span>(wait)
+    <span class="kw">return</span> <span class="kw">False</span>
+
+<span class="fn">send_webhook</span>(<span class="st">"https://httpbin.org/post"</span>, {<span class="st">"event"</span>: <span class="st">"order.placed"</span>})</pre>
+<div class="out-label">Output</div><pre class="output">Sent on attempt 1</pre>
+<div class="example-note">Exponential backoff (1s, 2s, 4s) avoids hammering a struggling server. Always set a timeout to prevent hanging forever.</div></div>
+`;}
+  },
+  {
+    id:'django-basics',icon:'🎸',title:'Django Basics',
+    desc:'project/app setup, models, views, URLs, admin, templates.',
+    content(){return `
+<div class="detail-header"><span class="icon">🎸</span>
+<h2>Django Basics</h2>
+<p><strong>Django</strong> is a "batteries included" framework — ORM, admin, auth, forms all built-in. Install: <code>pip install django</code>. Larger and more opinionated than Flask.</p></div>
+
+<div class="section-block"><h4>Project &amp; App Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Create project and app:</span>
+<span class="cm"># django-admin startproject mysite</span>
+<span class="cm"># cd mysite</span>
+<span class="cm"># python manage.py startapp blog</span>
+<span class="cm">#</span>
+<span class="cm"># Project structure:</span>
+<span class="cm"># mysite/</span>
+<span class="cm">#   manage.py</span>
+<span class="cm">#   mysite/settings.py   ← project config</span>
+<span class="cm">#   mysite/urls.py       ← root URL router</span>
+<span class="cm">#   blog/</span>
+<span class="cm">#     models.py          ← database models</span>
+<span class="cm">#     views.py           ← request handlers</span>
+<span class="cm">#     urls.py            ← app URL patterns</span>
+<span class="cm">#     templates/         ← HTML templates</span>
+<span class="fn">print</span>(<span class="st">"Django project structure"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Django project structure</pre></div>
+
+<div class="section-block"><h4>Models</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># blog/models.py</span>
+<span class="kw">from</span> django.db <span class="kw">import</span> models
+
+<span class="kw">class</span> <span class="bi">Post</span>(models.<span class="bi">Model</span>):
+    title     <span class="op">=</span> models.<span class="bi">CharField</span>(max_length<span class="op">=</span><span class="nm">200</span>)
+    content   <span class="op">=</span> models.<span class="bi">TextField</span>()
+    created   <span class="op">=</span> models.<span class="bi">DateTimeField</span>(auto_now_add<span class="op">=</span><span class="kw">True</span>)
+    published <span class="op">=</span> models.<span class="bi">BooleanField</span>(default<span class="op">=</span><span class="kw">False</span>)
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="nm">self</span>.title
+
+<span class="cm"># Create migration and apply:</span>
+<span class="cm"># python manage.py makemigrations</span>
+<span class="cm"># python manage.py migrate</span></pre>
+<div class="out-label">Output</div><pre class="output">Migrations created → posts table in database</pre></div>
+
+<div class="section-block"><h4>Views &amp; URLs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># blog/views.py</span>
+<span class="kw">from</span> django.http <span class="kw">import</span> JsonResponse
+<span class="kw">from</span> .models <span class="kw">import</span> Post
+
+<span class="kw">def</span> <span class="fn">post_list</span>(request):
+    posts <span class="op">=</span> <span class="fn">list</span>(<span class="bi">Post</span>.objects.<span class="fn">values</span>(<span class="st">"id"</span>,<span class="st">"title"</span>)[::<span class="nm">10</span>])
+    <span class="kw">return</span> <span class="fn">JsonResponse</span>(posts, safe<span class="op">=</span><span class="kw">False</span>)
+
+<span class="cm"># blog/urls.py</span>
+<span class="kw">from</span> django.urls <span class="kw">import</span> path
+<span class="kw">from</span> . <span class="kw">import</span> views
+urlpatterns <span class="op">=</span> [path(<span class="st">"posts/"</span>, views.post_list)]
+
+<span class="cm"># mysite/urls.py</span>
+<span class="kw">from</span> django.urls <span class="kw">import</span> include, path
+urlpatterns <span class="op">=</span> [path(<span class="st">"blog/"</span>, <span class="fn">include</span>(<span class="st">"blog.urls"</span>))]</pre>
+<div class="out-label">Output</div><pre class="output">GET /blog/posts/ → [{"id":1,"title":"Hello World"}]</pre></div>
+
+<div class="section-block"><h4>Admin &amp; Templates</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># blog/admin.py — register model</span>
+<span class="kw">from</span> django.contrib <span class="kw">import</span> admin
+<span class="kw">from</span> .models <span class="kw">import</span> Post
+admin.site.<span class="fn">register</span>(<span class="bi">Post</span>)
+
+<span class="cm"># Create superuser:</span>
+<span class="cm"># python manage.py createsuperuser
+# Visit /admin/ → full CRUD GUI automatically</span>
+
+<span class="cm"># Render template:</span>
+<span class="kw">from</span> django.shortcuts <span class="kw">import</span> render
+
+<span class="kw">def</span> <span class="fn">post_detail</span>(request, pk):
+    post <span class="op">=</span> <span class="bi">Post</span>.objects.<span class="fn">get</span>(pk<span class="op">=</span>pk)
+    <span class="kw">return</span> <span class="fn">render</span>(request, <span class="st">"blog/detail.html"</span>, {<span class="st">"post"</span>: post})</pre>
+<div class="out-label">Output</div><pre class="output">GET /admin/ → full auto-generated admin panel
+GET /blog/posts/1/ → rendered HTML template</pre>
+<div class="example-note">Django admin is auto-generated from your models — no extra code needed. It gives full CRUD, search, filtering, and pagination out of the box.</div></div>
+`;}
+  },
+  {
+    id:'graphql',icon:'🕸️',title:'GraphQL',
+    desc:'schema, query, mutation, resolvers with Strawberry.',
+    content(){return `
+<div class="detail-header"><span class="icon">🕸️</span>
+<h2>GraphQL</h2>
+<p><strong>GraphQL</strong> lets clients request exactly the data they need — no over- or under-fetching. <strong>Strawberry</strong> is the modern Python GraphQL library. Install: <code>pip install strawberry-graphql[fastapi]</code></p></div>
+
+<div class="section-block"><h4>Schema &amp; Types</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> strawberry
+<span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="dec">@strawberry.type</span>
+<span class="kw">class</span> <span class="bi">User</span>:
+    id: <span class="bi">int</span>
+    name: <span class="bi">str</span>
+    email: <span class="bi">str</span>
+
+USERS <span class="op">=</span> [
+    <span class="bi">User</span>(id<span class="op">=</span><span class="nm">1</span>, name<span class="op">=</span><span class="st">"Ravi"</span>, email<span class="op">=</span><span class="st">"r@x.com"</span>),
+    <span class="bi">User</span>(id<span class="op">=</span><span class="nm">2</span>, name<span class="op">=</span><span class="st">"Ana"</span>,  email<span class="op">=</span><span class="st">"a@x.com"</span>),
+]
+<span class="fn">print</span>(<span class="st">"Schema type defined"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Schema type defined</pre></div>
+
+<div class="section-block"><h4>Query &amp; Resolvers</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> strawberry
+<span class="kw">from</span> typing <span class="kw">import</span> List, Optional
+
+<span class="dec">@strawberry.type</span>
+<span class="kw">class</span> <span class="bi">Query</span>:
+    <span class="dec">@strawberry.field</span>
+    <span class="kw">def</span> <span class="fn">users</span>(<span class="nm">self</span>) <span class="op">-&gt;</span> List[<span class="bi">User</span>]:
+        <span class="kw">return</span> USERS
+
+    <span class="dec">@strawberry.field</span>
+    <span class="kw">def</span> <span class="fn">user</span>(<span class="nm">self</span>, id: <span class="bi">int</span>) <span class="op">-&gt;</span> Optional[<span class="bi">User</span>]:
+        <span class="kw">return</span> <span class="fn">next</span>((u <span class="kw">for</span> u <span class="kw">in</span> USERS <span class="kw">if</span> u.id <span class="op">==</span> id), <span class="kw">None</span>)
+
+schema <span class="op">=</span> strawberry.<span class="fn">Schema</span>(<span class="bi">Query</span>)
+result <span class="op">=</span> schema.<span class="fn">execute_sync</span>(<span class="st">"{ users { id name } }"</span>)
+<span class="fn">print</span>(result.data)</pre>
+<div class="out-label">Output</div><pre class="output">{'users': [{'id': 1, 'name': 'Ravi'}, {'id': 2, 'name': 'Ana'}]}</pre>
+<div class="example-note">The client asked for only id and name — email is not returned even though User has it. This is GraphQL's key feature: clients control the shape of the response.</div></div>
+
+<div class="section-block"><h4>Mutation</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> strawberry
+
+<span class="dec">@strawberry.type</span>
+<span class="kw">class</span> <span class="bi">Mutation</span>:
+    <span class="dec">@strawberry.mutation</span>
+    <span class="kw">def</span> <span class="fn">add_user</span>(<span class="nm">self</span>, name: <span class="bi">str</span>, email: <span class="bi">str</span>) <span class="op">-&gt;</span> <span class="bi">User</span>:
+        new_user <span class="op">=</span> <span class="bi">User</span>(id<span class="op">=</span><span class="fn">len</span>(USERS)<span class="op">+</span><span class="nm">1</span>, name<span class="op">=</span>name, email<span class="op">=</span>email)
+        USERS.<span class="fn">append</span>(new_user)
+        <span class="kw">return</span> new_user
+
+schema <span class="op">=</span> strawberry.<span class="fn">Schema</span>(query<span class="op">=</span><span class="bi">Query</span>, mutation<span class="op">=</span><span class="bi">Mutation</span>)
+result <span class="op">=</span> schema.<span class="fn">execute_sync</span>(
+    <span class="st">'mutation { addUser(name:"Bob", email:"b@x.com") { id name } }'</span>
+)
+<span class="fn">print</span>(result.data)</pre>
+<div class="out-label">Output</div><pre class="output">{'addUser': {'id': 3, 'name': 'Bob'}}</pre></div>
+
+<div class="section-block"><h4>FastAPI Integration</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> strawberry
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> strawberry.fastapi <span class="kw">import</span> GraphQLRouter
+
+schema <span class="op">=</span> strawberry.<span class="fn">Schema</span>(query<span class="op">=</span><span class="bi">Query</span>, mutation<span class="op">=</span><span class="bi">Mutation</span>)
+graphql_app <span class="op">=</span> <span class="bi">GraphQLRouter</span>(schema)
+
+app <span class="op">=</span> <span class="bi">FastAPI</span>()
+app.<span class="fn">include_router</span>(graphql_app, prefix<span class="op">=</span><span class="st">"/graphql"</span>)
+
+<span class="cm"># POST /graphql     → execute queries/mutations
+# GET  /graphql     → GraphiQL interactive playground</span>
+<span class="fn">print</span>(<span class="st">"GraphQL available at /graphql"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">GraphQL available at /graphql</pre>
+<div class="example-note">GraphQLRouter mounts both the API endpoint (POST) and an interactive playground (GET /graphql) automatically — like FastAPI's /docs but for GraphQL.</div></div>
+`;}
+  },
+  {
+    id:'websockets',icon:'🔌',title:'WebSockets',
+    desc:'Flask-SocketIO, events, emit, broadcast, rooms.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔌</span>
+<h2>WebSockets</h2>
+<p><strong>WebSockets</strong> provide full-duplex communication — the server can push data to clients without polling. <strong>Flask-SocketIO</strong> adds Socket.IO support to Flask. Install: <code>pip install flask-socketio</code></p></div>
+
+<div class="section-block"><h4>SocketIO Setup &amp; Events</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask
+<span class="kw">from</span> flask_socketio <span class="kw">import</span> SocketIO
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+socketio <span class="op">=</span> <span class="bi">SocketIO</span>(app, cors_allowed_origins<span class="op">=</span><span class="st">"*"</span>)
+
+<span class="dec">@socketio.on</span>(<span class="st">"connect"</span>)
+<span class="kw">def</span> <span class="fn">on_connect</span>():
+    <span class="fn">print</span>(<span class="st">"Client connected"</span>)
+
+<span class="dec">@socketio.on</span>(<span class="st">"disconnect"</span>)
+<span class="kw">def</span> <span class="fn">on_disconnect</span>():
+    <span class="fn">print</span>(<span class="st">"Client disconnected"</span>)
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">"__main__"</span>:
+    socketio.<span class="fn">run</span>(app, debug<span class="op">=</span><span class="kw">True</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Client connected
+Client disconnected</pre></div>
+
+<div class="section-block"><h4>emit — Server to Client</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask_socketio <span class="kw">import</span> SocketIO, emit
+
+<span class="dec">@socketio.on</span>(<span class="st">"message"</span>)
+<span class="kw">def</span> <span class="fn">handle_message</span>(data):
+    <span class="fn">print</span>(<span class="st">f"Received: {data}"</span>)
+    <span class="cm"># Send back to sender only</span>
+    <span class="fn">emit</span>(<span class="st">"response"</span>, {<span class="st">"echo"</span>: data})
+
+<span class="dec">@socketio.on</span>(<span class="st">"ping_server"</span>)
+<span class="kw">def</span> <span class="fn">handle_ping</span>():
+    <span class="fn">emit</span>(<span class="st">"pong"</span>, {<span class="st">"time"</span>: <span class="st">"12:00"</span>})</pre>
+<div class="out-label">Output</div><pre class="output">Received: hello
+→ emits "response" {"echo":"hello"} back to sender</pre></div>
+
+<div class="section-block"><h4>broadcast</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask_socketio <span class="kw">import</span> emit
+
+<span class="dec">@socketio.on</span>(<span class="st">"chat_message"</span>)
+<span class="kw">def</span> <span class="fn">handle_chat</span>(data):
+    <span class="cm"># Send to ALL connected clients including sender</span>
+    <span class="fn">emit</span>(<span class="st">"chat_message"</span>, data, broadcast<span class="op">=</span><span class="kw">True</span>)
+
+<span class="cm"># Server-side push (outside event handler):</span>
+<span class="cm"># socketio.emit("notification", {"msg": "Server restart in 5m"})</span></pre>
+<div class="out-label">Output</div><pre class="output">chat_message received → broadcast to all 47 connected clients</pre></div>
+
+<div class="section-block"><h4>Rooms</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask_socketio <span class="kw">import</span> emit, join_room, leave_room
+
+<span class="dec">@socketio.on</span>(<span class="st">"join"</span>)
+<span class="kw">def</span> <span class="fn">on_join</span>(data):
+    room <span class="op">=</span> data[<span class="st">"room"</span>]
+    <span class="fn">join_room</span>(room)
+    <span class="fn">emit</span>(<span class="st">"status"</span>, {<span class="st">"msg"</span>: <span class="st">f"Joined {room}"</span>}, to<span class="op">=</span>room)
+
+<span class="dec">@socketio.on</span>(<span class="st">"room_message"</span>)
+<span class="kw">def</span> <span class="fn">on_room_msg</span>(data):
+    <span class="cm"># Send only to clients in the same room</span>
+    <span class="fn">emit</span>(<span class="st">"room_message"</span>, data, to<span class="op">=</span>data[<span class="st">"room"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Client joins "room-42" → only room-42 members receive room_message</pre>
+<div class="example-note">Rooms are named groups — messages sent to a room go only to clients in that room. Perfect for chat rooms, game sessions, and per-user notifications.</div></div>
+`;}
+  },
+  {
+    id:'caching',icon:'⚡',title:'Caching',
+    desc:'Flask-Caching setup, @cached, timeout, memoize, cache invalidation.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚡</span>
+<h2>Caching</h2>
+<p><strong>Flask-Caching</strong> caches expensive responses so repeated requests are served instantly. Install: <code>pip install flask-caching</code>. Backends: SimpleCache (in-memory), Redis, Memcached.</p></div>
+
+<div class="section-block"><h4>Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask
+<span class="kw">from</span> flask_caching <span class="kw">import</span> Cache
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+app.config[<span class="st">"CACHE_TYPE"</span>] <span class="op">=</span> <span class="st">"SimpleCache"</span>  <span class="cm"># use "redis" in production</span>
+app.config[<span class="st">"CACHE_DEFAULT_TIMEOUT"</span>] <span class="op">=</span> <span class="nm">300</span>    <span class="cm"># 5 minutes</span>
+cache <span class="op">=</span> <span class="bi">Cache</span>(app)
+<span class="fn">print</span>(<span class="st">"Cache configured"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Cache configured</pre></div>
+
+<div class="section-block"><h4>@cached — Cache a Route</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> time
+
+<span class="dec">@app.route</span>(<span class="st">"/expensive"</span>)
+<span class="dec">@cache.cached</span>(timeout<span class="op">=</span><span class="nm">60</span>)
+<span class="kw">def</span> <span class="fn">expensive</span>():
+    time.<span class="fn">sleep</span>(<span class="nm">2</span>)   <span class="cm"># simulate slow DB query</span>
+    <span class="kw">return</span> {<span class="st">"data"</span>: <span class="st">"computed"</span>}
+
+<span class="cm"># 1st call: 2 seconds (computed)
+# 2nd call: &lt;1ms (from cache)
+# After 60s: cache expires, recomputes</span>
+<span class="fn">print</span>(<span class="st">"Route cached for 60s"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Route cached for 60s</pre>
+<div class="example-note">@cache.cached wraps the entire response. The cache key defaults to the request URL. Different URLs get different cache entries automatically.</div></div>
+
+<div class="section-block"><h4>memoize — Cache a Function</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="dec">@cache.memoize</span>(timeout<span class="op">=</span><span class="nm">120</span>)
+<span class="kw">def</span> <span class="fn">get_user_score</span>(user_id):
+    <span class="fn">print</span>(<span class="st">f"Fetching score for {user_id}"</span>)
+    <span class="kw">return</span> user_id <span class="op">*</span> <span class="nm">10</span>
+
+<span class="fn">print</span>(<span class="fn">get_user_score</span>(<span class="nm">5</span>))   <span class="cm"># fetches</span>
+<span class="fn">print</span>(<span class="fn">get_user_score</span>(<span class="nm">5</span>))   <span class="cm"># from cache</span>
+<span class="fn">print</span>(<span class="fn">get_user_score</span>(<span class="nm">7</span>))   <span class="cm"># different arg → fetches again</span></pre>
+<div class="out-label">Output</div><pre class="output">Fetching score for 5
+50
+50
+Fetching score for 7
+70</pre></div>
+
+<div class="section-block"><h4>Cache Invalidation</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Delete a specific cached key</span>
+cache.<span class="fn">delete</span>(<span class="st">"view//expensive"</span>)
+
+<span class="cm"># Delete memoize cache for specific args</span>
+cache.<span class="fn">delete_memoized</span>(get_user_score, <span class="nm">5</span>)
+
+<span class="cm"># Clear entire cache</span>
+cache.<span class="fn">clear</span>()
+<span class="fn">print</span>(<span class="st">"Cache cleared"</span>)
+
+<span class="cm"># Invalidate on data change:</span>
+<span class="dec">@app.route</span>(<span class="st">"/users/&lt;int:uid&gt;"</span>, methods<span class="op">=</span>[<span class="st">"PUT"</span>])
+<span class="kw">def</span> <span class="fn">update_user</span>(uid):
+    cache.<span class="fn">delete_memoized</span>(get_user_score, uid)
+    <span class="kw">return</span> {<span class="st">"updated"</span>: uid}</pre>
+<div class="out-label">Output</div><pre class="output">Cache cleared</pre>
+<div class="example-note">Always invalidate cache when underlying data changes — stale cache is worse than no cache. delete_memoized removes only the entry for specific arguments.</div></div>
+`;}
+  },
+  {
+    id:'rate-limiting',icon:'🚦',title:'Rate Limiting',
+    desc:'Flask-Limiter setup, per-route limits, per-user limits, custom error response.',
+    content(){return `
+<div class="detail-header"><span class="icon">🚦</span>
+<h2>Rate Limiting</h2>
+<p><strong>Flask-Limiter</strong> restricts how many requests a client can make in a time window — protects against abuse and DDoS. Install: <code>pip install flask-limiter</code></p></div>
+
+<div class="section-block"><h4>Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> Flask
+<span class="kw">from</span> flask_limiter <span class="kw">import</span> Limiter
+<span class="kw">from</span> flask_limiter.util <span class="kw">import</span> get_remote_address
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+limiter <span class="op">=</span> <span class="bi">Limiter</span>(
+    app,
+    key_func<span class="op">=</span>get_remote_address,  <span class="cm"># limit per IP</span>
+    default_limits<span class="op">=</span>[<span class="st">"200/day"</span>, <span class="st">"50/hour"</span>]
+)
+<span class="fn">print</span>(<span class="st">"Limiter: 200/day, 50/hour per IP by default"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Limiter: 200/day, 50/hour per IP by default</pre></div>
+
+<div class="section-block"><h4>Per-route Limits</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="dec">@app.route</span>(<span class="st">"/api/data"</span>)
+<span class="dec">@limiter.limit</span>(<span class="st">"30/minute"</span>)
+<span class="kw">def</span> <span class="fn">api_data</span>():
+    <span class="kw">return</span> {<span class="st">"data"</span>: <span class="st">"ok"</span>}
+
+<span class="dec">@app.route</span>(<span class="st">"/auth/login"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="dec">@limiter.limit</span>(<span class="st">"5/minute;20/hour"</span>)   <span class="cm"># multiple limits</span>
+<span class="kw">def</span> <span class="fn">login</span>():
+    <span class="kw">return</span> {<span class="st">"token"</span>: <span class="st">"abc"</span>}
+
+<span class="dec">@app.route</span>(<span class="st">"/health"</span>)
+<span class="dec">@limiter.exempt</span>           <span class="cm"># no limit on health checks</span>
+<span class="kw">def</span> <span class="fn">health</span>():
+    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"ok"</span>}</pre>
+<div class="out-label">Output</div><pre class="output">31st request to /api/data in 1 min → 429 Too Many Requests</pre></div>
+
+<div class="section-block"><h4>Per-user Limits</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask <span class="kw">import</span> request, session
+
+<span class="kw">def</span> <span class="fn">get_user_id</span>():
+    <span class="cm"># Use user ID as key instead of IP for authenticated routes</span>
+    <span class="kw">return</span> session.<span class="fn">get</span>(<span class="st">"user_id"</span>) <span class="kw">or</span> <span class="fn">get_remote_address</span>()
+
+user_limiter <span class="op">=</span> <span class="bi">Limiter</span>(app, key_func<span class="op">=</span>get_user_id)
+
+<span class="dec">@app.route</span>(<span class="st">"/api/export"</span>)
+<span class="dec">@user_limiter.limit</span>(<span class="st">"3/day"</span>)
+<span class="kw">def</span> <span class="fn">export</span>():
+    <span class="kw">return</span> {<span class="st">"file"</span>: <span class="st">"data.csv"</span>}</pre>
+<div class="out-label">Output</div><pre class="output">User 42: 3 exports/day allowed. 4th request → 429</pre>
+<div class="example-note">Per-user limits are fairer than per-IP — multiple users behind a corporate NAT share one IP but should each get their own quota.</div></div>
+
+<div class="section-block"><h4>Custom Error Response</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> flask_limiter.errors <span class="kw">import</span> RateLimitExceeded
+<span class="kw">from</span> flask <span class="kw">import</span> jsonify
+
+<span class="dec">@app.errorhandler</span>(<span class="bi">RateLimitExceeded</span>)
+<span class="kw">def</span> <span class="fn">rate_limit_handler</span>(e):
+    <span class="kw">return</span> <span class="fn">jsonify</span>({
+        <span class="st">"error"</span>: <span class="st">"rate_limit_exceeded"</span>,
+        <span class="st">"message"</span>: <span class="st">f"Limit: {e.description}"</span>,
+        <span class="st">"retry_after"</span>: <span class="st">"60 seconds"</span>
+    }), <span class="nm">429</span></pre>
+<div class="out-label">Output</div><pre class="output">429 {"error":"rate_limit_exceeded","message":"30 per 1 minute","retry_after":"60 seconds"}</pre></div>
+`;}
+  },
+  {
+    id:'background-tasks',icon:'⚙️',title:'Background Tasks',
+    desc:'Celery setup, task definition, delay, result, periodic tasks.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>Background Tasks — Celery</h2>
+<p><strong>Celery</strong> runs tasks asynchronously in worker processes — perfect for email sending, report generation, and anything that would make a web request wait too long. Install: <code>pip install celery redis</code></p></div>
+
+<div class="section-block"><h4>Celery Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># celery_app.py</span>
+<span class="kw">from</span> celery <span class="kw">import</span> Celery
+
+<span class="cm"># broker = message queue (Redis/RabbitMQ)</span>
+<span class="cm"># backend = where results are stored</span>
+celery <span class="op">=</span> <span class="bi">Celery</span>(
+    <span class="st">"myapp"</span>,
+    broker<span class="op">=</span><span class="st">"redis://localhost:6379/0"</span>,
+    backend<span class="op">=</span><span class="st">"redis://localhost:6379/0"</span>
+)
+
+<span class="cm"># Start worker:</span>
+<span class="cm"># celery -A celery_app worker --loglevel=info</span>
+<span class="fn">print</span>(<span class="st">"Celery configured"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Celery configured
+[INFO] celery@host ready</pre></div>
+
+<div class="section-block"><h4>Task Definition &amp; delay</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> celery_app <span class="kw">import</span> celery
+<span class="kw">import</span> time
+
+<span class="dec">@celery.task</span>
+<span class="kw">def</span> <span class="fn">send_email</span>(to, subject, body):
+    time.<span class="fn">sleep</span>(<span class="nm">2</span>)   <span class="cm"># simulate SMTP call</span>
+    <span class="fn">print</span>(<span class="st">f"Email sent to {to}"</span>)
+    <span class="kw">return</span> <span class="st">f"Sent to {to}"</span>
+
+<span class="cm"># In your Flask route:</span>
+<span class="dec">@app.route</span>(<span class="st">"/register"</span>, methods<span class="op">=</span>[<span class="st">"POST"</span>])
+<span class="kw">def</span> <span class="fn">register</span>():
+    <span class="cm"># Queues the task — returns immediately, doesn't wait</span>
+    send_email.<span class="fn">delay</span>(<span class="st">"user@example.com"</span>, <span class="st">"Welcome!"</span>, <span class="st">"Hello"</span>)
+    <span class="kw">return</span> {<span class="st">"msg"</span>: <span class="st">"registered"</span>}, <span class="nm">201</span></pre>
+<div class="out-label">Output</div><pre class="output">POST /register → {"msg":"registered"} returned immediately
+[worker] Email sent to user@example.com  (2s later, in background)</pre></div>
+
+<div class="section-block"><h4>Task Result</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Queue task and get a result object</span>
+result <span class="op">=</span> send_email.<span class="fn">delay</span>(<span class="st">"r@x.com"</span>, <span class="st">"Hi"</span>, <span class="st">"Body"</span>)
+<span class="fn">print</span>(<span class="st">"Task ID:"</span>, result.id)
+<span class="fn">print</span>(<span class="st">"Ready?"</span>, result.<span class="fn">ready</span>())      <span class="cm"># False (still running)</span>
+value <span class="op">=</span> result.<span class="fn">get</span>(timeout<span class="op">=</span><span class="nm">10</span>)        <span class="cm"># wait up to 10s</span>
+<span class="fn">print</span>(<span class="st">"Result:"</span>, value)</pre>
+<div class="out-label">Output</div><pre class="output">Task ID: a1b2c3d4-e5f6-...
+Ready? False
+Result: Sent to r@x.com</pre></div>
+
+<div class="section-block"><h4>Periodic Tasks (Beat)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> celery.schedules <span class="kw">import</span> crontab
+
+celery.conf.beat_schedule <span class="op">=</span> {
+    <span class="st">"cleanup-every-midnight"</span>: {
+        <span class="st">"task"</span>: <span class="st">"tasks.cleanup_old_logs"</span>,
+        <span class="st">"schedule"</span>: crontab(hour<span class="op">=</span><span class="nm">0</span>, minute<span class="op">=</span><span class="nm">0</span>),  <span class="cm"># midnight</span>
+    },
+    <span class="st">"send-daily-report"</span>: {
+        <span class="st">"task"</span>: <span class="st">"tasks.send_daily_report"</span>,
+        <span class="st">"schedule"</span>: crontab(hour<span class="op">=</span><span class="nm">9</span>, minute<span class="op">=</span><span class="nm">0</span>),  <span class="cm"># 9am</span>
+    },
+    <span class="st">"health-check"</span>: {
+        <span class="st">"task"</span>: <span class="st">"tasks.check_services"</span>,
+        <span class="st">"schedule"</span>: <span class="nm">60.0</span>,  <span class="cm"># every 60 seconds</span>
+    },
+}
+<span class="cm"># Start scheduler: celery -A celery_app beat --loglevel=info</span>
+<span class="fn">print</span>(<span class="st">"Periodic tasks configured"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Periodic tasks configured
+[beat] cleanup-every-midnight scheduled for 00:00
+[beat] send-daily-report scheduled for 09:00</pre>
+<div class="example-note">Celery Beat is the scheduler — it triggers tasks on schedule and pushes them to the broker. Workers pick them up. Always run beat as a separate process from workers.</div></div>
+`;}
+  }
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

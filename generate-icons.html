@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate PWA Icons</title>
+<style>
+body{font-family:-apple-system,sans-serif;padding:30px;background:#f5f5f7;}
+h1{font-size:20px;margin-bottom:20px;}
+canvas{border:1px solid #ddd;border-radius:8px;margin:4px;}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+button{padding:10px 24px;background:#007aff;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;}
+p{color:#666;font-size:13px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+<h1>PyHub Icon Generator</h1>
+<p>Click "Generate & Download All Icons" — save each file into an <strong>icons/</strong> folder next to python-hub.html</p>
+<div class="row" id="previews"></div>
+<button onclick="generateAll()">Generate &amp; Download All Icons</button>
+
+<script>
+const SIZES = [72,96,128,144,152,192,384,512];
+
+function drawIcon(size) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  // Background
+  const grad = ctx.createLinearGradient(0,0,size,size);
+  grad.addColorStop(0,'#007aff');
+  grad.addColorStop(1,'#0056cc');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.roundRect(0,0,size,size,size*0.22);
+  ctx.fill();
+  // Python "Py" text
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `bold ${size*0.38}px -apple-system,sans-serif`;
+  ctx.fillText('Py', size/2, size*0.42);
+  // Subtitle
+  ctx.font = `${size*0.13}px -apple-system,sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.fillText('HUB', size/2, size*0.72);
+  return c;
+}
+
+function generateAll() {
+  SIZES.forEach(size => {
+    const c = drawIcon(size);
+    const a = document.createElement('a');
+    a.download = `icon-${size}.png`;
+    a.href = c.toDataURL('image/png');
+    a.click();
+  });
+}
+
+// Show previews
+const row = document.getElementById('previews');
+[72,96,144,192,512].forEach(s => {
+  const c = drawIcon(s);
+  c.title = s+'x'+s;
+  c.style.width = Math.min(s,80)+'px';
+  c.style.height = Math.min(s,80)+'px';
+  row.appendChild(c);
+});
+</script>
+</body>
+</html>

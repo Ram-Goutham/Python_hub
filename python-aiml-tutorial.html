@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python AI / ML</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link active" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+<div class="site-header">
+  <div class="level-badge">Level 4</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Python AI / ML</h1>
+  <p>NumPy, Pandas, Matplotlib, Scikit-learn, Keras, NLP, and LLM APIs — the complete practical stack for data science and machine learning in Python.</p>
+</div>
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+<script>
+const topics = [
+  {
+    id:'numpy-basics',icon:'🔢',title:'NumPy Basics',
+    desc:'arrays, dtype, shape, reshape, arange, linspace, zeros, ones.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔢</span>
+<h2>NumPy Basics</h2>
+<p><strong>NumPy</strong> is the foundation of scientific Python. It provides fast, memory-efficient N-dimensional arrays and mathematical operations. Install: <code>pip install numpy</code></p></div>
+
+<div class="section-block"><h4>Creating Arrays &amp; dtype</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>])
+b <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">1.0</span>, <span class="nm">2.0</span>, <span class="nm">3.0</span>])
+c <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>],[<span class="nm">3</span>,<span class="nm">4</span>]], dtype<span class="op">=</span>np.float32)
+
+<span class="fn">print</span>(a.dtype, b.dtype, c.dtype)
+<span class="fn">print</span>(a.<span class="fn">astype</span>(float))
+<span class="fn">print</span>(c)</pre>
+<div class="out-label">Output</div><pre class="output">int64 float64 float32
+[1. 2. 3. 4.]
+[[1. 2.]
+ [3. 4.]]</pre>
+<div class="example-note">dtype controls memory layout and precision. int64 = 8 bytes/element, float32 = 4 bytes. Use float32 for large ML arrays to halve memory.</div></div>
+
+<div class="section-block"><h4>arange, linspace, zeros, ones</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="fn">print</span>(np.<span class="fn">arange</span>(<span class="nm">0</span>, <span class="nm">10</span>, <span class="nm">2</span>))         <span class="cm"># like range()</span>
+<span class="fn">print</span>(np.<span class="fn">linspace</span>(<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">5</span>))         <span class="cm"># 5 evenly spaced</span>
+<span class="fn">print</span>(np.<span class="fn">zeros</span>((<span class="nm">2</span>, <span class="nm">3</span>)))
+<span class="fn">print</span>(np.<span class="fn">ones</span>((<span class="nm">2</span>, <span class="nm">2</span>)))
+<span class="fn">print</span>(np.<span class="fn">eye</span>(<span class="nm">3</span>))                     <span class="cm"># identity matrix</span></pre>
+<div class="out-label">Output</div><pre class="output">[0 2 4 6 8]
+[0.   0.25 0.5  0.75 1.  ]
+[[0. 0. 0.]
+ [0. 0. 0.]]
+[[1. 1.]
+ [1. 1.]]
+[[1. 0. 0.]
+ [0. 1. 0.]
+ [0. 0. 1.]]</pre></div>
+
+<div class="section-block"><h4>shape, reshape, ndim, size</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a <span class="op">=</span> np.<span class="fn">arange</span>(<span class="nm">12</span>)
+<span class="fn">print</span>(a.shape, a.ndim, a.size)
+
+b <span class="op">=</span> a.<span class="fn">reshape</span>(<span class="nm">3</span>, <span class="nm">4</span>)
+<span class="fn">print</span>(b)
+<span class="fn">print</span>(b.shape)
+
+<span class="fn">print</span>(b.<span class="fn">flatten</span>())         <span class="cm"># back to 1D</span>
+<span class="fn">print</span>(b.<span class="fn">reshape</span>(<span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>).shape)</pre>
+<div class="out-label">Output</div><pre class="output">(12,) 1 12
+[[ 0  1  2  3]
+ [ 4  5  6  7]
+ [ 8  9 10 11]]
+(3, 4)
+[ 0  1  2  3  4  5  6  7  8  9 10 11]
+(2, 2, 3)</pre></div>
+
+<div class="section-block"><h4>Indexing &amp; Slicing</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>],[<span class="nm">7</span>,<span class="nm">8</span>,<span class="nm">9</span>]])
+<span class="fn">print</span>(a[<span class="nm">1</span>, <span class="nm">2</span>])            <span class="cm"># row 1 col 2</span>
+<span class="fn">print</span>(a[<span class="nm">0</span>:2, <span class="nm">1</span>:])         <span class="cm"># rows 0-1, cols 1+</span>
+<span class="fn">print</span>(a[:, <span class="nm">1</span>])            <span class="cm"># all rows, col 1</span>
+<span class="fn">print</span>(a[a <span class="op">&gt;</span> <span class="nm">5</span>])           <span class="cm"># boolean mask</span></pre>
+<div class="out-label">Output</div><pre class="output">6
+[[2 3]
+ [5 6]]
+[2 5 8]
+[6 7 8 9]</pre></div>
+`;}
+  },
+  {
+    id:'numpy-ops',icon:'⚙️',title:'NumPy Operations',
+    desc:'arithmetic, broadcasting, ufuncs, aggregates, axis.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>NumPy Operations</h2>
+<p>NumPy operations are applied element-wise on entire arrays at once — no Python loops needed. This is called <strong>vectorization</strong> and is typically 100x faster than a loop.</p></div>
+
+<div class="section-block"><h4>Arithmetic &amp; Element-wise</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>])
+<span class="fn">print</span>(a <span class="op">*</span> <span class="nm">2</span>)
+<span class="fn">print</span>(a <span class="op">**</span> <span class="nm">2</span>)
+<span class="fn">print</span>(a <span class="op">+</span> np.<span class="fn">array</span>([<span class="nm">10</span>,<span class="nm">20</span>,<span class="nm">30</span>,<span class="nm">40</span>]))
+<span class="fn">print</span>(np.<span class="fn">sqrt</span>(a.astype(float)))</pre>
+<div class="out-label">Output</div><pre class="output">[2 4 6 8]
+[ 1  4  9 16]
+[11 22 33 44]
+[1.   1.41 1.73 2.  ]</pre></div>
+
+<div class="section-block"><h4>Broadcasting</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+mat <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>]])  <span class="cm"># shape (2,3)</span>
+row <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">10</span>,<span class="nm">20</span>,<span class="nm">30</span>])            <span class="cm"># shape (3,)</span>
+<span class="fn">print</span>(mat <span class="op">+</span> row)   <span class="cm"># row broadcast across all rows</span>
+
+col <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">100</span>],[<span class="nm">200</span>]])        <span class="cm"># shape (2,1)</span>
+<span class="fn">print</span>(mat <span class="op">+</span> col)   <span class="cm"># col broadcast across all cols</span></pre>
+<div class="out-label">Output</div><pre class="output">[[11 22 33]
+ [14 25 36]]
+[[101 102 103]
+ [204 205 206]]</pre>
+<div class="example-note">Broadcasting stretches smaller arrays to match larger ones — no copying. Rule: dimensions align from the right; size-1 dims stretch to match.</div></div>
+
+<div class="section-block"><h4>Universal Functions (ufuncs)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">0</span>, np.pi<span class="op">/</span><span class="nm">2</span>, np.pi])
+<span class="fn">print</span>(np.<span class="fn">round</span>(np.<span class="fn">sin</span>(a), <span class="nm">2</span>))
+<span class="fn">print</span>(np.<span class="fn">exp</span>(np.<span class="fn">array</span>([<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">2</span>])))
+<span class="fn">print</span>(np.<span class="fn">log</span>(np.<span class="fn">array</span>([<span class="nm">1</span>, np.e, np.e<span class="op">**</span><span class="nm">2</span>])))</pre>
+<div class="out-label">Output</div><pre class="output">[0.   1.   0.  ]
+[1.    2.718 7.389]
+[0. 1. 2.]</pre></div>
+
+<div class="section-block"><h4>Aggregates &amp; axis</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+a <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],[<span class="nm">4</span>,<span class="nm">5</span>,<span class="nm">6</span>]])
+<span class="fn">print</span>(a.<span class="fn">sum</span>())            <span class="cm"># all elements</span>
+<span class="fn">print</span>(a.<span class="fn">sum</span>(axis<span class="op">=</span><span class="nm">0</span>))     <span class="cm"># sum down rows → per col</span>
+<span class="fn">print</span>(a.<span class="fn">sum</span>(axis<span class="op">=</span><span class="nm">1</span>))     <span class="cm"># sum across cols → per row</span>
+<span class="fn">print</span>(a.<span class="fn">mean</span>(), a.<span class="fn">std</span>(), a.<span class="fn">min</span>(), a.<span class="fn">max</span>())</pre>
+<div class="out-label">Output</div><pre class="output">21
+[5 7 9]
+[ 6 15]
+3.5 1.71 1 6</pre>
+<div class="example-note">axis=0 collapses rows (operate down). axis=1 collapses columns (operate across). Think: the axis dimension disappears after the operation.</div></div>
+`;}
+  },
+  {
+    id:'pandas-basics',icon:'🐼',title:'Pandas Basics',
+    desc:'DataFrame, Series, read_csv, head, info, describe.',
+    content(){return `
+<div class="detail-header"><span class="icon">🐼</span>
+<h2>Pandas Basics</h2>
+<p><strong>Pandas</strong> provides DataFrame (table) and Series (column) — the core structures for data analysis. Install: <code>pip install pandas</code></p></div>
+
+<div class="section-block"><h4>Series &amp; DataFrame Creation</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+s <span class="op">=</span> pd.<span class="bi">Series</span>([<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>], index<span class="op">=</span>[<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"c"</span>])
+<span class="fn">print</span>(s)
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({
+    <span class="st">"name"</span>: [<span class="st">"Ravi"</span>, <span class="st">"Ana"</span>, <span class="st">"Bob"</span>],
+    <span class="st">"age"</span>:  [<span class="nm">25</span>, <span class="nm">30</span>, <span class="nm">22</span>],
+    <span class="st">"score"</span>:[<span class="nm">88.5</span>, <span class="nm">92.0</span>, <span class="nm">76.0</span>]
+})
+<span class="fn">print</span>(df)</pre>
+<div class="out-label">Output</div><pre class="output">a    10
+b    20
+c    30
+dtype: int64
+   name  age  score
+0  Ravi   25   88.5
+1   Ana   30   92.0
+2   Bob   22   76.0</pre></div>
+
+<div class="section-block"><h4>read_csv, head, tail</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># Simulating a CSV in memory</span>
+<span class="kw">from</span> io <span class="kw">import</span> StringIO
+csv_data <span class="op">=</span> <span class="st">"""name,age,score
+Ravi,25,88
+Ana,30,92
+Bob,22,76
+Priya,28,95
+Sam,35,81"""</span>
+
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="fn">StringIO</span>(csv_data))
+<span class="fn">print</span>(df.<span class="fn">head</span>(<span class="nm">3</span>))
+<span class="fn">print</span>(df.<span class="fn">tail</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">    name  age  score
+0   Ravi   25     88
+1    Ana   30     92
+2    Bob   22     76
+    name  age  score
+3  Priya   28     95
+4    Sam   35     81</pre></div>
+
+<div class="section-block"><h4>info &amp; dtypes</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> io <span class="kw">import</span> StringIO
+
+df <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="fn">StringIO</span>(<span class="st">"name,age,score\nRavi,25,88.5\nAna,30,92.0"</span>))
+<span class="fn">print</span>(df.dtypes)
+<span class="fn">print</span>(df.shape)
+<span class="fn">print</span>(df.columns.<span class="fn">tolist</span>())</pre>
+<div class="out-label">Output</div><pre class="output">name      object
+age        int64
+score    float64
+dtype: object
+(2, 3)
+['name', 'age', 'score']</pre></div>
+
+<div class="section-block"><h4>describe &amp; Statistics</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"age"</span>:[<span class="nm">25</span>,<span class="nm">30</span>,<span class="nm">22</span>,<span class="nm">28</span>,<span class="nm">35</span>],<span class="st">"score"</span>:[<span class="nm">88</span>,<span class="nm">92</span>,<span class="nm">76</span>,<span class="nm">95</span>,<span class="nm">81</span>]})
+<span class="fn">print</span>(df.<span class="fn">describe</span>().<span class="fn">round</span>(<span class="nm">1</span>))</pre>
+<div class="out-label">Output</div><pre class="output">       age  score
+count  5.0    5.0
+mean  28.0   86.4
+std    4.8    7.4
+min   22.0   76.0
+25%   25.0   81.0
+50%   28.0   88.0
+75%   30.0   92.0
+max   35.0   95.0</pre></div>
+`;}
+  },
+  {
+    id:'pandas-manip',icon:'🔧',title:'Pandas Manipulation',
+    desc:'loc/iloc, filtering, groupby, merge, fillna, dropna.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔧</span>
+<h2>Pandas Manipulation</h2>
+<p>Real data needs cleaning and reshaping. Pandas provides powerful tools for selecting, filtering, grouping, joining, and handling missing values.</p></div>
+
+<div class="section-block"><h4>loc &amp; iloc</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"name"</span>:[<span class="st">"Ravi"</span>,<span class="st">"Ana"</span>,<span class="st">"Bob"</span>],<span class="st">"score"</span>:[<span class="nm">88</span>,<span class="nm">92</span>,<span class="nm">76</span>]})
+<span class="fn">print</span>(df.<span class="fn">loc</span>[<span class="nm">0</span>, <span class="st">"name"</span>])          <span class="cm"># by label</span>
+<span class="fn">print</span>(df.<span class="fn">iloc</span>[<span class="nm">1</span>, <span class="nm">0</span>])               <span class="cm"># by position</span>
+<span class="fn">print</span>(df.<span class="fn">loc</span>[<span class="nm">0</span>:<span class="nm">1</span>, [<span class="st">"name"</span>,<span class="st">"score"</span>]])</pre>
+<div class="out-label">Output</div><pre class="output">Ravi
+Ana
+   name  score
+0  Ravi     88
+1   Ana     92</pre></div>
+
+<div class="section-block"><h4>Boolean Filtering</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"name"</span>:[<span class="st">"Ravi"</span>,<span class="st">"Ana"</span>,<span class="st">"Bob"</span>,<span class="st">"Priya"</span>],
+                   <span class="st">"age"</span>:[<span class="nm">25</span>,<span class="nm">30</span>,<span class="nm">22</span>,<span class="nm">28</span>],<span class="st">"score"</span>:[<span class="nm">88</span>,<span class="nm">92</span>,<span class="nm">76</span>,<span class="nm">95</span>]})
+<span class="fn">print</span>(df[df[<span class="st">"score"</span>] <span class="op">&gt;</span> <span class="nm">85</span>])
+<span class="fn">print</span>(df[(df[<span class="st">"age"</span>] <span class="op">&gt;</span> <span class="nm">24</span>) <span class="op">&amp;</span> (df[<span class="st">"score"</span>] <span class="op">&gt;</span> <span class="nm">90</span>)])</pre>
+<div class="out-label">Output</div><pre class="output">    name  age  score
+0   Ravi   25     88
+1    Ana   30     92
+3  Priya   28     95
+    name  age  score
+1    Ana   30     92
+3  Priya   28     95</pre></div>
+
+<div class="section-block"><h4>groupby &amp; agg</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"dept"</span>:[<span class="st">"IT"</span>,<span class="st">"HR"</span>,<span class="st">"IT"</span>,<span class="st">"HR"</span>,<span class="st">"IT"</span>],
+                   <span class="st">"salary"</span>:[<span class="nm">70</span>,<span class="nm">50</span>,<span class="nm">80</span>,<span class="nm">55</span>,<span class="nm">75</span>]})
+<span class="fn">print</span>(df.<span class="fn">groupby</span>(<span class="st">"dept"</span>)[<span class="st">"salary"</span>].<span class="fn">agg</span>([<span class="st">"mean"</span>,<span class="st">"max"</span>,<span class="st">"count"</span>]))</pre>
+<div class="out-label">Output</div><pre class="output">       mean  max  count
+dept
+HR     52.5   55      2
+IT     75.0   80      3</pre></div>
+
+<div class="section-block"><h4>merge &amp; fillna / dropna</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+df1 <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"id"</span>:[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>],<span class="st">"name"</span>:[<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>]})
+df2 <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"id"</span>:[<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">4</span>],<span class="st">"score"</span>:[<span class="nm">90</span>,<span class="nm">80</span>,<span class="nm">70</span>]})
+<span class="fn">print</span>(pd.<span class="fn">merge</span>(df1, df2, on<span class="op">=</span><span class="st">"id"</span>, how<span class="op">=</span><span class="st">"left"</span>))
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"a"</span>:[<span class="nm">1</span>,np.nan,<span class="nm">3</span>],<span class="st">"b"</span>:[np.nan,<span class="nm">2</span>,<span class="nm">3</span>]})
+<span class="fn">print</span>(df.<span class="fn">fillna</span>(<span class="nm">0</span>))
+<span class="fn">print</span>(df.<span class="fn">dropna</span>())</pre>
+<div class="out-label">Output</div><pre class="output">   id name  score
+0   1    A   90.0
+1   2    B   80.0
+2   3    C    NaN
+     a    b
+0  1.0  0.0
+1  0.0  2.0
+2  3.0  3.0
+     a    b
+2  3.0  3.0</pre></div>
+`;}
+  },
+  {
+    id:'matplotlib',icon:'📊',title:'Matplotlib',
+    desc:'line, scatter, bar, histogram, subplots, styling.',
+    content(){return `
+<div class="detail-header"><span class="icon">📊</span>
+<h2>Matplotlib</h2>
+<p><strong>Matplotlib</strong> is Python's core plotting library. Install: <code>pip install matplotlib</code>. Note: in a terminal the plots open in a window; in Jupyter they appear inline.</p></div>
+
+<div class="section-block"><h4>Line Plot</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+x <span class="op">=</span> np.<span class="fn">linspace</span>(<span class="nm">0</span>, <span class="nm">2</span><span class="op">*</span>np.pi, <span class="nm">100</span>)
+plt.<span class="fn">figure</span>(figsize<span class="op">=</span>(<span class="nm">8</span>,<span class="nm">3</span>))
+plt.<span class="fn">plot</span>(x, np.<span class="fn">sin</span>(x), label<span class="op">=</span><span class="st">"sin"</span>, color<span class="op">=</span><span class="st">"steelblue"</span>)
+plt.<span class="fn">plot</span>(x, np.<span class="fn">cos</span>(x), label<span class="op">=</span><span class="st">"cos"</span>, color<span class="op">=</span><span class="st">"orange"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>)
+plt.<span class="fn">title</span>(<span class="st">"Sine and Cosine"</span>)
+plt.<span class="fn">xlabel</span>(<span class="st">"x"</span>); plt.<span class="fn">ylabel</span>(<span class="st">"y"</span>)
+plt.<span class="fn">legend</span>()
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[Window: line chart with sin (blue solid) and cos (orange dashed)]</pre></div>
+
+<div class="section-block"><h4>Scatter &amp; Bar</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+fig, (ax1, ax2) <span class="op">=</span> plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">2</span>, figsize<span class="op">=</span>(<span class="nm">10</span>,<span class="nm">4</span>))
+
+np.random.<span class="fn">seed</span>(<span class="nm">42</span>)
+x <span class="op">=</span> np.random.<span class="fn">randn</span>(<span class="nm">50</span>); y <span class="op">=</span> x <span class="op">*</span> <span class="nm">2</span> <span class="op">+</span> np.random.<span class="fn">randn</span>(<span class="nm">50</span>)
+ax1.<span class="fn">scatter</span>(x, y, alpha<span class="op">=</span><span class="nm">0.6</span>, color<span class="op">=</span><span class="st">"steelblue"</span>)
+ax1.<span class="fn">set_title</span>(<span class="st">"Scatter"</span>)
+
+cats <span class="op">=</span> [<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>,<span class="st">"D"</span>]; vals <span class="op">=</span> [<span class="nm">23</span>,<span class="nm">45</span>,<span class="nm">12</span>,<span class="nm">67</span>]
+ax2.<span class="fn">bar</span>(cats, vals, color<span class="op">=</span>[<span class="st">"#4c7a53"</span>,<span class="st">"#a9824f"</span>,<span class="st">"#7ab8d4"</span>,<span class="st">"#d4a0d4"</span>])
+ax2.<span class="fn">set_title</span>(<span class="st">"Bar Chart"</span>)
+plt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[Window: side-by-side scatter and bar chart]</pre></div>
+
+<div class="section-block"><h4>Histogram &amp; Styling</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+plt.<span class="fn">style.use</span>(<span class="st">"seaborn-v0_8-darkgrid"</span>)
+data <span class="op">=</span> np.random.<span class="fn">normal</span>(<span class="nm">60</span>, <span class="nm">15</span>, <span class="nm">1000</span>)
+plt.<span class="fn">figure</span>(figsize<span class="op">=</span>(<span class="nm">7</span>,<span class="nm">4</span>))
+plt.<span class="fn">hist</span>(data, bins<span class="op">=</span><span class="nm">30</span>, color<span class="op">=</span><span class="st">"steelblue"</span>, edgecolor<span class="op">=</span><span class="st">"white"</span>, alpha<span class="op">=</span><span class="nm">0.8</span>)
+plt.<span class="fn">axvline</span>(data.<span class="fn">mean</span>(), color<span class="op">=</span><span class="st">"orange"</span>, linewidth<span class="op">=</span><span class="nm">2</span>, label<span class="op">=</span><span class="st">"mean"</span>)
+plt.<span class="fn">title</span>(<span class="st">"Score Distribution"</span>)
+plt.<span class="fn">legend</span>(); plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[Window: histogram of 1000 normal values with mean line]</pre>
+<div class="example-note">plt.style.use() applies a theme globally. axvline/axhline draws vertical/horizontal reference lines.</div></div>
+
+<div class="section-block"><h4>Subplots Layout</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+fig, axes <span class="op">=</span> plt.<span class="fn">subplots</span>(<span class="nm">2</span>, <span class="nm">2</span>, figsize<span class="op">=</span>(<span class="nm">9</span>, <span class="nm">6</span>))
+x <span class="op">=</span> np.<span class="fn">linspace</span>(<span class="nm">0</span>, <span class="nm">2</span><span class="op">*</span>np.pi, <span class="nm">80</span>)
+
+axes[<span class="nm">0</span>,<span class="nm">0</span>].<span class="fn">plot</span>(x, np.<span class="fn">sin</span>(x)); axes[<span class="nm">0</span>,<span class="nm">0</span>].<span class="fn">set_title</span>(<span class="st">"sin"</span>)
+axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">plot</span>(x, np.<span class="fn">cos</span>(x), <span class="st">"r"</span>); axes[<span class="nm">0</span>,<span class="nm">1</span>].<span class="fn">set_title</span>(<span class="st">"cos"</span>)
+axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">bar</span>([<span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"C"</span>], [<span class="nm">3</span>,<span class="nm">7</span>,<span class="nm">5</span>]); axes[<span class="nm">1</span>,<span class="nm">0</span>].<span class="fn">set_title</span>(<span class="st">"bar"</span>)
+axes[<span class="nm">1</span>,<span class="nm">1</span>].<span class="fn">hist</span>(np.random.<span class="fn">randn</span>(<span class="nm">200</span>), bins<span class="op">=</span><span class="nm">20</span>); axes[<span class="nm">1</span>,<span class="nm">1</span>].<span class="fn">set_title</span>(<span class="st">"hist"</span>)
+
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[2×2 grid: sin, cos, bar chart, histogram — each in its own panel]</pre>
+<div class="example-note">subplots(rows, cols) returns a fig and an array of axes. Access each with axes[row, col]. tight_layout() prevents labels overlapping.</div></div>
+`;}
+  },
+  {
+    id:'sklearn-basics',icon:'🤖',title:'Scikit-learn Basics',
+    desc:'train_test_split, LinearRegression, fit/predict, score, metrics.',
+    content(){return `
+<div class="detail-header"><span class="icon">🤖</span>
+<h2>Scikit-learn Basics</h2>
+<p><strong>Scikit-learn</strong> is the standard ML library. Every model follows the same API: <code>fit(X, y)</code> → <code>predict(X)</code> → <code>score(X, y)</code>. Install: <code>pip install scikit-learn</code></p></div>
+
+<div class="section-block"><h4>train_test_split</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X <span class="op">=</span> np.random.<span class="fn">rand</span>(<span class="nm">100</span>, <span class="nm">3</span>)
+y <span class="op">=</span> np.random.<span class="fn">rand</span>(<span class="nm">100</span>)
+
+X_train, X_test, y_train, y_test <span class="op">=</span> <span class="fn">train_test_split</span>(
+    X, y, test_size<span class="op">=</span><span class="nm">0.2</span>, random_state<span class="op">=</span><span class="nm">42</span>
+)
+<span class="fn">print</span>(X_train.shape, X_test.shape)</pre>
+<div class="out-label">Output</div><pre class="output">(80, 3) (20, 3)</pre>
+<div class="example-note">test_size=0.2 keeps 20% for testing. random_state ensures reproducible splits.</div></div>
+
+<div class="section-block"><h4>LinearRegression — fit &amp; predict</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.<span class="fn">seed</span>(<span class="nm">0</span>)
+X <span class="op">=</span> np.random.<span class="fn">rand</span>(<span class="nm">50</span>, <span class="nm">1</span>) <span class="op">*</span> <span class="nm">10</span>
+y <span class="op">=</span> <span class="nm">3</span> <span class="op">*</span> X.<span class="fn">flatten</span>() <span class="op">+</span> <span class="nm">2</span> <span class="op">+</span> np.random.<span class="fn">randn</span>(<span class="nm">50</span>)
+
+model <span class="op">=</span> <span class="bi">LinearRegression</span>()
+model.<span class="fn">fit</span>(X, y)
+preds <span class="op">=</span> model.<span class="fn">predict</span>([[<span class="nm">5</span>], [<span class="nm">7</span>]])
+<span class="fn">print</span>(<span class="st">f"coef: {model.coef_[0]:.2f}, intercept: {model.intercept_:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"predictions: {preds.round(2)}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">coef: 3.01, intercept: 1.95
+predictions: [17.  22.97]</pre></div>
+
+<div class="section-block"><h4>score &amp; Regression Metrics</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error, mean_squared_error, r2_score
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.<span class="fn">seed</span>(<span class="nm">1</span>)
+X <span class="op">=</span> np.random.<span class="fn">rand</span>(<span class="nm">100</span>,<span class="nm">1</span>) <span class="op">*</span> <span class="nm">10</span>
+y <span class="op">=</span> <span class="nm">2</span><span class="op">*</span>X.<span class="fn">flatten</span>() <span class="op">+</span> np.random.<span class="fn">randn</span>(<span class="nm">100</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.2</span>,random_state<span class="op">=</span><span class="nm">42</span>)
+m <span class="op">=</span> <span class="bi">LinearRegression</span>().<span class="fn">fit</span>(Xtr,ytr)
+p <span class="op">=</span> m.<span class="fn">predict</span>(Xte)
+<span class="fn">print</span>(<span class="st">f"MAE:  {mean_absolute_error(yte,p):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"RMSE: {mean_squared_error(yte,p,squared=False):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"R²:   {r2_score(yte,p):.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">MAE:  0.842
+RMSE: 1.043
+R²:   0.971</pre></div>
+`;}
+  },
+  {
+    id:'classification',icon:'🏷️',title:'Classification',
+    desc:'KNN, Decision Tree, Random Forest, confusion matrix, accuracy, classification_report.',
+    content(){return `
+<div class="detail-header"><span class="icon">🏷️</span>
+<h2>Classification</h2>
+<p>Classification predicts a category label. Scikit-learn provides many classifiers with the same fit/predict API.</p></div>
+
+<div class="section-block"><h4>KNN &amp; Decision Tree</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> KNeighborsClassifier
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.3</span>,random_state<span class="op">=</span><span class="nm">42</span>)
+
+knn <span class="op">=</span> <span class="bi">KNeighborsClassifier</span>(n_neighbors<span class="op">=</span><span class="nm">5</span>).<span class="fn">fit</span>(Xtr,ytr)
+dt  <span class="op">=</span> <span class="bi">DecisionTreeClassifier</span>(max_depth<span class="op">=</span><span class="nm">3</span>,random_state<span class="op">=</span><span class="nm">0</span>).<span class="fn">fit</span>(Xtr,ytr)
+<span class="fn">print</span>(<span class="st">f"KNN accuracy:  {knn.score(Xte,yte):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Tree accuracy: {dt.score(Xte,yte):.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">KNN accuracy:  0.978
+Tree accuracy: 0.978</pre></div>
+
+<div class="section-block"><h4>Random Forest</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X,y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.3</span>,random_state<span class="op">=</span><span class="nm">42</span>)
+rf <span class="op">=</span> <span class="bi">RandomForestClassifier</span>(n_estimators<span class="op">=</span><span class="nm">100</span>,random_state<span class="op">=</span><span class="nm">42</span>).<span class="fn">fit</span>(Xtr,ytr)
+<span class="fn">print</span>(<span class="st">f"RF accuracy: {rf.score(Xte,yte):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">"Feature importances:"</span>, rf.feature_importances_.<span class="fn">round</span>(<span class="nm">3</span>))</pre>
+<div class="out-label">Output</div><pre class="output">RF accuracy: 1.000
+Feature importances: [0.096 0.027 0.441 0.436]</pre></div>
+
+<div class="section-block"><h4>Confusion Matrix, Accuracy &amp; classification_report</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> confusion_matrix, classification_report, accuracy_score
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X,y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.3</span>,random_state<span class="op">=</span><span class="nm">1</span>)
+rf <span class="op">=</span> <span class="bi">RandomForestClassifier</span>(random_state<span class="op">=</span><span class="nm">0</span>).<span class="fn">fit</span>(Xtr,ytr)
+ypred <span class="op">=</span> rf.<span class="fn">predict</span>(Xte)
+<span class="fn">print</span>(<span class="fn">confusion_matrix</span>(yte,ypred))
+<span class="fn">print</span>(<span class="fn">classification_report</span>(yte,ypred,target_names<span class="op">=</span>[<span class="st">"setosa"</span>,<span class="st">"versicolor"</span>,<span class="st">"virginica"</span>]))</pre>
+<div class="out-label">Output</div><pre class="output">[[14  0  0]
+ [ 0 17  1]
+ [ 0  0 13]]
+              precision  recall  f1-score  support
+     setosa      1.00     1.00      1.00       14
+ versicolor      1.00     0.94      0.97       18
+  virginica      0.93     1.00      0.96       13
+   accuracy                         0.98       45</pre></div>
+`;}
+  },
+  {
+    id:'clustering',icon:'🔵',title:'Clustering',
+    desc:'KMeans, elbow method, DBSCAN, silhouette score.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔵</span>
+<h2>Clustering</h2>
+<p>Clustering groups similar data points together without labels (unsupervised learning). <strong>KMeans</strong> finds spherical clusters; <strong>DBSCAN</strong> finds arbitrary-shaped clusters and handles noise.</p></div>
+
+<div class="section-block"><h4>KMeans</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_blobs
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X, true_labels <span class="op">=</span> <span class="fn">make_blobs</span>(n_samples<span class="op">=</span><span class="nm">150</span>, centers<span class="op">=</span><span class="nm">3</span>, random_state<span class="op">=</span><span class="nm">42</span>)
+km <span class="op">=</span> <span class="bi">KMeans</span>(n_clusters<span class="op">=</span><span class="nm">3</span>, random_state<span class="op">=</span><span class="nm">42</span>, n_init<span class="op">=</span><span class="st">"auto"</span>).<span class="fn">fit</span>(X)
+<span class="fn">print</span>(<span class="st">"Cluster counts:"</span>, np.<span class="fn">bincount</span>(km.labels_))
+<span class="fn">print</span>(<span class="st">"Inertia:"</span>, <span class="fn">round</span>(km.inertia_, <span class="nm">1</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Cluster counts: [50 50 50]
+Inertia: 212.4</pre></div>
+
+<div class="section-block"><h4>Elbow Method</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_blobs
+
+X, _ <span class="op">=</span> <span class="fn">make_blobs</span>(n_samples<span class="op">=</span><span class="nm">200</span>, centers<span class="op">=</span><span class="nm">4</span>, random_state<span class="op">=</span><span class="nm">0</span>)
+inertias <span class="op">=</span> []
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">9</span>):
+    km <span class="op">=</span> <span class="bi">KMeans</span>(n_clusters<span class="op">=</span>k, random_state<span class="op">=</span><span class="nm">0</span>, n_init<span class="op">=</span><span class="st">"auto"</span>).<span class="fn">fit</span>(X)
+    inertias.<span class="fn">append</span>(<span class="fn">round</span>(km.inertia_, <span class="nm">1</span>))
+<span class="fn">print</span>(<span class="st">"k  inertia"</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> <span class="fn">enumerate</span>(inertias, <span class="nm">1</span>):
+    <span class="fn">print</span>(<span class="st">f"{k}  {v}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">k  inertia
+1  10421.3
+2  2545.1
+3  1098.2
+4  347.3
+5  310.4
+6  275.8
+7  245.1
+8  218.9</pre>
+<div class="example-note">The "elbow" is at k=4 where inertia stops dropping sharply — that's the optimal k. Plot inertia vs k and look for the bend.</div></div>
+
+<div class="section-block"><h4>DBSCAN</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> DBSCAN
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_moons
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X, _ <span class="op">=</span> <span class="fn">make_moons</span>(n_samples<span class="op">=</span><span class="nm">200</span>, noise<span class="op">=</span><span class="nm">0.1</span>, random_state<span class="op">=</span><span class="nm">0</span>)
+db <span class="op">=</span> <span class="bi">DBSCAN</span>(eps<span class="op">=</span><span class="nm">0.3</span>, min_samples<span class="op">=</span><span class="nm">5</span>).<span class="fn">fit</span>(X)
+<span class="fn">print</span>(<span class="st">"Labels:"</span>, np.<span class="fn">unique</span>(db.labels_))
+<span class="fn">print</span>(<span class="st">"Noise points:"</span>, np.<span class="fn">sum</span>(db.labels_ <span class="op">==</span> <span class="op">-</span><span class="nm">1</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Labels: [-1  0  1]
+Noise points: 3</pre>
+<div class="example-note">DBSCAN assigns -1 to noise points. eps = neighbourhood radius, min_samples = min points to form a dense region.</div></div>
+
+<div class="section-block"><h4>Silhouette Score</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> make_blobs
+
+X, _ <span class="op">=</span> <span class="fn">make_blobs</span>(n_samples<span class="op">=</span><span class="nm">150</span>, centers<span class="op">=</span><span class="nm">3</span>, random_state<span class="op">=</span><span class="nm">0</span>)
+<span class="kw">for</span> k <span class="kw">in</span> [<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>]:
+    labels <span class="op">=</span> <span class="bi">KMeans</span>(n_clusters<span class="op">=</span>k,random_state<span class="op">=</span><span class="nm">0</span>,n_init<span class="op">=</span><span class="st">"auto"</span>).<span class="fn">fit_predict</span>(X)
+    score <span class="op">=</span> <span class="fn">silhouette_score</span>(X, labels)
+    <span class="fn">print</span>(<span class="st">f"k={k}: silhouette={score:.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">k=2: silhouette=0.627
+k=3: silhouette=0.800
+k=4: silhouette=0.651</pre>
+<div class="example-note">Silhouette score ranges from -1 to 1. Higher is better — clusters are dense and well-separated. k=3 wins here.</div></div>
+`;}
+  },
+  {
+    id:'feature-eng',icon:'🛠️',title:'Feature Engineering',
+    desc:'StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder, Pipeline.',
+    content(){return `
+<div class="detail-header"><span class="icon">🛠️</span>
+<h2>Feature Engineering</h2>
+<p>Raw data needs to be transformed before feeding to ML models. Scaling prevents large-valued features dominating; encoding converts categories to numbers.</p></div>
+
+<div class="section-block"><h4>StandardScaler &amp; MinMaxScaler</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, MinMaxScaler
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">100</span>,<span class="nm">0.1</span>],[<span class="nm">200</span>,<span class="nm">0.5</span>],[<span class="nm">300</span>,<span class="nm">1.0</span>]])
+
+std <span class="op">=</span> <span class="bi">StandardScaler</span>().<span class="fn">fit_transform</span>(X)
+mm  <span class="op">=</span> <span class="bi">MinMaxScaler</span>().<span class="fn">fit_transform</span>(X)
+<span class="fn">print</span>(<span class="st">"StandardScaler:\n"</span>, std.<span class="fn">round</span>(<span class="nm">2</span>))
+<span class="fn">print</span>(<span class="st">"MinMaxScaler:\n"</span>, mm.<span class="fn">round</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">StandardScaler:
+ [[-1.22 -1.22]
+ [ 0.    0.  ]
+ [ 1.22  1.22]]
+MinMaxScaler:
+ [[0.  0. ]
+ [0.5 0.44]
+ [1.  1. ]]</pre>
+<div class="example-note">StandardScaler → mean=0, std=1 (good for SVM, linear models). MinMaxScaler → [0,1] range (good for neural nets, KNN).</div></div>
+
+<div class="section-block"><h4>LabelEncoder &amp; OneHotEncoder</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> LabelEncoder, OneHotEncoder
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+cats <span class="op">=</span> [<span class="st">"cat"</span>,<span class="st">"dog"</span>,<span class="st">"cat"</span>,<span class="st">"bird"</span>]
+le <span class="op">=</span> <span class="bi">LabelEncoder</span>()
+<span class="fn">print</span>(<span class="st">"Label encoded:"</span>, le.<span class="fn">fit_transform</span>(cats))
+
+ohe <span class="op">=</span> <span class="bi">OneHotEncoder</span>(sparse_output<span class="op">=</span><span class="kw">False</span>)
+X <span class="op">=</span> np.<span class="fn">array</span>(cats).<span class="fn">reshape</span>(<span class="op">-</span><span class="nm">1</span>, <span class="nm">1</span>)
+<span class="fn">print</span>(<span class="st">"OneHot:\n"</span>, ohe.<span class="fn">fit_transform</span>(X))</pre>
+<div class="out-label">Output</div><pre class="output">Label encoded: [1 2 1 0]
+OneHot:
+ [[0. 1. 0.]
+ [0. 0. 1.]
+ [0. 1. 0.]
+ [1. 0. 0.]]</pre>
+<div class="example-note">LabelEncoder: categories → integers (for target labels). OneHotEncoder: categories → binary columns (for features — avoids false ordinal relationships).</div></div>
+
+<div class="section-block"><h4>Pipeline</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.2</span>,random_state<span class="op">=</span><span class="nm">0</span>)
+
+pipe <span class="op">=</span> <span class="bi">Pipeline</span>([
+    (<span class="st">"scaler"</span>, <span class="bi">StandardScaler</span>()),
+    (<span class="st">"model"</span>,  <span class="bi">LogisticRegression</span>(max_iter<span class="op">=</span><span class="nm">200</span>))
+])
+pipe.<span class="fn">fit</span>(Xtr, ytr)
+<span class="fn">print</span>(<span class="st">f"Pipeline accuracy: {pipe.score(Xte,yte):.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Pipeline accuracy: 0.967</pre>
+<div class="example-note">Pipeline chains preprocessing + model. fit() fits all steps. predict() transforms then predicts. Prevents data leakage from applying scaler on full dataset.</div></div>
+`;}
+  },
+  {
+    id:'model-eval',icon:'📐',title:'Model Evaluation',
+    desc:'cross_val_score, GridSearchCV, precision/recall/F1, ROC/AUC.',
+    content(){return `
+<div class="detail-header"><span class="icon">📐</span>
+<h2>Model Evaluation</h2>
+<p>A single train/test split can be misleading. Cross-validation and grid search give more reliable performance estimates and help tune hyperparameters.</p></div>
+
+<div class="section-block"><h4>cross_val_score</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_val_score
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+scores <span class="op">=</span> <span class="fn">cross_val_score</span>(<span class="bi">RandomForestClassifier</span>(random_state<span class="op">=</span><span class="nm">0</span>), X, y, cv<span class="op">=</span><span class="nm">5</span>)
+<span class="fn">print</span>(<span class="st">f"Fold scores: {scores.round(3)}"</span>)
+<span class="fn">print</span>(<span class="st">f"Mean: {scores.mean():.3f} ± {scores.std():.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Fold scores: [0.967 1.    0.933 0.967 1.   ]
+Mean: 0.973 ± 0.025</pre></div>
+
+<div class="section-block"><h4>GridSearchCV</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+param_grid <span class="op">=</span> {<span class="st">"n_estimators"</span>:[<span class="nm">10</span>,<span class="nm">50</span>,<span class="nm">100</span>], <span class="st">"max_depth"</span>:[<span class="kw">None</span>,<span class="nm">3</span>,<span class="nm">5</span>]}
+gs <span class="op">=</span> <span class="bi">GridSearchCV</span>(<span class="bi">RandomForestClassifier</span>(random_state<span class="op">=</span><span class="nm">0</span>), param_grid, cv<span class="op">=</span><span class="nm">5</span>)
+gs.<span class="fn">fit</span>(X, y)
+<span class="fn">print</span>(<span class="st">"Best params:"</span>, gs.best_params_)
+<span class="fn">print</span>(<span class="st">f"Best CV score: {gs.best_score_:.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Best params: {'max_depth': None, 'n_estimators': 100}
+Best CV score: 0.967</pre></div>
+
+<div class="section-block"><h4>Precision, Recall, F1</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> precision_score, recall_score, f1_score
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+y_true <span class="op">=</span> [<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>]
+y_pred <span class="op">=</span> [<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>]
+<span class="fn">print</span>(<span class="st">f"Precision: {precision_score(y_true,y_pred):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Recall:    {recall_score(y_true,y_pred):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"F1:        {f1_score(y_true,y_pred):.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Precision: 0.800
+Recall:    0.800
+F1:        0.800</pre>
+<div class="example-note">Precision = of predicted positives, how many were actually positive. Recall = of actual positives, how many did we catch. F1 = harmonic mean of both.</div></div>
+
+<div class="section-block"><h4>ROC Curve &amp; AUC</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, roc_curve
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_breast_cancer
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+X,y <span class="op">=</span> <span class="fn">load_breast_cancer</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.3</span>,random_state<span class="op">=</span><span class="nm">0</span>)
+lr <span class="op">=</span> <span class="bi">LogisticRegression</span>(max_iter<span class="op">=</span><span class="nm">5000</span>).<span class="fn">fit</span>(Xtr,ytr)
+proba <span class="op">=</span> lr.<span class="fn">predict_proba</span>(Xte)[:,<span class="nm">1</span>]
+<span class="fn">print</span>(<span class="st">f"AUC: {roc_auc_score(yte, proba):.4f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">AUC: 0.9955</pre>
+<div class="example-note">AUC=1.0 is perfect. AUC=0.5 is random. AUC measures overall discriminative ability regardless of threshold — better than accuracy for imbalanced datasets.</div></div>
+`;}
+  },
+  {
+    id:'pca',icon:'📉',title:'Dimensionality Reduction',
+    desc:'PCA, explained variance ratio, t-SNE, feature importance.',
+    content(){return `
+<div class="detail-header"><span class="icon">📉</span>
+<h2>Dimensionality Reduction</h2>
+<p>High-dimensional data is hard to visualise and can hurt model performance. PCA and t-SNE reduce dimensions while preserving structure.</p></div>
+
+<div class="section-block"><h4>PCA</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+X_scaled <span class="op">=</span> <span class="bi">StandardScaler</span>().<span class="fn">fit_transform</span>(X)
+pca <span class="op">=</span> <span class="bi">PCA</span>(n_components<span class="op">=</span><span class="nm">2</span>)
+X2d <span class="op">=</span> pca.<span class="fn">fit_transform</span>(X_scaled)
+<span class="fn">print</span>(<span class="st">"Original shape:"</span>, X.shape)
+<span class="fn">print</span>(<span class="st">"Reduced shape: "</span>, X2d.shape)</pre>
+<div class="out-label">Output</div><pre class="output">Original shape: (150, 4)
+Reduced shape:  (150, 2)</pre></div>
+
+<div class="section-block"><h4>Explained Variance Ratio</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X,_ <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+pca <span class="op">=</span> <span class="bi">PCA</span>().<span class="fn">fit</span>(<span class="bi">StandardScaler</span>().<span class="fn">fit_transform</span>(X))
+<span class="fn">print</span>(<span class="st">"Variance per PC:"</span>, pca.explained_variance_ratio_.<span class="fn">round</span>(<span class="nm">3</span>))
+<span class="fn">print</span>(<span class="st">"Cumulative:      "</span>, np.<span class="fn">cumsum</span>(pca.explained_variance_ratio_).<span class="fn">round</span>(<span class="nm">3</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Variance per PC: [0.73  0.229 0.037 0.005]
+Cumulative:      [0.73  0.958 0.995 1.   ]</pre>
+<div class="example-note">2 components capture 95.8% of the variance — we can reduce from 4D to 2D losing only 4.2% information.</div></div>
+
+<div class="section-block"><h4>t-SNE</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.manifold <span class="kw">import</span> TSNE
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+tsne <span class="op">=</span> <span class="bi">TSNE</span>(n_components<span class="op">=</span><span class="nm">2</span>, random_state<span class="op">=</span><span class="nm">42</span>, perplexity<span class="op">=</span><span class="nm">30</span>)
+X2d <span class="op">=</span> tsne.<span class="fn">fit_transform</span>(X)
+<span class="fn">print</span>(<span class="st">"t-SNE output shape:"</span>, X2d.shape)
+<span class="fn">print</span>(<span class="st">"Sample:"</span>, X2d[:<span class="nm">3</span>].<span class="fn">round</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">t-SNE output shape: (150, 2)
+Sample: [[-16.34  12.81]
+ [-13.92  15.23]
+ [-15.01  14.52]]</pre>
+<div class="example-note">t-SNE is for visualisation only — not for ML pipelines. It preserves local structure (clusters) but distances between clusters are not meaningful.</div></div>
+
+<div class="section-block"><h4>Feature Importance</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+rf <span class="op">=</span> <span class="bi">RandomForestClassifier</span>(n_estimators<span class="op">=</span><span class="nm">100</span>, random_state<span class="op">=</span><span class="nm">0</span>).<span class="fn">fit</span>(X, y)
+names <span class="op">=</span> [<span class="st">"sepal_len"</span>,<span class="st">"sepal_wid"</span>,<span class="st">"petal_len"</span>,<span class="st">"petal_wid"</span>]
+<span class="kw">for</span> n, imp <span class="kw">in</span> <span class="fn">sorted</span>(<span class="fn">zip</span>(names, rf.feature_importances_), key<span class="op">=</span><span class="kw">lambda</span> x:<span class="op">-</span>x[<span class="nm">1</span>]):
+    <span class="fn">print</span>(<span class="st">f"{n}: {imp:.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">petal_wid: 0.436
+petal_len: 0.441
+sepal_len: 0.096
+sepal_wid: 0.027</pre></div>
+`;}
+  },
+  {
+    id:'nlp',icon:'💬',title:'NLP Basics',
+    desc:'tokenization, stopwords, CountVectorizer, TF-IDF.',
+    content(){return `
+<div class="detail-header"><span class="icon">💬</span>
+<h2>NLP Basics</h2>
+<p>Natural Language Processing converts text into numerical features that ML models can use. Install: <code>pip install scikit-learn nltk</code></p></div>
+
+<div class="section-block"><h4>Tokenization</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+<span class="kw">def</span> <span class="fn">tokenize</span>(text):
+    text <span class="op">=</span> text.<span class="fn">lower</span>()
+    tokens <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'\b[a-z]+\b'</span>, text)
+    <span class="kw">return</span> tokens
+
+text <span class="op">=</span> <span class="st">"Python is great! Python makes ML easy."</span>
+<span class="fn">print</span>(<span class="fn">tokenize</span>(text))</pre>
+<div class="out-label">Output</div><pre class="output">['python', 'is', 'great', 'python', 'makes', 'ml', 'easy']</pre></div>
+
+<div class="section-block"><h4>Stopwords</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> ENGLISH_STOP_WORDS
+<span class="kw">import</span> re
+
+<span class="kw">def</span> <span class="fn">remove_stopwords</span>(text):
+    tokens <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'\b[a-z]+\b'</span>, text.<span class="fn">lower</span>())
+    <span class="kw">return</span> [t <span class="kw">for</span> t <span class="kw">in</span> tokens <span class="kw">if</span> t <span class="kw">not in</span> ENGLISH_STOP_WORDS]
+
+<span class="fn">print</span>(<span class="fn">remove_stopwords</span>(<span class="st">"This is a great Python library for ML"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">['great', 'python', 'library', 'ml']</pre>
+<div class="example-note">Stopwords (is, the, a, this) carry little meaning. Removing them reduces noise and vocabulary size.</div></div>
+
+<div class="section-block"><h4>CountVectorizer</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> CountVectorizer
+
+corpus <span class="op">=</span> [<span class="st">"I love Python"</span>, <span class="st">"Python is great"</span>, <span class="st">"I love ML and Python"</span>]
+cv <span class="op">=</span> <span class="bi">CountVectorizer</span>()
+X <span class="op">=</span> cv.<span class="fn">fit_transform</span>(corpus)
+<span class="fn">print</span>(<span class="st">"Vocabulary:"</span>, cv.vocabulary_)
+<span class="fn">print</span>(<span class="st">"Matrix:\n"</span>, X.<span class="fn">toarray</span>())</pre>
+<div class="out-label">Output</div><pre class="output">Vocabulary: {'love': 4, 'python': 5, 'is': 3, 'great': 2, 'ml': 6, 'and': 0, 'i': 1}
+Matrix:
+ [[0 1 0 0 1 1 0]
+ [0 0 1 1 0 1 0]
+ [1 1 0 0 1 1 1]]</pre></div>
+
+<div class="section-block"><h4>TF-IDF</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> TfidfVectorizer
+
+corpus <span class="op">=</span> [<span class="st">"I love Python"</span>, <span class="st">"Python is great"</span>, <span class="st">"I love ML and Python"</span>]
+tfidf <span class="op">=</span> <span class="bi">TfidfVectorizer</span>()
+X <span class="op">=</span> tfidf.<span class="fn">fit_transform</span>(corpus)
+<span class="fn">print</span>(X.<span class="fn">toarray</span>().<span class="fn">round</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">[[0.   0.53 0.   0.   0.67 0.51 0.  ]
+ [0.   0.   0.58 0.58 0.   0.44 0.  ]
+ [0.45 0.36 0.   0.   0.45 0.34 0.45]]</pre>
+<div class="example-note">TF-IDF down-weights words that appear in many documents (like "python" here) and up-weights rare discriminative terms. Better than raw counts for text classification.</div></div>
+`;}
+  },
+  {
+    id:'model-persist',icon:'💾',title:'Model Persistence',
+    desc:'joblib, pickle, saving/loading pipeline, best practices.',
+    content(){return `
+<div class="detail-header"><span class="icon">💾</span>
+<h2>Model Persistence</h2>
+<p>Trained models need to be saved for deployment. <strong>joblib</strong> is preferred for scikit-learn models (handles numpy arrays efficiently); <strong>pickle</strong> is Python's built-in serialisation.</p></div>
+
+<div class="section-block"><h4>joblib dump &amp; load</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> joblib
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+model <span class="op">=</span> <span class="bi">RandomForestClassifier</span>(random_state<span class="op">=</span><span class="nm">0</span>).<span class="fn">fit</span>(X, y)
+
+joblib.<span class="fn">dump</span>(model, <span class="st">"rf_model.pkl"</span>)
+loaded <span class="op">=</span> joblib.<span class="fn">load</span>(<span class="st">"rf_model.pkl"</span>)
+<span class="fn">print</span>(<span class="st">"Loaded model score:"</span>, loaded.<span class="fn">score</span>(X, y))</pre>
+<div class="out-label">Output</div><pre class="output">Loaded model score: 1.0</pre></div>
+
+<div class="section-block"><h4>pickle</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pickle
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+model <span class="op">=</span> <span class="bi">LogisticRegression</span>(max_iter<span class="op">=</span><span class="nm">200</span>).<span class="fn">fit</span>(X, y)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"lr.pkl"</span>, <span class="st">"wb"</span>) <span class="kw">as</span> f:
+    pickle.<span class="fn">dump</span>(model, f)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"lr.pkl"</span>, <span class="st">"rb"</span>) <span class="kw">as</span> f:
+    loaded <span class="op">=</span> pickle.<span class="fn">load</span>(f)
+
+<span class="fn">print</span>(<span class="st">"Loaded:"</span>, loaded.<span class="fn">predict</span>(X[:<span class="nm">3</span>]))</pre>
+<div class="out-label">Output</div><pre class="output">Loaded: [0 0 0]</pre>
+<div class="example-note">joblib is preferred for large sklearn models — it uses memory mapping for large arrays. pickle is fine for small models or non-sklearn objects.</div></div>
+
+<div class="section-block"><h4>Saving a Full Pipeline</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> joblib
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+pipe <span class="op">=</span> <span class="bi">Pipeline</span>([(<span class="st">"sc"</span>,<span class="bi">StandardScaler</span>()),(<span class="st">"lr"</span>,<span class="bi">LogisticRegression</span>(max_iter<span class="op">=</span><span class="nm">200</span>))])
+pipe.<span class="fn">fit</span>(X, y)
+joblib.<span class="fn">dump</span>(pipe, <span class="st">"pipeline.pkl"</span>)
+
+loaded_pipe <span class="op">=</span> joblib.<span class="fn">load</span>(<span class="st">"pipeline.pkl"</span>)
+<span class="fn">print</span>(<span class="st">"Pipeline score:"</span>, loaded_pipe.<span class="fn">score</span>(X, y).<span class="fn">round</span>(<span class="nm">3</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Pipeline score: 0.973</pre>
+<div class="example-note">Always save the full pipeline, not just the model — the scaler's fitted parameters (mean, std) are needed to transform new data identically at inference time.</div></div>
+
+<div class="section-block"><h4>Best Practices</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> sklearn, joblib
+
+<span class="cm"># 1. Save sklearn version alongside the model</span>
+metadata <span class="op">=</span> {<span class="st">"sklearn_version"</span>: sklearn.__version__, <span class="st">"model_file"</span>: <span class="st">"rf.pkl"</span>}
+joblib.<span class="fn">dump</span>(metadata, <span class="st">"model_meta.pkl"</span>)
+
+<span class="cm"># 2. Never unpickle files from untrusted sources
+#    pickle.load() executes arbitrary code on load</span>
+
+<span class="cm"># 3. Use compression for large models</span>
+<span class="cm"># joblib.dump(model, "model.pkl.gz", compress=3)</span>
+
+<span class="cm"># 4. Check versions match before loading</span>
+meta <span class="op">=</span> joblib.<span class="fn">load</span>(<span class="st">"model_meta.pkl"</span>)
+<span class="kw">if</span> meta[<span class="st">"sklearn_version"</span>] <span class="op">!=</span> sklearn.__version__:
+    <span class="fn">print</span>(<span class="st">"WARNING: version mismatch — model may behave differently"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">f"sklearn {sklearn.__version__} — versions match ✓"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">sklearn 1.4.0 — versions match ✓</pre>
+<div class="example-note">Always record the sklearn version when saving. A model trained on sklearn 1.2 may not load correctly on 1.4. Never load pickle files from untrusted sources — they can execute arbitrary code.</div></div>
+`;}
+  },
+  {
+    id:'keras',icon:'🧠',title:'Keras Basics',
+    desc:'Sequential, Dense, compile, fit, evaluate, callbacks.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧠</span>
+<h2>Keras Basics</h2>
+<p><strong>Keras</strong> (part of TensorFlow) is the high-level API for building neural networks. Install: <code>pip install tensorflow</code></p></div>
+
+<div class="section-block"><h4>Sequential &amp; Dense Layers</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> tensorflow <span class="kw">import</span> keras
+<span class="kw">from</span> tensorflow.keras <span class="kw">import</span> layers
+
+model <span class="op">=</span> keras.<span class="bi">Sequential</span>([
+    layers.<span class="bi">Dense</span>(<span class="nm">64</span>, activation<span class="op">=</span><span class="st">"relu"</span>, input_shape<span class="op">=</span>(<span class="nm">4</span>,)),
+    layers.<span class="bi">Dense</span>(<span class="nm">32</span>, activation<span class="op">=</span><span class="st">"relu"</span>),
+    layers.<span class="bi">Dense</span>(<span class="nm">3</span>,  activation<span class="op">=</span><span class="st">"softmax"</span>)
+])
+model.<span class="fn">summary</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Model: "sequential"
+Layer (type)        Output Shape    Param #
+dense (Dense)       (None, 64)      320
+dense_1 (Dense)     (None, 32)      2,080
+dense_2 (Dense)     (None, 3)       99
+Total params: 2,499</pre></div>
+
+<div class="section-block"><h4>compile, fit &amp; evaluate</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> tensorflow <span class="kw">import</span> keras
+<span class="kw">from</span> tensorflow.keras <span class="kw">import</span> layers
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">import</span> tensorflow <span class="kw">as</span> tf
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+X <span class="op">=</span> <span class="bi">StandardScaler</span>().<span class="fn">fit_transform</span>(X)
+y <span class="op">=</span> tf.keras.utils.<span class="fn">to_categorical</span>(y, <span class="nm">3</span>)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.2</span>,random_state<span class="op">=</span><span class="nm">42</span>)
+
+model <span class="op">=</span> keras.<span class="bi">Sequential</span>([layers.<span class="bi">Dense</span>(<span class="nm">32</span>,activation<span class="op">=</span><span class="st">"relu"</span>,input_shape<span class="op">=</span>(<span class="nm">4</span>,)),layers.<span class="bi">Dense</span>(<span class="nm">3</span>,activation<span class="op">=</span><span class="st">"softmax"</span>)])
+model.<span class="fn">compile</span>(optimizer<span class="op">=</span><span class="st">"adam"</span>, loss<span class="op">=</span><span class="st">"categorical_crossentropy"</span>, metrics<span class="op">=</span>[<span class="st">"accuracy"</span>])
+model.<span class="fn">fit</span>(Xtr, ytr, epochs<span class="op">=</span><span class="nm">30</span>, batch_size<span class="op">=</span><span class="nm">16</span>, verbose<span class="op">=</span><span class="nm">0</span>)
+loss, acc <span class="op">=</span> model.<span class="fn">evaluate</span>(Xte, yte, verbose<span class="op">=</span><span class="nm">0</span>)
+<span class="fn">print</span>(<span class="st">f"Test accuracy: {acc:.3f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Test accuracy: 0.967</pre></div>
+
+<div class="section-block"><h4>Callbacks (EarlyStopping)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> tensorflow.keras.callbacks <span class="kw">import</span> EarlyStopping, ModelCheckpoint
+
+early_stop <span class="op">=</span> <span class="bi">EarlyStopping</span>(
+    monitor<span class="op">=</span><span class="st">"val_loss"</span>, patience<span class="op">=</span><span class="nm">5</span>, restore_best_weights<span class="op">=</span><span class="kw">True</span>
+)
+checkpoint <span class="op">=</span> <span class="bi">ModelCheckpoint</span>(
+    <span class="st">"best_model.h5"</span>, monitor<span class="op">=</span><span class="st">"val_accuracy"</span>, save_best_only<span class="op">=</span><span class="kw">True</span>
+)
+
+<span class="cm"># model.fit(Xtr, ytr, validation_split=0.2,</span>
+<span class="cm">#           epochs=100, callbacks=[early_stop, checkpoint])</span>
+<span class="fn">print</span>(<span class="st">"EarlyStopping stops training when val_loss stops improving for 5 epochs."</span>)
+<span class="fn">print</span>(<span class="st">"ModelCheckpoint saves the best model weights automatically."</span>)</pre>
+<div class="out-label">Output</div><pre class="output">EarlyStopping stops training when val_loss stops improving for 5 epochs.
+ModelCheckpoint saves the best model weights automatically.</pre>
+<div class="example-note">Callbacks are called at each epoch. EarlyStopping prevents overfitting by stopping early. restore_best_weights reverts to the best epoch's weights.</div></div>
+`;}
+  },
+  {
+    id:'llm',icon:'🤖',title:'LLM / OpenAI API',
+    desc:'API setup, chat completions, system/user roles, token counting, streaming.',
+    content(){return `
+<div class="detail-header"><span class="icon">🤖</span>
+<h2>LLM / OpenAI API</h2>
+<p>The OpenAI API (and compatible APIs like Anthropic, Together, local Ollama) let you call large language models programmatically. Install: <code>pip install openai</code></p></div>
+
+<div class="section-block"><h4>API Setup &amp; Key</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">import</span> os
+
+<span class="cm"># Never hardcode keys — use environment variables</span>
+client <span class="op">=</span> <span class="bi">OpenAI</span>(api_key<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"OPENAI_API_KEY"</span>])
+<span class="fn">print</span>(<span class="st">"Client ready"</span>)
+
+<span class="cm"># Set key in shell before running:
+# export OPENAI_API_KEY="sk-..."   (Linux/Mac)
+# set OPENAI_API_KEY=sk-...        (Windows cmd)</span></pre>
+<div class="out-label">Output</div><pre class="output">Client ready</pre></div>
+
+<div class="section-block"><h4>Chat Completions</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client <span class="op">=</span> <span class="bi">OpenAI</span>()
+
+response <span class="op">=</span> client.chat.completions.<span class="fn">create</span>(
+    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,
+    messages<span class="op">=</span>[
+        {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"What is 2+2? Answer in one word."</span>}
+    ]
+)
+<span class="fn">print</span>(response.choices[<span class="nm">0</span>].message.content)</pre>
+<div class="out-label">Output</div><pre class="output">Four</pre></div>
+
+<div class="section-block"><h4>System / User / Assistant Roles</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client <span class="op">=</span> <span class="bi">OpenAI</span>()
+
+messages <span class="op">=</span> [
+    {<span class="st">"role"</span>: <span class="st">"system"</span>,    <span class="st">"content"</span>: <span class="st">"You are a concise Python tutor."</span>},
+    {<span class="st">"role"</span>: <span class="st">"user"</span>,      <span class="st">"content"</span>: <span class="st">"What is a list comprehension?"</span>},
+    {<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: <span class="st">"A compact way to create lists."</span>},
+    {<span class="st">"role"</span>: <span class="st">"user"</span>,      <span class="st">"content"</span>: <span class="st">"Give me one example."</span>},
+]
+
+resp <span class="op">=</span> client.chat.completions.<span class="fn">create</span>(model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>, messages<span class="op">=</span>messages)
+<span class="fn">print</span>(resp.choices[<span class="nm">0</span>].message.content)</pre>
+<div class="out-label">Output</div><pre class="output">[x**2 for x in range(5)]  # [0, 1, 4, 9, 16]</pre>
+<div class="example-note">system = persistent instructions for the model's behaviour. user = human turn. assistant = model's previous reply. Build multi-turn conversations by appending to the messages list.</div></div>
+
+<div class="section-block"><h4>Token Counting &amp; Streaming</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+client <span class="op">=</span> <span class="bi">OpenAI</span>()
+
+<span class="cm"># Token usage from response</span>
+resp <span class="op">=</span> client.chat.completions.<span class="fn">create</span>(
+    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,
+    messages<span class="op">=</span>[{<span class="st">"role"</span>:<span class="st">"user"</span>,<span class="st">"content"</span>:<span class="st">"Hello"</span>}]
+)
+<span class="fn">print</span>(<span class="st">"Prompt tokens:"</span>, resp.usage.prompt_tokens)
+<span class="fn">print</span>(<span class="st">"Completion tokens:"</span>, resp.usage.completion_tokens)
+
+<span class="cm"># Streaming — print tokens as they arrive</span>
+stream <span class="op">=</span> client.chat.completions.<span class="fn">create</span>(
+    model<span class="op">=</span><span class="st">"gpt-4o-mini"</span>,
+    messages<span class="op">=</span>[{<span class="st">"role"</span>:<span class="st">"user"</span>,<span class="st">"content"</span>:<span class="st">"Say hi"</span>}],
+    stream<span class="op">=</span><span class="kw">True</span>
+)
+<span class="kw">for</span> chunk <span class="kw">in</span> stream:
+    delta <span class="op">=</span> chunk.choices[<span class="nm">0</span>].delta.content
+    <span class="kw">if</span> delta: <span class="fn">print</span>(delta, end<span class="op">=</span><span class="st">""</span>, flush<span class="op">=</span><span class="kw">True</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Prompt tokens: 8
+Completion tokens: 9
+Hi there! How can I help you today?</pre>
+<div class="example-note">Streaming delivers tokens progressively — crucial for chatbot UX. stream=True returns a generator; each chunk has a delta with partial content.</div></div>
+`;}
+  },
+  {
+    id:'seaborn',icon:'🎨',title:'Seaborn',
+    desc:'heatmap, pairplot, boxplot, violin, categorical plots.',
+    content(){return `
+<div class="detail-header"><span class="icon">🎨</span>
+<h2>Seaborn</h2>
+<p><strong>Seaborn</strong> is a statistical visualisation library built on Matplotlib. It produces beautiful plots with less code. Install: <code>pip install seaborn</code></p></div>
+
+<div class="section-block"><h4>Heatmap</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+df <span class="op">=</span> sns.<span class="fn">load_dataset</span>(<span class="st">"iris"</span>).drop(<span class="st">"species"</span>, axis<span class="op">=</span><span class="nm">1</span>)
+corr <span class="op">=</span> df.<span class="fn">corr</span>()
+sns.<span class="fn">heatmap</span>(corr, annot<span class="op">=</span><span class="kw">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"coolwarm"</span>)
+plt.<span class="fn">title</span>(<span class="st">"Correlation Heatmap"</span>); plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[Heatmap of feature correlations — warm = positive, cool = negative]</pre>
+<div class="example-note">annot=True writes the value in each cell. cmap="coolwarm" — blue (negative) → white → red (positive).</div></div>
+
+<div class="section-block"><h4>pairplot</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+iris <span class="op">=</span> sns.<span class="fn">load_dataset</span>(<span class="st">"iris"</span>)
+sns.<span class="fn">pairplot</span>(iris, hue<span class="op">=</span><span class="st">"species"</span>, diag_kind<span class="op">=</span><span class="st">"kde"</span>)
+plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[Grid of scatter plots for every feature pair, coloured by species]</pre>
+<div class="example-note">pairplot shows every feature vs every other feature. hue separates classes by colour. Essential for quick EDA.</div></div>
+
+<div class="section-block"><h4>boxplot &amp; violin</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+tips <span class="op">=</span> sns.<span class="fn">load_dataset</span>(<span class="st">"tips"</span>)
+fig, (ax1, ax2) <span class="op">=</span> plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">2</span>, figsize<span class="op">=</span>(<span class="nm">10</span>,<span class="nm">4</span>))
+sns.<span class="fn">boxplot</span>(data<span class="op">=</span>tips, x<span class="op">=</span><span class="st">"day"</span>, y<span class="op">=</span><span class="st">"total_bill"</span>, ax<span class="op">=</span>ax1)
+sns.<span class="fn">violinplot</span>(data<span class="op">=</span>tips, x<span class="op">=</span><span class="st">"day"</span>, y<span class="op">=</span><span class="st">"total_bill"</span>, ax<span class="op">=</span>ax2)
+plt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[Boxplot shows median/IQR/outliers; violin adds full distribution shape]</pre></div>
+
+<div class="section-block"><h4>Categorical Plots (countplot, barplot)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+tips <span class="op">=</span> sns.<span class="fn">load_dataset</span>(<span class="st">"tips"</span>)
+fig, (ax1, ax2) <span class="op">=</span> plt.<span class="fn">subplots</span>(<span class="nm">1</span>, <span class="nm">2</span>, figsize<span class="op">=</span>(<span class="nm">10</span>,<span class="nm">4</span>))
+sns.<span class="fn">countplot</span>(data<span class="op">=</span>tips, x<span class="op">=</span><span class="st">"day"</span>, hue<span class="op">=</span><span class="st">"sex"</span>, ax<span class="op">=</span>ax1)
+sns.<span class="fn">barplot</span>(data<span class="op">=</span>tips, x<span class="op">=</span><span class="st">"day"</span>, y<span class="op">=</span><span class="st">"tip"</span>, ax<span class="op">=</span>ax2)
+plt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()</pre>
+<div class="out-label">Output</div><pre class="output">[countplot: bar counts by day/sex; barplot: mean tip ± CI per day]</pre>
+<div class="example-note">countplot counts rows. barplot shows mean ± 95% CI. Both support hue for sub-grouping by a second category.</div></div>
+`;}
+  },
+  {
+    id:'reg-metrics',icon:'📏',title:'Regression Metrics',
+    desc:'MAE, MSE, RMSE, R², adjusted R².',
+    content(){return `
+<div class="detail-header"><span class="icon">📏</span>
+<h2>Regression Metrics</h2>
+<p>These metrics measure how far a regression model's predictions are from actual values — each emphasises different aspects of error.</p></div>
+
+<div class="section-block"><h4>MAE — Mean Absolute Error</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+y_true <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">3</span>, <span class="op">-</span><span class="nm">0.5</span>, <span class="nm">2</span>, <span class="nm">7</span>])
+y_pred <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">2.5</span>, <span class="nm">0</span>, <span class="nm">2</span>, <span class="nm">8</span>])
+<span class="fn">print</span>(<span class="st">f"MAE: {mean_absolute_error(y_true, y_pred)}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">MAE: 0.5</pre>
+<div class="example-note">MAE = average |y − ŷ|. Robust to outliers — every error weighted equally. Interpretable: predictions are off by 0.5 units on average.</div></div>
+
+<div class="section-block"><h4>MSE &amp; RMSE</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_squared_error
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+y_true <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">3</span>, <span class="op">-</span><span class="nm">0.5</span>, <span class="nm">2</span>, <span class="nm">7</span>])
+y_pred <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">2.5</span>, <span class="nm">0</span>, <span class="nm">2</span>, <span class="nm">8</span>])
+mse  <span class="op">=</span> <span class="fn">mean_squared_error</span>(y_true, y_pred)
+rmse <span class="op">=</span> np.<span class="fn">sqrt</span>(mse)
+<span class="fn">print</span>(<span class="st">f"MSE:  {mse}"</span>)
+<span class="fn">print</span>(<span class="st">f"RMSE: {rmse:.4f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">MSE:  0.375
+RMSE: 0.6124</pre>
+<div class="example-note">MSE squares errors — large errors penalised more. RMSE is in the same units as the target, making it more interpretable than MSE.</div></div>
+
+<div class="section-block"><h4>R² Score</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> r2_score
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+y_true <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">3</span>, <span class="op">-</span><span class="nm">0.5</span>, <span class="nm">2</span>, <span class="nm">7</span>])
+y_pred <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">2.5</span>, <span class="nm">0</span>, <span class="nm">2</span>, <span class="nm">8</span>])
+<span class="fn">print</span>(<span class="st">f"R²: {r2_score(y_true, y_pred):.4f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">R²: 0.9486</pre>
+<div class="example-note">R²=1 is perfect. R²=0 means no better than predicting the mean. Measures proportion of variance explained by the model.</div></div>
+
+<div class="section-block"><h4>Adjusted R²</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> r2_score
+
+<span class="kw">def</span> <span class="fn">adjusted_r2</span>(y_true, y_pred, n_features):
+    n <span class="op">=</span> <span class="fn">len</span>(y_true)
+    r2 <span class="op">=</span> <span class="fn">r2_score</span>(y_true, y_pred)
+    <span class="kw">return</span> <span class="nm">1</span> <span class="op">-</span> (<span class="nm">1</span><span class="op">-</span>r2) <span class="op">*</span> (n<span class="op">-</span><span class="nm">1</span>) <span class="op">/</span> (n<span class="op">-</span>n_features<span class="op">-</span><span class="nm">1</span>)
+
+y_true <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">3</span>,<span class="op">-</span><span class="nm">0.5</span>,<span class="nm">2</span>,<span class="nm">7</span>,<span class="nm">5</span>,<span class="nm">4</span>])
+y_pred <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">2.8</span>,<span class="nm">0.1</span>,<span class="nm">2.1</span>,<span class="nm">6.9</span>,<span class="nm">5.2</span>,<span class="nm">3.8</span>])
+<span class="fn">print</span>(<span class="st">f"R²:          {r2_score(y_true,y_pred):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Adjusted R²: {adjusted_r2(y_true,y_pred,3):.4f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">R²:          0.9897
+Adjusted R²: 0.9743</pre>
+<div class="example-note">Adjusted R² penalises adding irrelevant features. R² always increases with more features; adjusted R² decreases if new features don't help enough.</div></div>
+`;}
+  },
+  {
+    id:'timeseries',icon:'📈',title:'Time Series',
+    desc:'datetime index, resample, rolling, shift, lag features.',
+    content(){return `
+<div class="detail-header"><span class="icon">📈</span>
+<h2>Time Series</h2>
+<p>Time series data has temporal order. Pandas provides powerful tools for resampling, rolling statistics, and creating lag features for forecasting models.</p></div>
+
+<div class="section-block"><h4>datetime Index</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+dates <span class="op">=</span> pd.<span class="fn">date_range</span>(<span class="st">"2024-01-01"</span>, periods<span class="op">=</span><span class="nm">6</span>, freq<span class="op">=</span><span class="st">"D"</span>)
+ts <span class="op">=</span> pd.<span class="bi">Series</span>([<span class="nm">10</span>,<span class="nm">12</span>,<span class="nm">9</span>,<span class="nm">15</span>,<span class="nm">11</span>,<span class="nm">14</span>], index<span class="op">=</span>dates)
+<span class="fn">print</span>(ts)
+<span class="fn">print</span>(ts[<span class="st">"2024-01-03"</span>:<span class="st">"2024-01-05"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">2024-01-01    10
+2024-01-02    12
+2024-01-03     9
+2024-01-04    15
+2024-01-05    11
+2024-01-06    14
+2024-01-03     9
+2024-01-04    15
+2024-01-05    11</pre></div>
+
+<div class="section-block"><h4>resample</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+np.random.<span class="fn">seed</span>(<span class="nm">0</span>)
+ts <span class="op">=</span> pd.<span class="bi">Series</span>(np.random.<span class="fn">randn</span>(<span class="nm">90</span>),
+    index<span class="op">=</span>pd.<span class="fn">date_range</span>(<span class="st">"2024-01-01"</span>, periods<span class="op">=</span><span class="nm">90</span>, freq<span class="op">=</span><span class="st">"D"</span>))
+<span class="fn">print</span>(ts.<span class="fn">resample</span>(<span class="st">"ME"</span>).<span class="fn">mean</span>().<span class="fn">round</span>(<span class="nm">3</span>))</pre>
+<div class="out-label">Output</div><pre class="output">2024-01-31    0.057
+2024-02-29   -0.122
+2024-03-31    0.034
+Freq: ME, dtype: float64</pre>
+<div class="example-note">resample("ME") groups by month-end. Use "W" for weekly, "QE" quarterly. Then apply .mean(), .sum(), .max() etc.</div></div>
+
+<div class="section-block"><h4>Rolling Window</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+ts <span class="op">=</span> pd.<span class="bi">Series</span>([<span class="nm">10</span>,<span class="nm">11</span>,<span class="nm">9</span>,<span class="nm">14</span>,<span class="nm">12</span>,<span class="nm">15</span>,<span class="nm">13</span>])
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"val"</span>:ts, <span class="st">"MA3"</span>:ts.<span class="fn">rolling</span>(<span class="nm">3</span>).<span class="fn">mean</span>(), <span class="st">"std3"</span>:ts.<span class="fn">rolling</span>(<span class="nm">3</span>).<span class="fn">std</span>()})
+<span class="fn">print</span>(df.<span class="fn">round</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">   val    MA3  std3
+0   10    NaN   NaN
+1   11    NaN   NaN
+2    9  10.00  1.00
+3   14  11.33  2.52
+4   12  11.67  2.52
+5   15  13.67  1.53
+6   13  13.33  1.53</pre></div>
+
+<div class="section-block"><h4>shift &amp; Lag Features</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+ts <span class="op">=</span> pd.<span class="bi">Series</span>([<span class="nm">10</span>,<span class="nm">12</span>,<span class="nm">9</span>,<span class="nm">15</span>,<span class="nm">11</span>,<span class="nm">14</span>])
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"t"</span>:ts, <span class="st">"t-1"</span>:ts.<span class="fn">shift</span>(<span class="nm">1</span>), <span class="st">"t-2"</span>:ts.<span class="fn">shift</span>(<span class="nm">2</span>), <span class="st">"diff"</span>:ts.<span class="fn">diff</span>()})
+<span class="fn">print</span>(df)</pre>
+<div class="out-label">Output</div><pre class="output">    t   t-1   t-2  diff
+0  10   NaN   NaN   NaN
+1  12  10.0   NaN   2.0
+2   9  12.0  10.0  -3.0
+3  15   9.0  12.0   6.0
+4  11  15.0   9.0  -4.0
+5  14  11.0  15.0   3.0</pre>
+<div class="example-note">Lag features convert time series forecasting into supervised ML: t-1 and t-2 become input features; t is the target to predict.</div></div>
+`;}
+  },
+  {
+    id:'preprocessing',icon:'🔄',title:'Data Preprocessing',
+    desc:'SimpleImputer, ColumnTransformer, PolynomialFeatures, full pipeline.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔄</span>
+<h2>Data Preprocessing</h2>
+<p>Real datasets have missing values and mixed types. <strong>ColumnTransformer</strong> applies different preprocessing to different columns, and <strong>Pipeline</strong> chains everything into one reproducible step.</p></div>
+
+<div class="section-block"><h4>SimpleImputer</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">1</span>,<span class="nm">2</span>],[np.nan,<span class="nm">3</span>],[<span class="nm">7</span>,np.nan]])
+<span class="fn">print</span>(<span class="st">"mean:"</span>, <span class="bi">SimpleImputer</span>(strategy<span class="op">=</span><span class="st">"mean"</span>).<span class="fn">fit_transform</span>(X))
+<span class="fn">print</span>(<span class="st">"const:"</span>, <span class="bi">SimpleImputer</span>(strategy<span class="op">=</span><span class="st">"constant"</span>,fill_value<span class="op">=</span><span class="nm">0</span>).<span class="fn">fit_transform</span>(X))</pre>
+<div class="out-label">Output</div><pre class="output">mean: [[1.  2. ]
+ [4.  3. ]
+ [7.  2.5]]
+const: [[1. 2.]
+ [0. 3.]
+ [7. 0.]]</pre></div>
+
+<div class="section-block"><h4>ColumnTransformer</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, OneHotEncoder
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"age"</span>:[<span class="nm">25</span>,<span class="nm">30</span>,<span class="nm">22</span>],<span class="st">"city"</span>:[<span class="st">"Hyd"</span>,<span class="st">"Mum"</span>,<span class="st">"Hyd"</span>]})
+ct <span class="op">=</span> <span class="bi">ColumnTransformer</span>([
+    (<span class="st">"num"</span>, <span class="bi">StandardScaler</span>(), [<span class="st">"age"</span>]),
+    (<span class="st">"cat"</span>, <span class="bi">OneHotEncoder</span>(), [<span class="st">"city"</span>])
+])
+<span class="fn">print</span>(ct.<span class="fn">fit_transform</span>(df).<span class="fn">round</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">[[-0.22  1.    0.  ]
+ [ 1.4   0.    1.  ]
+ [-1.18  1.    0.  ]]</pre>
+<div class="example-note">ColumnTransformer applies StandardScaler to numeric cols and OneHotEncoder to categorical cols simultaneously — output is one combined feature matrix.</div></div>
+
+<div class="section-block"><h4>PolynomialFeatures</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> PolynomialFeatures
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+X <span class="op">=</span> np.<span class="fn">array</span>([[<span class="nm">2</span>, <span class="nm">3</span>]])
+poly <span class="op">=</span> <span class="bi">PolynomialFeatures</span>(degree<span class="op">=</span><span class="nm">2</span>, include_bias<span class="op">=</span><span class="kw">False</span>)
+<span class="fn">print</span>(poly.<span class="fn">fit_transform</span>(X))
+<span class="fn">print</span>(poly.<span class="fn">get_feature_names_out</span>([<span class="st">"a"</span>,<span class="st">"b"</span>]))</pre>
+<div class="out-label">Output</div><pre class="output">[[2. 3. 4. 6. 9.]]
+['a' 'b' 'a^2' 'a b' 'b^2']</pre>
+<div class="example-note">For [a,b] degree=2: adds a², ab, b². Captures non-linear relationships in linear models without switching to a non-linear algorithm.</div></div>
+
+<div class="section-block"><h4>Full Pipeline with ColumnTransformer</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, OneHotEncoder
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">import</span> pandas <span class="kw">as</span> pd, numpy <span class="kw">as</span> np
+
+df <span class="op">=</span> pd.<span class="bi">DataFrame</span>({<span class="st">"age"</span>:[<span class="nm">25</span>,np.nan,<span class="nm">30</span>,<span class="nm">22</span>],<span class="st">"city"</span>:[<span class="st">"Hyd"</span>,<span class="st">"Mum"</span>,<span class="st">"Hyd"</span>,<span class="st">"Del"</span>]})
+y <span class="op">=</span> [<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>]
+num_pipe <span class="op">=</span> <span class="bi">Pipeline</span>([(<span class="st">"imp"</span>,<span class="bi">SimpleImputer</span>(strategy<span class="op">=</span><span class="st">"mean"</span>)),(<span class="st">"sc"</span>,<span class="bi">StandardScaler</span>())])
+ct <span class="op">=</span> <span class="bi">ColumnTransformer</span>([(<span class="st">"num"</span>,num_pipe,[<span class="st">"age"</span>]),(<span class="st">"cat"</span>,<span class="bi">OneHotEncoder</span>(handle_unknown<span class="op">=</span><span class="st">"ignore"</span>),[<span class="st">"city"</span>])])
+pipe <span class="op">=</span> <span class="bi">Pipeline</span>([(<span class="st">"prep"</span>,ct),(<span class="st">"model"</span>,<span class="bi">LogisticRegression</span>())])
+pipe.<span class="fn">fit</span>(df, y)
+<span class="fn">print</span>(<span class="st">"Predictions:"</span>, pipe.<span class="fn">predict</span>(df))</pre>
+<div class="out-label">Output</div><pre class="output">Predictions: [0 1 0 1]</pre></div>
+`;}
+  },
+  {
+    id:'nn-intro',icon:'🧬',title:'Neural Networks Intro',
+    desc:'perceptron concept, MLPClassifier, activation functions, layer structure.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧬</span>
+<h2>Neural Networks Intro</h2>
+<p>Neural networks learn by adjusting weights across layers of connected nodes. Scikit-learn's <strong>MLPClassifier</strong> is the easiest entry point before moving to Keras/PyTorch.</p></div>
+
+<div class="section-block"><h4>Perceptron Concept</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">perceptron</span>(inputs, weights, bias):
+    z <span class="op">=</span> np.<span class="fn">dot</span>(inputs, weights) <span class="op">+</span> bias
+    <span class="kw">return</span> <span class="nm">1</span> <span class="kw">if</span> z <span class="op">&gt;=</span> <span class="nm">0</span> <span class="kw">else</span> <span class="nm">0</span>
+
+w <span class="op">=</span> np.<span class="fn">array</span>([<span class="nm">1</span>,<span class="nm">1</span>]); b <span class="op">=</span> <span class="op">-</span><span class="nm">1.5</span>   <span class="cm"># AND gate</span>
+<span class="kw">for</span> x <span class="kw">in</span> [[<span class="nm">0</span>,<span class="nm">0</span>],[<span class="nm">0</span>,<span class="nm">1</span>],[<span class="nm">1</span>,<span class="nm">0</span>],[<span class="nm">1</span>,<span class="nm">1</span>]]:
+    <span class="fn">print</span>(<span class="st">f"AND{x} = {perceptron(x,w,b)}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">AND[0, 0] = 0
+AND[0, 1] = 0
+AND[1, 0] = 0
+AND[1, 1] = 1</pre>
+<div class="example-note">A single perceptron learns linearly separable functions. XOR requires multiple layers — the key motivation for deep networks.</div></div>
+
+<div class="section-block"><h4>Activation Functions</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+z <span class="op">=</span> np.<span class="fn">array</span>([<span class="op">-</span><span class="nm">2</span>,<span class="op">-</span><span class="nm">1</span>,<span class="nm">0</span>,<span class="nm">1</span>,<span class="nm">2</span>])
+<span class="fn">print</span>(<span class="st">"ReLU:   "</span>, np.<span class="fn">maximum</span>(<span class="nm">0</span>,z))
+<span class="fn">print</span>(<span class="st">"Sigmoid:"</span>, (<span class="nm">1</span><span class="op">/</span>(<span class="nm">1</span><span class="op">+</span>np.<span class="fn">exp</span>(<span class="op">-</span>z))).<span class="fn">round</span>(<span class="nm">2</span>))
+<span class="fn">print</span>(<span class="st">"Tanh:   "</span>, np.<span class="fn">tanh</span>(z).<span class="fn">round</span>(<span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">ReLU:    [0 0 0 1 2]
+Sigmoid: [0.12 0.27 0.5  0.73 0.88]
+Tanh:    [-0.96 -0.76  0.    0.76  0.96]</pre>
+<div class="example-note">ReLU (hidden): fast, avoids vanishing gradient. Sigmoid (binary output): squashes to [0,1]. Softmax (multi-class output): probabilities summing to 1.</div></div>
+
+<div class="section-block"><h4>MLPClassifier &amp; Layer Structure</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> sklearn.neural_network <span class="kw">import</span> MLPClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+X, y <span class="op">=</span> <span class="fn">load_iris</span>(return_X_y<span class="op">=</span><span class="kw">True</span>)
+X <span class="op">=</span> <span class="bi">StandardScaler</span>().<span class="fn">fit_transform</span>(X)
+Xtr,Xte,ytr,yte <span class="op">=</span> <span class="fn">train_test_split</span>(X,y,test_size<span class="op">=</span><span class="nm">0.2</span>,random_state<span class="op">=</span><span class="nm">42</span>)
+
+mlp <span class="op">=</span> <span class="bi">MLPClassifier</span>(hidden_layer_sizes<span class="op">=</span>(<span class="nm">64</span>,<span class="nm">32</span>),activation<span class="op">=</span><span class="st">"relu"</span>,max_iter<span class="op">=</span><span class="nm">500</span>,random_state<span class="op">=</span><span class="nm">0</span>)
+mlp.<span class="fn">fit</span>(Xtr, ytr)
+<span class="fn">print</span>(<span class="st">f"Accuracy:    {mlp.score(Xte,yte):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Layer sizes: input(4) → hidden(64) → hidden(32) → output(3)"</span>)
+<span class="fn">print</span>(<span class="st">f"n_iter_:     {mlp.n_iter_}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Accuracy:    1.000
+Layer sizes: input(4) → hidden(64) → hidden(32) → output(3)
+n_iter_:     87</pre>
+<div class="example-note">hidden_layer_sizes=(64,32) = two hidden layers. Always scale before training — neural networks converge much faster with standardised features.</div></div>
+`;}
+  }
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

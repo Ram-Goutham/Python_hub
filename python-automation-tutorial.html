@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Automation</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link active" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+<div class="site-header">
+  <div class="level-badge">Level 5</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Python Automation</h1>
+  <p>File system, subprocess, web scraping, Excel, PDF, email, scheduling, databases, and CLI tools — automate everything with Python.</p>
+</div>
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+<script>
+const topics = [
+  {
+    id:'os-sys',icon:'🗂️',title:'os & sys',
+    desc:'os.path, listdir, makedirs, environ, sys.argv, sys.exit.',
+    content(){return `
+<div class="detail-header"><span class="icon">🗂️</span>
+<h2>os &amp; sys</h2>
+<p>The <strong>os</strong> module interacts with the operating system — files, directories, environment variables. The <strong>sys</strong> module interacts with the Python interpreter itself.</p></div>
+
+<div class="section-block"><h4>os.path Operations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> os
+
+p <span class="op">=</span> <span class="st">"/home/user/data/file.txt"</span>
+<span class="fn">print</span>(os.path.<span class="fn">basename</span>(p))
+<span class="fn">print</span>(os.path.<span class="fn">dirname</span>(p))
+<span class="fn">print</span>(os.path.<span class="fn">splitext</span>(p))
+<span class="fn">print</span>(os.path.<span class="fn">join</span>(<span class="st">"data"</span>, <span class="st">"output"</span>, <span class="st">"result.csv"</span>))
+<span class="fn">print</span>(os.path.<span class="fn">exists</span>(p))
+<span class="fn">print</span>(os.path.<span class="fn">abspath</span>(<span class="st">"."</span>))</pre>
+<div class="out-label">Output</div><pre class="output">file.txt
+/home/user/data
+('/home/user/data/file', '.txt')
+data/output/result.csv
+False
+/current/working/directory</pre></div>
+
+<div class="section-block"><h4>listdir &amp; walk</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> os
+
+<span class="cm"># list files in current dir</span>
+<span class="fn">print</span>(os.<span class="fn">listdir</span>(<span class="st">"."</span>)[:<span class="nm">4</span>])
+
+<span class="cm"># walk full directory tree</span>
+<span class="kw">for</span> root, dirs, files <span class="kw">in</span> os.<span class="fn">walk</span>(<span class="st">"."</span>):
+    <span class="kw">for</span> f <span class="kw">in</span> files:
+        <span class="kw">if</span> f.<span class="fn">endswith</span>(<span class="st">".py"</span>):
+            <span class="fn">print</span>(os.path.<span class="fn">join</span>(root, f))
+    <span class="kw">break</span>  <span class="cm"># top level only</span></pre>
+<div class="out-label">Output</div><pre class="output">['script.py', 'data', 'README.md', 'config.json']
+./script.py</pre></div>
+
+<div class="section-block"><h4>makedirs &amp; remove</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> os
+
+os.<span class="fn">makedirs</span>(<span class="st">"output/reports/2024"</span>, exist_ok<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"Created nested dirs"</span>)
+
+<span class="cm"># os.remove("file.txt")     — delete a file</span>
+<span class="cm"># os.rmdir("empty_dir")     — delete empty dir</span>
+<span class="fn">print</span>(os.path.<span class="fn">isdir</span>(<span class="st">"output/reports/2024"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Created nested dirs
+True</pre>
+<div class="example-note">exist_ok=True prevents an error if the directory already exists — safe to call repeatedly in scripts.</div></div>
+
+<div class="section-block"><h4>environ, sys.argv &amp; sys.exit</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> os, sys
+
+<span class="cm"># Read environment variable with default</span>
+db_url <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"DATABASE_URL"</span>, <span class="st">"sqlite:///local.db"</span>)
+<span class="fn">print</span>(<span class="st">"DB:"</span>, db_url)
+
+<span class="cm"># sys.argv: script name + arguments</span>
+<span class="fn">print</span>(<span class="st">"Script:"</span>, sys.argv[<span class="nm">0</span>])
+<span class="cm"># sys.exit(0)  — clean exit; sys.exit(1) = error exit</span>
+<span class="fn">print</span>(<span class="st">"Python:"</span>, sys.version.<span class="fn">split</span>()[<span class="nm">0</span>])</pre>
+<div class="out-label">Output</div><pre class="output">DB: sqlite:///local.db
+Script: script.py
+Python: 3.11.4</pre></div>
+`;}
+  },
+  {
+    id:'shutil',icon:'📦',title:'shutil',
+    desc:'copy, copy2, move, rmtree, make_archive, disk_usage.',
+    content(){return `
+<div class="detail-header"><span class="icon">📦</span>
+<h2>shutil</h2>
+<p><strong>shutil</strong> (shell utilities) provides high-level file operations — copying, moving, removing entire directory trees, and creating archives.</p></div>
+
+<div class="section-block"><h4>copy &amp; copy2</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> shutil
+
+<span class="cm"># copy — copies file content + permissions</span>
+shutil.<span class="fn">copy</span>(<span class="st">"source.txt"</span>, <span class="st">"dest.txt"</span>)
+
+<span class="cm"># copy2 — also preserves metadata (timestamps)</span>
+shutil.<span class="fn">copy2</span>(<span class="st">"source.txt"</span>, <span class="st">"backup/source.txt"</span>)
+
+<span class="cm"># copytree — copy entire directory</span>
+shutil.<span class="fn">copytree</span>(<span class="st">"src_dir"</span>, <span class="st">"dst_dir"</span>, dirs_exist_ok<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"Copied"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Copied</pre>
+<div class="example-note">copy() copies content. copy2() also preserves access/modified timestamps. copytree() recursively copies a whole directory.</div></div>
+
+<div class="section-block"><h4>move &amp; rmtree</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> shutil
+
+shutil.<span class="fn">move</span>(<span class="st">"old_name.txt"</span>, <span class="st">"new_name.txt"</span>)   <span class="cm"># rename or move</span>
+shutil.<span class="fn">move</span>(<span class="st">"file.txt"</span>, <span class="st">"archive/"</span>)           <span class="cm"># move into folder</span>
+
+<span class="cm"># rmtree — remove directory and ALL its contents</span>
+shutil.<span class="fn">rmtree</span>(<span class="st">"temp_dir"</span>, ignore_errors<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"Moved and cleaned up"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Moved and cleaned up</pre>
+<div class="example-note">rmtree is destructive — there is no recycle bin. Use ignore_errors=True to silently skip if the directory doesn't exist.</div></div>
+
+<div class="section-block"><h4>make_archive</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> shutil, os
+
+<span class="cm"># Create a zip archive of a folder</span>
+shutil.<span class="fn">make_archive</span>(
+    base_name<span class="op">=</span><span class="st">"backup_2024"</span>,   <span class="cm"># output filename (no ext)</span>
+    format<span class="op">=</span><span class="st">"zip"</span>,             <span class="cm"># zip / tar / gztar</span>
+    root_dir<span class="op">=</span><span class="st">"."</span>,
+    base_dir<span class="op">=</span><span class="st">"output"</span>         <span class="cm"># folder to archive</span>
+)
+<span class="fn">print</span>(os.path.<span class="fn">exists</span>(<span class="st">"backup_2024.zip"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">True</pre></div>
+
+<div class="section-block"><h4>disk_usage</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> shutil
+
+usage <span class="op">=</span> shutil.<span class="fn">disk_usage</span>(<span class="st">"/"</span>)
+<span class="fn">print</span>(<span class="st">f"Total: {usage.total / 1e9:.1f} GB"</span>)
+<span class="fn">print</span>(<span class="st">f"Used:  {usage.used  / 1e9:.1f} GB"</span>)
+<span class="fn">print</span>(<span class="st">f"Free:  {usage.free  / 1e9:.1f} GB"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Total: 500.1 GB
+Used:  210.4 GB
+Free:  289.7 GB</pre></div>
+`;}
+  },
+  {
+    id:'pathlib',icon:'📂',title:'pathlib',
+    desc:'Path ops, glob, rglob, read_text/write_text, stat, iterdir.',
+    content(){return `
+<div class="detail-header"><span class="icon">📂</span>
+<h2>pathlib</h2>
+<p><strong>pathlib.Path</strong> is the modern, object-oriented way to work with file system paths. It replaces most os.path usage with cleaner, chainable syntax.</p></div>
+
+<div class="section-block"><h4>Path Basics</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+p <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"data/reports/jan.csv"</span>)
+<span class="fn">print</span>(p.name)       <span class="cm"># jan.csv</span>
+<span class="fn">print</span>(p.stem)       <span class="cm"># jan</span>
+<span class="fn">print</span>(p.suffix)     <span class="cm"># .csv</span>
+<span class="fn">print</span>(p.parent)     <span class="cm"># data/reports</span>
+<span class="fn">print</span>(p.<span class="fn">with_suffix</span>(<span class="st">".xlsx"</span>))  <span class="cm"># rename extension</span>
+<span class="fn">print</span>(p.<span class="fn">with_name</span>(<span class="st">"feb.csv"</span>))  <span class="cm"># rename file</span></pre>
+<div class="out-label">Output</div><pre class="output">jan.csv
+jan
+.csv
+data/reports
+data/reports/jan.xlsx
+data/reports/feb.csv</pre></div>
+
+<div class="section-block"><h4>glob &amp; rglob</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+base <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"."</span>)
+
+<span class="cm"># glob — current dir only</span>
+<span class="kw">for</span> f <span class="kw">in</span> base.<span class="fn">glob</span>(<span class="st">"*.html"</span>):
+    <span class="fn">print</span>(f.name)
+
+<span class="cm"># rglob — recursive (all subdirs)</span>
+py_files <span class="op">=</span> <span class="fn">list</span>(base.<span class="fn">rglob</span>(<span class="st">"*.py"</span>))
+<span class="fn">print</span>(<span class="st">f"Found {len(py_files)} .py files"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">index.html
+app.html
+Found 12 .py files</pre></div>
+
+<div class="section-block"><h4>read_text &amp; write_text</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+p <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"note.txt"</span>)
+p.<span class="fn">write_text</span>(<span class="st">"Hello from pathlib!\nLine 2"</span>)
+content <span class="op">=</span> p.<span class="fn">read_text</span>()
+<span class="fn">print</span>(content)
+<span class="fn">print</span>(p.<span class="fn">read_bytes</span>()[:<span class="nm">5</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Hello from pathlib!
+Line 2
+b'Hello'</pre></div>
+
+<div class="section-block"><h4>stat &amp; iterdir</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> datetime
+
+p <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"note.txt"</span>)
+st <span class="op">=</span> p.<span class="fn">stat</span>()
+<span class="fn">print</span>(<span class="st">f"Size: {st.st_size} bytes"</span>)
+<span class="fn">print</span>(<span class="st">f"Modified: {datetime.datetime.fromtimestamp(st.st_mtime):%Y-%m-%d}"</span>)
+
+<span class="cm"># List directory contents</span>
+<span class="kw">for</span> item <span class="kw">in</span> <span class="bi">Path</span>(<span class="st">"."</span>).<span class="fn">iterdir</span>():
+    kind <span class="op">=</span> <span class="st">"DIR"</span> <span class="kw">if</span> item.<span class="fn">is_dir</span>() <span class="kw">else</span> <span class="st">"FILE"</span>
+    <span class="fn">print</span>(<span class="st">f"{kind}: {item.name}"</span>)
+    <span class="kw">break</span></pre>
+<div class="out-label">Output</div><pre class="output">Size: 26 bytes
+Modified: 2026-07-25
+FILE: script.py</pre></div>
+`;}
+  },
+  {
+    id:'subprocess',icon:'⚙️',title:'subprocess',
+    desc:'run, Popen, stdout/stderr, check_output, shell=True.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>subprocess</h2>
+<p>The <strong>subprocess</strong> module runs external commands and shell scripts from Python, capturing their output and handling errors.</p></div>
+
+<div class="section-block"><h4>subprocess.run</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> subprocess
+
+result <span class="op">=</span> subprocess.<span class="fn">run</span>(
+    [<span class="st">"python"</span>, <span class="st">"--version"</span>],
+    capture_output<span class="op">=</span><span class="kw">True</span>, text<span class="op">=</span><span class="kw">True</span>
+)
+<span class="fn">print</span>(<span class="st">"stdout:"</span>, result.stdout)
+<span class="fn">print</span>(<span class="st">"returncode:"</span>, result.returncode)</pre>
+<div class="out-label">Output</div><pre class="output">stdout: Python 3.11.4
+returncode: 0</pre>
+<div class="example-note">capture_output=True captures stdout and stderr. text=True decodes bytes to string. returncode 0 = success, non-zero = error.</div></div>
+
+<div class="section-block"><h4>Capturing stdout &amp; stderr</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> subprocess
+
+result <span class="op">=</span> subprocess.<span class="fn">run</span>(
+    [<span class="st">"ls"</span>, <span class="st">"-la"</span>],
+    stdout<span class="op">=</span>subprocess.PIPE,
+    stderr<span class="op">=</span>subprocess.PIPE,
+    text<span class="op">=</span><span class="kw">True</span>
+)
+<span class="fn">print</span>(result.stdout[:<span class="nm">120</span>])
+
+<span class="cm"># Raise exception on non-zero exit</span>
+<span class="kw">try</span>:
+    subprocess.<span class="fn">run</span>([<span class="st">"false"</span>], check<span class="op">=</span><span class="kw">True</span>)
+<span class="kw">except</span> subprocess.<span class="bi">CalledProcessError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="st">f"Failed with code {e.returncode}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">total 48
+drwxr-xr-x  8 user user 4096 Jul 25 10:00 .
+drwxr-xr-x 22 user user 4096 Jul 25 09:00 ..
+Failed with code 1</pre></div>
+
+<div class="section-block"><h4>check_output</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> subprocess
+
+<span class="cm"># Quick way to get command output as string</span>
+output <span class="op">=</span> subprocess.<span class="fn">check_output</span>(
+    [<span class="st">"echo"</span>, <span class="st">"Hello World"</span>], text<span class="op">=</span><span class="kw">True</span>
+)
+<span class="fn">print</span>(output.<span class="fn">strip</span>())
+
+git_log <span class="op">=</span> subprocess.<span class="fn">check_output</span>(
+    [<span class="st">"git"</span>, <span class="st">"log"</span>, <span class="st">"--oneline"</span>, <span class="st">"-3"</span>], text<span class="op">=</span><span class="kw">True</span>
+)
+<span class="fn">print</span>(git_log)</pre>
+<div class="out-label">Output</div><pre class="output">Hello World
+a1b2c3d Fix bug in parser
+e4f5g6h Add feature X
+h7i8j9k Initial commit</pre></div>
+
+<div class="section-block"><h4>Popen &amp; shell=True</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> subprocess
+
+<span class="cm"># Popen — non-blocking, read output line by line</span>
+proc <span class="op">=</span> subprocess.<span class="bi">Popen</span>(
+    [<span class="st">"ping"</span>, <span class="st">"-c"</span>, <span class="st">"3"</span>, <span class="st">"8.8.8.8"</span>],
+    stdout<span class="op">=</span>subprocess.PIPE, text<span class="op">=</span><span class="kw">True</span>
+)
+<span class="kw">for</span> line <span class="kw">in</span> proc.stdout:
+    <span class="fn">print</span>(line.<span class="fn">strip</span>())
+proc.<span class="fn">wait</span>()
+
+<span class="cm"># shell=True — run a shell pipeline</span>
+out <span class="op">=</span> subprocess.<span class="fn">check_output</span>(<span class="st">"ls *.py | wc -l"</span>, shell<span class="op">=</span><span class="kw">True</span>, text<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"py files:"</span>, out.<span class="fn">strip</span>())</pre>
+<div class="out-label">Output</div><pre class="output">PING 8.8.8.8: 56 bytes of data
+64 bytes from 8.8.8.8: icmp_seq=0 ttl=118 time=12ms
+...
+py files: 5</pre>
+<div class="example-note">shell=True passes the command to the OS shell — enables pipes and globs but is a security risk if the command contains user input.</div></div>
+`;}
+  },
+  {
+    id:'schedule',icon:'⏰',title:'schedule',
+    desc:'every(), run_pending, threading for background jobs, multiple intervals.',
+    content(){return `
+<div class="detail-header"><span class="icon">⏰</span>
+<h2>schedule</h2>
+<p><strong>schedule</strong> is a simple, human-friendly job scheduler. Install: <code>pip install schedule</code>. Jobs run in the same thread — use threading for background execution.</p></div>
+
+<div class="section-block"><h4>every().do() &amp; run_pending</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> schedule, time
+
+<span class="kw">def</span> <span class="fn">backup</span>():
+    <span class="fn">print</span>(<span class="st">"Running backup..."</span>)
+
+<span class="kw">def</span> <span class="fn">report</span>():
+    <span class="fn">print</span>(<span class="st">"Sending report..."</span>)
+
+schedule.every(<span class="nm">10</span>).<span class="fn">seconds</span>.<span class="fn">do</span>(backup)
+schedule.every().<span class="fn">hour</span>.<span class="fn">do</span>(report)
+schedule.every().<span class="fn">day</span>.<span class="fn">at</span>(<span class="st">"09:00"</span>).<span class="fn">do</span>(report)
+
+<span class="fn">print</span>(<span class="st">"Jobs scheduled:"</span>, <span class="fn">len</span>(schedule.jobs))
+schedule.<span class="fn">run_pending</span>()   <span class="cm"># run any due jobs once</span></pre>
+<div class="out-label">Output</div><pre class="output">Jobs scheduled: 3</pre></div>
+
+<div class="section-block"><h4>run_pending Loop</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> schedule, time
+
+<span class="kw">def</span> <span class="fn">tick</span>():
+    <span class="fn">print</span>(<span class="st">"tick"</span>)
+
+schedule.every(<span class="nm">1</span>).<span class="fn">seconds</span>.<span class="fn">do</span>(tick)
+
+<span class="cm"># Standard run loop (runs until interrupted)</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>):    <span class="cm"># normally: while True</span>
+    schedule.<span class="fn">run_pending</span>()
+    time.<span class="fn">sleep</span>(<span class="nm">1</span>)</pre>
+<div class="out-label">Output</div><pre class="output">tick
+tick
+tick</pre></div>
+
+<div class="section-block"><h4>Threading for Background Jobs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> schedule, time, threading
+
+<span class="kw">def</span> <span class="fn">run_scheduler</span>():
+    <span class="kw">while</span> <span class="kw">True</span>:
+        schedule.<span class="fn">run_pending</span>()
+        time.<span class="fn">sleep</span>(<span class="nm">1</span>)
+
+schedule.every(<span class="nm">5</span>).<span class="fn">seconds</span>.<span class="fn">do</span>(<span class="kw">lambda</span>: <span class="fn">print</span>(<span class="st">"background job"</span>))
+
+t <span class="op">=</span> threading.<span class="bi">Thread</span>(target<span class="op">=</span>run_scheduler, daemon<span class="op">=</span><span class="kw">True</span>)
+t.<span class="fn">start</span>()
+<span class="fn">print</span>(<span class="st">"Main program continues..."</span>)
+time.<span class="fn">sleep</span>(<span class="nm">6</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Main program continues...
+background job</pre>
+<div class="example-note">daemon=True means the thread dies when the main program exits — no need to explicitly stop it.</div></div>
+
+<div class="section-block"><h4>Multiple Intervals &amp; cancel</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> schedule
+
+job1 <span class="op">=</span> schedule.every(<span class="nm">5</span>).<span class="fn">minutes</span>.<span class="fn">do</span>(<span class="kw">lambda</span>: <span class="fn">print</span>(<span class="st">"5-min job"</span>))
+job2 <span class="op">=</span> schedule.every(<span class="nm">1</span>).<span class="fn">hour</span>.<span class="fn">do</span>(<span class="kw">lambda</span>: <span class="fn">print</span>(<span class="st">"hourly job"</span>))
+job3 <span class="op">=</span> schedule.every().<span class="fn">monday</span>.<span class="fn">at</span>(<span class="st">"08:30"</span>).<span class="fn">do</span>(<span class="kw">lambda</span>: <span class="fn">print</span>(<span class="st">"monday job"</span>))
+
+<span class="fn">print</span>(<span class="st">"All jobs:"</span>, <span class="fn">len</span>(schedule.jobs))
+schedule.<span class="fn">cancel_job</span>(job2)
+<span class="fn">print</span>(<span class="st">"After cancel:"</span>, <span class="fn">len</span>(schedule.jobs))</pre>
+<div class="out-label">Output</div><pre class="output">All jobs: 3
+After cancel: 2</pre></div>
+`;}
+  },
+  {
+    id:'requests',icon:'🌐',title:'requests',
+    desc:'get, post, headers, params, session, status codes.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌐</span>
+<h2>requests</h2>
+<p><strong>requests</strong> is the standard HTTP library for Python. Install: <code>pip install requests</code>. It handles encoding, SSL, and redirects automatically.</p></div>
+
+<div class="section-block"><h4>GET Request</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+r <span class="op">=</span> requests.<span class="fn">get</span>(<span class="st">"https://httpbin.org/get"</span>)
+<span class="fn">print</span>(<span class="st">"Status:"</span>, r.status_code)
+<span class="fn">print</span>(<span class="st">"Content-Type:"</span>, r.headers[<span class="st">"content-type"</span>])
+data <span class="op">=</span> r.<span class="fn">json</span>()
+<span class="fn">print</span>(<span class="st">"URL:"</span>, data[<span class="st">"url"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Status: 200
+Content-Type: application/json
+URL: https://httpbin.org/get</pre></div>
+
+<div class="section-block"><h4>Headers &amp; Params</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+r <span class="op">=</span> requests.<span class="fn">get</span>(
+    <span class="st">"https://httpbin.org/get"</span>,
+    headers<span class="op">=</span>{<span class="st">"User-Agent"</span>: <span class="st">"MyBot/1.0"</span>, <span class="st">"Accept"</span>: <span class="st">"application/json"</span>},
+    params<span class="op">=</span>{<span class="st">"q"</span>: <span class="st">"python"</span>, <span class="st">"page"</span>: <span class="nm">1</span>},
+    timeout<span class="op">=</span><span class="nm">10</span>
+)
+<span class="fn">print</span>(<span class="st">"Final URL:"</span>, r.url)
+<span class="fn">print</span>(<span class="st">"Status:"</span>, r.status_code)</pre>
+<div class="out-label">Output</div><pre class="output">Final URL: https://httpbin.org/get?q=python&page=1
+Status: 200</pre></div>
+
+<div class="section-block"><h4>POST Request</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+r <span class="op">=</span> requests.<span class="fn">post</span>(
+    <span class="st">"https://httpbin.org/post"</span>,
+    json<span class="op">=</span>{<span class="st">"name"</span>: <span class="st">"Ravi"</span>, <span class="st">"score"</span>: <span class="nm">95</span>}
+)
+body <span class="op">=</span> r.<span class="fn">json</span>()
+<span class="fn">print</span>(<span class="st">"Sent:"</span>, body[<span class="st">"json"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Sent: {'name': 'Ravi', 'score': 95}</pre></div>
+
+<div class="section-block"><h4>Session &amp; Status Codes</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> requests
+
+<span class="cm"># Session reuses connection + shares headers/cookies</span>
+<span class="kw">with</span> requests.<span class="bi">Session</span>() <span class="kw">as</span> s:
+    s.headers.<span class="fn">update</span>({<span class="st">"Authorization"</span>: <span class="st">"Bearer mytoken"</span>})
+    r1 <span class="op">=</span> s.<span class="fn">get</span>(<span class="st">"https://httpbin.org/get"</span>)
+    r2 <span class="op">=</span> s.<span class="fn">get</span>(<span class="st">"https://httpbin.org/status/404"</span>)
+    <span class="fn">print</span>(r1.status_code, r2.status_code)
+    r2.<span class="fn">raise_for_status</span>()  <span class="cm"># raises if 4xx/5xx</span></pre>
+<div class="out-label">Output</div><pre class="output">200 404
+requests.exceptions.HTTPError: 404 Client Error</pre>
+<div class="example-note">Session reuses the TCP connection — much faster for multiple requests to the same host. raise_for_status() is the cleanest way to handle HTTP errors.</div></div>
+`;}
+  },
+  {
+    id:'beautifulsoup',icon:'🕸️',title:'BeautifulSoup',
+    desc:'parse, find, find_all, CSS selectors, attrs.',
+    content(){return `
+<div class="detail-header"><span class="icon">🕸️</span>
+<h2>BeautifulSoup</h2>
+<p><strong>BeautifulSoup</strong> parses HTML/XML and extracts data. Install: <code>pip install beautifulsoup4 lxml</code>. Combine with requests for web scraping.</p></div>
+
+<div class="section-block"><h4>parse &amp; find</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+html <span class="op">=</span> <span class="st">"""&lt;html&gt;&lt;body&gt;
+  &lt;h1 id="title"&gt;Python Guide&lt;/h1&gt;
+  &lt;p class="intro"&gt;Learn Python fast.&lt;/p&gt;
+  &lt;p class="intro"&gt;Start today.&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;"""</span>
+
+soup <span class="op">=</span> <span class="bi">BeautifulSoup</span>(html, <span class="st">"lxml"</span>)
+<span class="fn">print</span>(soup.<span class="fn">find</span>(<span class="st">"h1"</span>).text)
+<span class="fn">print</span>(soup.<span class="fn">find</span>(<span class="st">"p"</span>).text)</pre>
+<div class="out-label">Output</div><pre class="output">Python Guide
+Learn Python fast.</pre></div>
+
+<div class="section-block"><h4>find_all</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+html <span class="op">=</span> <span class="st">"""&lt;ul&gt;
+  &lt;li&gt;Apple&lt;/li&gt;&lt;li&gt;Banana&lt;/li&gt;&lt;li&gt;Cherry&lt;/li&gt;
+&lt;/ul&gt;"""</span>
+soup <span class="op">=</span> <span class="bi">BeautifulSoup</span>(html, <span class="st">"lxml"</span>)
+items <span class="op">=</span> soup.<span class="fn">find_all</span>(<span class="st">"li"</span>)
+<span class="fn">print</span>([i.text <span class="kw">for</span> i <span class="kw">in</span> items])</pre>
+<div class="out-label">Output</div><pre class="output">['Apple', 'Banana', 'Cherry']</pre></div>
+
+<div class="section-block"><h4>CSS Selectors</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+html <span class="op">=</span> <span class="st">"""&lt;div class="card"&gt;
+  &lt;h2&gt;Title&lt;/h2&gt;
+  &lt;span class="price"&gt;₹500&lt;/span&gt;
+  &lt;a href="/buy"&gt;Buy&lt;/a&gt;
+&lt;/div&gt;"""</span>
+soup <span class="op">=</span> <span class="bi">BeautifulSoup</span>(html, <span class="st">"lxml"</span>)
+<span class="fn">print</span>(soup.<span class="fn">select_one</span>(<span class="st">".card h2"</span>).text)
+<span class="fn">print</span>(soup.<span class="fn">select_one</span>(<span class="st">".price"</span>).text)
+<span class="fn">print</span>(soup.<span class="fn">select</span>(<span class="st">"a"</span>)[<span class="nm">0</span>][<span class="st">"href"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Title
+₹500
+/buy</pre></div>
+
+<div class="section-block"><h4>attrs &amp; Real Scraping Pattern</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+html <span class="op">=</span> <span class="st">"""&lt;a href="https://python.org" class="ext"&gt;Python&lt;/a&gt;
+&lt;img src="logo.png" alt="Logo" width="100"&gt;"""</span>
+
+soup <span class="op">=</span> <span class="bi">BeautifulSoup</span>(html, <span class="st">"lxml"</span>)
+link <span class="op">=</span> soup.<span class="fn">find</span>(<span class="st">"a"</span>)
+<span class="fn">print</span>(link[<span class="st">"href"</span>])
+<span class="fn">print</span>(link.<span class="fn">get</span>(<span class="st">"class"</span>))
+img <span class="op">=</span> soup.<span class="fn">find</span>(<span class="st">"img"</span>)
+<span class="fn">print</span>(img.attrs)</pre>
+<div class="out-label">Output</div><pre class="output">https://python.org
+['ext']
+{'src': 'logo.png', 'alt': 'Logo', 'width': '100'}</pre></div>
+`;}
+  },
+  {
+    id:'excel',icon:'📊',title:'Excel — openpyxl',
+    desc:'load_workbook, read/write cells, multiple sheets, styles.',
+    content(){return `
+<div class="detail-header"><span class="icon">📊</span>
+<h2>Excel — openpyxl</h2>
+<p><strong>openpyxl</strong> reads and writes .xlsx files. Install: <code>pip install openpyxl</code>. For reading only, <strong>xlrd</strong> also works. For heavy data, combine with pandas.</p></div>
+
+<div class="section-block"><h4>Create &amp; Write Cells</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> openpyxl
+
+wb <span class="op">=</span> openpyxl.<span class="bi">Workbook</span>()
+ws <span class="op">=</span> wb.active
+ws.title <span class="op">=</span> <span class="st">"Sales"</span>
+
+ws[<span class="st">"A1"</span>] <span class="op">=</span> <span class="st">"Product"</span>; ws[<span class="st">"B1"</span>] <span class="op">=</span> <span class="st">"Revenue"</span>
+ws.<span class="fn">append</span>([<span class="st">"Widget"</span>, <span class="nm">15000</span>])
+ws.<span class="fn">append</span>([<span class="st">"Gadget"</span>, <span class="nm">22000</span>])
+ws.<span class="fn">append</span>([<span class="st">"Gizmo"</span>,  <span class="nm">9500</span>])
+wb.<span class="fn">save</span>(<span class="st">"sales.xlsx"</span>)
+<span class="fn">print</span>(<span class="st">"Saved sales.xlsx"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Saved sales.xlsx</pre></div>
+
+<div class="section-block"><h4>Load &amp; Read Cells</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> openpyxl
+
+wb <span class="op">=</span> openpyxl.<span class="fn">load_workbook</span>(<span class="st">"sales.xlsx"</span>)
+ws <span class="op">=</span> wb[<span class="st">"Sales"</span>]
+
+<span class="fn">print</span>(<span class="st">f"Rows: {ws.max_row}, Cols: {ws.max_column}"</span>)
+<span class="kw">for</span> row <span class="kw">in</span> ws.<span class="fn">iter_rows</span>(min_row<span class="op">=</span><span class="nm">2</span>, values_only<span class="op">=</span><span class="kw">True</span>):
+    <span class="fn">print</span>(row)</pre>
+<div class="out-label">Output</div><pre class="output">Rows: 4, Cols: 2
+('Widget', 15000)
+('Gadget', 22000)
+('Gizmo', 9500)</pre></div>
+
+<div class="section-block"><h4>Multiple Sheets</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> openpyxl
+
+wb <span class="op">=</span> openpyxl.<span class="fn">load_workbook</span>(<span class="st">"sales.xlsx"</span>)
+wb.<span class="fn">create_sheet</span>(<span class="st">"Summary"</span>)
+ws2 <span class="op">=</span> wb[<span class="st">"Summary"</span>]
+ws2[<span class="st">"A1"</span>] <span class="op">=</span> <span class="st">"Total"</span>
+ws2[<span class="st">"B1"</span>] <span class="op">=</span> <span class="st">"=SUM(Sales!B2:B4)"</span>  <span class="cm"># Excel formula</span>
+<span class="fn">print</span>(<span class="st">"Sheets:"</span>, wb.sheetnames)
+wb.<span class="fn">save</span>(<span class="st">"sales.xlsx"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Sheets: ['Sales', 'Summary']</pre></div>
+
+<div class="section-block"><h4>Styles</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook
+<span class="kw">from</span> openpyxl.styles <span class="kw">import</span> Font, PatternFill, Alignment
+
+wb <span class="op">=</span> <span class="bi">Workbook</span>(); ws <span class="op">=</span> wb.active
+ws[<span class="st">"A1"</span>] <span class="op">=</span> <span class="st">"Header"</span>
+ws[<span class="st">"A1"</span>].font <span class="op">=</span> <span class="bi">Font</span>(bold<span class="op">=</span><span class="kw">True</span>, size<span class="op">=</span><span class="nm">14</span>, color<span class="op">=</span><span class="st">"FFFFFF"</span>)
+ws[<span class="st">"A1"</span>].fill <span class="op">=</span> <span class="bi">PatternFill</span>(fill_type<span class="op">=</span><span class="st">"solid"</span>, fgColor<span class="op">=</span><span class="st">"4472C4"</span>)
+ws[<span class="st">"A1"</span>].alignment <span class="op">=</span> <span class="bi">Alignment</span>(horizontal<span class="op">=</span><span class="st">"center"</span>)
+ws.column_dimensions[<span class="st">"A"</span>].width <span class="op">=</span> <span class="nm">20</span>
+wb.<span class="fn">save</span>(<span class="st">"styled.xlsx"</span>)
+<span class="fn">print</span>(<span class="st">"Styled header saved"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Styled header saved</pre></div>
+`;}
+  },
+  {
+    id:'pdf',icon:'📄',title:'PDF — pypdf',
+    desc:'PdfReader, extract text, PdfWriter, merge, split pages.',
+    content(){return `
+<div class="detail-header"><span class="icon">📄</span>
+<h2>PDF — pypdf</h2>
+<p><strong>pypdf</strong> reads, writes, merges, and splits PDF files. Install: <code>pip install pypdf</code>. For creating PDFs from scratch use <strong>reportlab</strong> or <strong>fpdf2</strong>.</p></div>
+
+<div class="section-block"><h4>PdfReader &amp; Extract Text</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader
+
+reader <span class="op">=</span> <span class="bi">PdfReader</span>(<span class="st">"document.pdf"</span>)
+<span class="fn">print</span>(<span class="st">f"Pages: {len(reader.pages)}"</span>)
+<span class="fn">print</span>(<span class="st">f"Encrypted: {reader.is_encrypted}"</span>)
+
+page <span class="op">=</span> reader.pages[<span class="nm">0</span>]
+text <span class="op">=</span> page.<span class="fn">extract_text</span>()
+<span class="fn">print</span>(text[:<span class="nm">200</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Pages: 5
+Encrypted: False
+Python Automation Guide
+Chapter 1: Introduction
+This guide covers practical automation techniques...</pre></div>
+
+<div class="section-block"><h4>PdfWriter — Create &amp; Modify</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader, PdfWriter
+
+reader <span class="op">=</span> <span class="bi">PdfReader</span>(<span class="st">"document.pdf"</span>)
+writer <span class="op">=</span> <span class="bi">PdfWriter</span>()
+
+<span class="cm"># Copy all pages</span>
+<span class="kw">for</span> page <span class="kw">in</span> reader.pages:
+    writer.<span class="fn">add_page</span>(page)
+
+writer.<span class="fn">add_metadata</span>({<span class="st">"/Author"</span>: <span class="st">"Ravi"</span>, <span class="st">"/Title"</span>: <span class="st">"My Report"</span>})
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"output.pdf"</span>, <span class="st">"wb"</span>) <span class="kw">as</span> f:
+    writer.<span class="fn">write</span>(f)
+<span class="fn">print</span>(<span class="st">"PDF written"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">PDF written</pre></div>
+
+<div class="section-block"><h4>Merge PDFs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pypdf <span class="kw">import</span> PdfWriter
+
+writer <span class="op">=</span> <span class="bi">PdfWriter</span>()
+
+<span class="kw">for</span> filename <span class="kw">in</span> [<span class="st">"part1.pdf"</span>, <span class="st">"part2.pdf"</span>, <span class="st">"part3.pdf"</span>]:
+    writer.<span class="fn">append</span>(filename)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"merged.pdf"</span>, <span class="st">"wb"</span>) <span class="kw">as</span> f:
+    writer.<span class="fn">write</span>(f)
+<span class="fn">print</span>(<span class="st">f"Merged into {writer.get_num_pages()} pages"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Merged into 15 pages</pre></div>
+
+<div class="section-block"><h4>Split Pages</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pypdf <span class="kw">import</span> PdfReader, PdfWriter
+
+reader <span class="op">=</span> <span class="bi">PdfReader</span>(<span class="st">"merged.pdf"</span>)
+<span class="kw">for</span> i, page <span class="kw">in</span> <span class="fn">enumerate</span>(reader.pages):
+    writer <span class="op">=</span> <span class="bi">PdfWriter</span>()
+    writer.<span class="fn">add_page</span>(page)
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">f"page_{i+1}.pdf"</span>, <span class="st">"wb"</span>) <span class="kw">as</span> f:
+        writer.<span class="fn">write</span>(f)
+<span class="fn">print</span>(<span class="st">f"Split into {len(reader.pages)} files"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Split into 15 files</pre></div>
+`;}
+  },
+  {
+    id:'email',icon:'📧',title:'Email — smtplib',
+    desc:'SMTP setup, plain text, HTML email, attachments.',
+    content(){return `
+<div class="detail-header"><span class="icon">📧</span>
+<h2>Email — smtplib</h2>
+<p>Python's <strong>smtplib</strong> sends emails via SMTP. Use <strong>email.mime</strong> to build messages with HTML and attachments. For Gmail, enable App Passwords.</p></div>
+
+<div class="section-block"><h4>SMTP Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> smtplib, os
+
+<span class="cm"># Use environment variables — never hardcode passwords</span>
+SENDER <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"EMAIL_USER"</span>)
+PASSWD <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"EMAIL_PASS"</span>)
+
+<span class="kw">with</span> smtplib.<span class="bi">SMTP_SSL</span>(<span class="st">"smtp.gmail.com"</span>, <span class="nm">465</span>) <span class="kw">as</span> smtp:
+    smtp.<span class="fn">login</span>(SENDER, PASSWD)
+    <span class="fn">print</span>(<span class="st">"Logged in successfully"</span>)
+    <span class="cm"># smtp.quit() called automatically by context manager</span></pre>
+<div class="out-label">Output</div><pre class="output">Logged in successfully</pre></div>
+
+<div class="section-block"><h4>Plain Text Email</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> smtplib
+<span class="kw">from</span> email.mime.text <span class="kw">import</span> MIMEText
+
+msg <span class="op">=</span> <span class="bi">MIMEText</span>(<span class="st">"Hello from Python automation!"</span>)
+msg[<span class="st">"Subject"</span>] <span class="op">=</span> <span class="st">"Test Email"</span>
+msg[<span class="st">"From"</span>]    <span class="op">=</span> <span class="st">"sender@gmail.com"</span>
+msg[<span class="st">"To"</span>]      <span class="op">=</span> <span class="st">"recipient@example.com"</span>
+
+<span class="kw">with</span> smtplib.<span class="bi">SMTP_SSL</span>(<span class="st">"smtp.gmail.com"</span>, <span class="nm">465</span>) <span class="kw">as</span> smtp:
+    smtp.<span class="fn">login</span>(<span class="st">"sender@gmail.com"</span>, <span class="st">"apppassword"</span>)
+    smtp.<span class="fn">send_message</span>(msg)
+<span class="fn">print</span>(<span class="st">"Email sent"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Email sent</pre></div>
+
+<div class="section-block"><h4>HTML Email</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> email.mime.multipart <span class="kw">import</span> MIMEMultipart
+<span class="kw">from</span> email.mime.text <span class="kw">import</span> MIMEText
+
+msg <span class="op">=</span> <span class="bi">MIMEMultipart</span>(<span class="st">"alternative"</span>)
+msg[<span class="st">"Subject"</span>] <span class="op">=</span> <span class="st">"Report"</span>
+msg[<span class="st">"From"</span>]    <span class="op">=</span> <span class="st">"me@gmail.com"</span>
+msg[<span class="st">"To"</span>]      <span class="op">=</span> <span class="st">"boss@company.com"</span>
+
+plain <span class="op">=</span> <span class="bi">MIMEText</span>(<span class="st">"Sales up 12% this month."</span>, <span class="st">"plain"</span>)
+html  <span class="op">=</span> <span class="bi">MIMEText</span>(<span class="st">"&lt;h2&gt;Sales up &lt;b&gt;12%&lt;/b&gt; this month.&lt;/h2&gt;"</span>, <span class="st">"html"</span>)
+msg.<span class="fn">attach</span>(plain)
+msg.<span class="fn">attach</span>(html)   <span class="cm"># HTML shown if supported, else plain</span>
+<span class="fn">print</span>(<span class="st">"Message built"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Message built</pre></div>
+
+<div class="section-block"><h4>Attachments</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> email.mime.multipart <span class="kw">import</span> MIMEMultipart
+<span class="kw">from</span> email.mime.base <span class="kw">import</span> MIMEBase
+<span class="kw">from</span> email <span class="kw">import</span> encoders
+
+msg <span class="op">=</span> <span class="bi">MIMEMultipart</span>()
+msg[<span class="st">"Subject"</span>] <span class="op">=</span> <span class="st">"Report with attachment"</span>
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"report.pdf"</span>, <span class="st">"rb"</span>) <span class="kw">as</span> f:
+    part <span class="op">=</span> <span class="bi">MIMEBase</span>(<span class="st">"application"</span>, <span class="st">"octet-stream"</span>)
+    part.<span class="fn">set_payload</span>(f.<span class="fn">read</span>())
+encoders.<span class="fn">encode_base64</span>(part)
+part.<span class="fn">add_header</span>(<span class="st">"Content-Disposition"</span>, <span class="st">'attachment; filename="report.pdf"'</span>)
+msg.<span class="fn">attach</span>(part)
+<span class="fn">print</span>(<span class="st">"Attachment added"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Attachment added</pre></div>
+`;}
+  },
+  {
+    id:'sqlite',icon:'🗄️',title:'SQLite',
+    desc:'connect, create table, insert, query, fetchall, parameterised queries.',
+    content(){return `
+<div class="detail-header"><span class="icon">🗄️</span>
+<h2>SQLite</h2>
+<p><strong>sqlite3</strong> is built into Python — no installation needed. SQLite stores the entire database in a single file, perfect for local automation scripts.</p></div>
+
+<div class="section-block"><h4>connect &amp; create table</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> sqlite3
+
+conn <span class="op">=</span> sqlite3.<span class="fn">connect</span>(<span class="st">"app.db"</span>)   <span class="cm"># creates file if not exists</span>
+cur <span class="op">=</span> conn.<span class="fn">cursor</span>()
+
+cur.<span class="fn">execute</span>(<span class="st">"""
+  CREATE TABLE IF NOT EXISTS users (
+    id    INTEGER PRIMARY KEY AUTOINCREMENT,
+    name  TEXT NOT NULL,
+    email TEXT UNIQUE,
+    score REAL DEFAULT 0
+  )
+"""</span>)
+conn.<span class="fn">commit</span>()
+<span class="fn">print</span>(<span class="st">"Table created"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Table created</pre></div>
+
+<div class="section-block"><h4>insert &amp; parameterised queries</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> sqlite3
+
+conn <span class="op">=</span> sqlite3.<span class="fn">connect</span>(<span class="st">"app.db"</span>)
+cur <span class="op">=</span> conn.<span class="fn">cursor</span>()
+
+<span class="cm"># Parameterised — prevents SQL injection</span>
+cur.<span class="fn">execute</span>(<span class="st">"INSERT OR IGNORE INTO users (name, email, score) VALUES (?,?,?)"</span>,
+           (<span class="st">"Ravi"</span>, <span class="st">"r@x.com"</span>, <span class="nm">92.5</span>))
+
+users <span class="op">=</span> [(<span class="st">"Ana"</span>,<span class="st">"a@x.com"</span>,<span class="nm">88</span>), (<span class="st">"Bob"</span>,<span class="st">"b@x.com"</span>,<span class="nm">75</span>)]
+cur.<span class="fn">executemany</span>(<span class="st">"INSERT OR IGNORE INTO users (name,email,score) VALUES (?,?,?)"</span>, users)
+conn.<span class="fn">commit</span>()
+<span class="fn">print</span>(<span class="st">"Inserted"</span>, cur.rowcount, <span class="st">"rows"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Inserted 2 rows</pre>
+<div class="example-note">Always use ? placeholders — never f-strings or % formatting in SQL. This prevents SQL injection attacks.</div></div>
+
+<div class="section-block"><h4>query &amp; fetchall</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> sqlite3
+
+conn <span class="op">=</span> sqlite3.<span class="fn">connect</span>(<span class="st">"app.db"</span>)
+conn.row_factory <span class="op">=</span> sqlite3.<span class="bi">Row</span>   <span class="cm"># dict-like rows</span>
+cur <span class="op">=</span> conn.<span class="fn">cursor</span>()
+
+cur.<span class="fn">execute</span>(<span class="st">"SELECT * FROM users WHERE score &gt; ? ORDER BY score DESC"</span>, (<span class="nm">80</span>,))
+rows <span class="op">=</span> cur.<span class="fn">fetchall</span>()
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="fn">print</span>(<span class="st">f"{row['name']}: {row['score']}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Ravi: 92.5
+Ana: 88.0</pre>
+<div class="example-note">row_factory = sqlite3.Row lets you access columns by name (row['name']) instead of index (row[1]).</div></div>
+`;}
+  },
+  {
+    id:'csv-auto',icon:'📋',title:'CSV Automation',
+    desc:'DictReader, DictWriter, filter/transform, batch processing.',
+    content(){return `
+<div class="detail-header"><span class="icon">📋</span>
+<h2>CSV Automation</h2>
+<p>CSV is the most common format for data exchange. Python's built-in <strong>csv</strong> module handles reading, writing, filtering, and transforming CSV files without pandas.</p></div>
+
+<div class="section-block"><h4>DictReader</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+<span class="kw">from</span> io <span class="kw">import</span> StringIO
+
+data <span class="op">=</span> <span class="st">"""name,dept,salary
+Ravi,IT,70000
+Ana,HR,55000
+Bob,IT,80000
+Priya,HR,60000"""</span>
+
+<span class="kw">with</span> <span class="fn">StringIO</span>(data) <span class="kw">as</span> f:
+    reader <span class="op">=</span> csv.<span class="bi">DictReader</span>(f)
+    <span class="kw">for</span> row <span class="kw">in</span> reader:
+        <span class="fn">print</span>(<span class="st">f"{row['name']} ({row['dept']}): ₹{row['salary']}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Ravi (IT): ₹70000
+Ana (HR): ₹55000
+Bob (IT): ₹80000
+Priya (HR): ₹60000</pre></div>
+
+<div class="section-block"><h4>DictWriter</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+
+rows <span class="op">=</span> [
+    {<span class="st">"name"</span>:<span class="st">"Ravi"</span>, <span class="st">"dept"</span>:<span class="st">"IT"</span>, <span class="st">"salary"</span>:<span class="nm">70000</span>},
+    {<span class="st">"name"</span>:<span class="st">"Ana"</span>,  <span class="st">"dept"</span>:<span class="st">"HR"</span>, <span class="st">"salary"</span>:<span class="nm">55000</span>},
+]
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"staff.csv"</span>, <span class="st">"w"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="kw">as</span> f:
+    writer <span class="op">=</span> csv.<span class="bi">DictWriter</span>(f, fieldnames<span class="op">=</span>[<span class="st">"name"</span>,<span class="st">"dept"</span>,<span class="st">"salary"</span>])
+    writer.<span class="fn">writeheader</span>()
+    writer.<span class="fn">writerows</span>(rows)
+<span class="fn">print</span>(<span class="fn">open</span>(<span class="st">"staff.csv"</span>).<span class="fn">read</span>())</pre>
+<div class="out-label">Output</div><pre class="output">name,dept,salary
+Ravi,IT,70000
+Ana,HR,55000</pre></div>
+
+<div class="section-block"><h4>Filter &amp; Transform</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+<span class="kw">from</span> io <span class="kw">import</span> StringIO
+
+src <span class="op">=</span> <span class="st">"name,dept,salary\nRavi,IT,70000\nAna,HR,55000\nBob,IT,80000"</span>
+
+<span class="kw">with</span> <span class="fn">StringIO</span>(src) <span class="kw">as</span> f:
+    reader <span class="op">=</span> csv.<span class="bi">DictReader</span>(f)
+    it_staff <span class="op">=</span> [r <span class="kw">for</span> r <span class="kw">in</span> reader <span class="kw">if</span> r[<span class="st">"dept"</span>] <span class="op">==</span> <span class="st">"IT"</span>]
+
+<span class="cm"># Add computed column + write</span>
+<span class="kw">for</span> r <span class="kw">in</span> it_staff:
+    r[<span class="st">"bonus"</span>] <span class="op">=</span> <span class="fn">int</span>(r[<span class="st">"salary"</span>]) <span class="op">*</span> <span class="nm">0.10</span>
+    <span class="fn">print</span>(r)</pre>
+<div class="out-label">Output</div><pre class="output">{'name': 'Ravi', 'dept': 'IT', 'salary': '70000', 'bonus': 7000.0}
+{'name': 'Bob', 'dept': 'IT', 'salary': '80000', 'bonus': 8000.0}</pre></div>
+
+<div class="section-block"><h4>Batch Processing Large Files</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+
+<span class="kw">def</span> <span class="fn">process_in_batches</span>(filename, batch_size<span class="op">=</span><span class="nm">1000</span>):
+    <span class="kw">with</span> <span class="fn">open</span>(filename) <span class="kw">as</span> f:
+        reader <span class="op">=</span> csv.<span class="bi">DictReader</span>(f)
+        batch <span class="op">=</span> []
+        <span class="kw">for</span> i, row <span class="kw">in</span> <span class="fn">enumerate</span>(reader):
+            batch.<span class="fn">append</span>(row)
+            <span class="kw">if</span> <span class="fn">len</span>(batch) <span class="op">==</span> batch_size:
+                <span class="fn">print</span>(<span class="st">f"Processing batch of {len(batch)} rows"</span>)
+                batch <span class="op">=</span> []
+        <span class="kw">if</span> batch:
+            <span class="fn">print</span>(<span class="st">f"Final batch: {len(batch)} rows"</span>)
+
+<span class="fn">process_in_batches</span>(<span class="st">"staff.csv"</span>, batch_size<span class="op">=</span><span class="nm">1</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Processing batch of 1 rows
+Final batch of 1 rows</pre></div>
+`;}
+  },
+  {
+    id:'regex-auto',icon:'🔍',title:'Regex Automation',
+    desc:'findall, sub, groups, email/phone/URL patterns.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔍</span>
+<h2>Regex Automation</h2>
+<p>Regular expressions extract, validate, and transform text at scale. Python's <strong>re</strong> module is built-in — no install needed.</p></div>
+
+<div class="section-block"><h4>findall</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+text <span class="op">=</span> <span class="st">"Call 9876543210 or 8765432109. Email: help@company.com"</span>
+phones <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'\b\d{10}\b'</span>, text)
+<span class="fn">print</span>(<span class="st">"Phones:"</span>, phones)
+
+numbers <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'\d+'</span>, <span class="st">"Order 42 shipped in 3 days"</span>)
+<span class="fn">print</span>(<span class="st">"Numbers:"</span>, numbers)</pre>
+<div class="out-label">Output</div><pre class="output">Phones: ['9876543210', '8765432109']
+Numbers: ['42', '3']</pre></div>
+
+<div class="section-block"><h4>sub — Replace</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+<span class="cm"># Mask phone numbers</span>
+text <span class="op">=</span> <span class="st">"Call 9876543210 for support"</span>
+masked <span class="op">=</span> re.<span class="fn">sub</span>(<span class="st">r'\b\d{10}\b'</span>, <span class="st">"**REDACTED**"</span>, text)
+<span class="fn">print</span>(masked)
+
+<span class="cm"># Normalise whitespace</span>
+messy <span class="op">=</span> <span class="st">"hello   world  \t  python"</span>
+clean <span class="op">=</span> re.<span class="fn">sub</span>(<span class="st">r'\s+'</span>, <span class="st">" "</span>, messy).<span class="fn">strip</span>()
+<span class="fn">print</span>(clean)</pre>
+<div class="out-label">Output</div><pre class="output">Call **REDACTED** for support
+hello world python</pre></div>
+
+<div class="section-block"><h4>Groups</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+log <span class="op">=</span> <span class="st">"2026-07-25 10:30:45 ERROR Database connection failed"</span>
+m <span class="op">=</span> re.<span class="fn">match</span>(<span class="st">r'(?P&lt;date&gt;\S+) (?P&lt;time&gt;\S+) (?P&lt;level&gt;\w+) (?P&lt;msg&gt;.*)'</span>, log)
+<span class="kw">if</span> m:
+    <span class="fn">print</span>(<span class="st">"Date:"</span>, m.<span class="fn">group</span>(<span class="st">"date"</span>))
+    <span class="fn">print</span>(<span class="st">"Level:"</span>, m.<span class="fn">group</span>(<span class="st">"level"</span>))
+    <span class="fn">print</span>(<span class="st">"Msg:"</span>, m.<span class="fn">group</span>(<span class="st">"msg"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Date: 2026-07-25
+Level: ERROR
+Msg: Database connection failed</pre></div>
+
+<div class="section-block"><h4>Email, Phone &amp; URL Patterns</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+text <span class="op">=</span> <span class="st">"""Contact: user@example.com or admin@corp.in
+Phone: +91 98765 43210, 044-27654321
+Visit: https://www.example.com or http://sub.site.org/path"""</span>
+
+emails <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'[\w.+-]+@[\w-]+\.[\w.]+'</span>, text)
+phones <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'[\+\d][\d\s\-]{8,}'</span>, text)
+urls   <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'https?://[^\s]+'</span>, text)
+<span class="fn">print</span>(<span class="st">"Emails:"</span>, emails)
+<span class="fn">print</span>(<span class="st">"Phones:"</span>, [p.<span class="fn">strip</span>() <span class="kw">for</span> p <span class="kw">in</span> phones])
+<span class="fn">print</span>(<span class="st">"URLs:"</span>, urls)</pre>
+<div class="out-label">Output</div><pre class="output">Emails: ['user@example.com', 'admin@corp.in']
+Phones: ['+91 98765 43210', '044-27654321']
+URLs: ['https://www.example.com', 'http://sub.site.org/path']</pre></div>
+`;}
+  },
+  {
+    id:'logging-mon',icon:'📋',title:'Logging & Monitoring',
+    desc:'basicConfig, FileHandler, RotatingFileHandler, alert hook.',
+    content(){return `
+<div class="detail-header"><span class="icon">📋</span>
+<h2>Logging &amp; Monitoring</h2>
+<p>Good automation scripts log everything — successes, warnings, and errors. The <strong>logging</strong> module provides levels, file rotation, and custom hooks for alerts.</p></div>
+
+<div class="section-block"><h4>basicConfig</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> logging
+
+logging.<span class="fn">basicConfig</span>(
+    level<span class="op">=</span>logging.DEBUG,
+    format<span class="op">=</span><span class="st">"%(asctime)s [%(levelname)s] %(message)s"</span>,
+    datefmt<span class="op">=</span><span class="st">"%Y-%m-%d %H:%M:%S"</span>
+)
+logging.<span class="fn">debug</span>(<span class="st">"Starting job"</span>)
+logging.<span class="fn">info</span>(<span class="st">"Processing 100 records"</span>)
+logging.<span class="fn">warning</span>(<span class="st">"Disk space below 10%"</span>)
+logging.<span class="fn">error</span>(<span class="st">"Failed to connect"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">2026-07-25 10:00:00 [DEBUG] Starting job
+2026-07-25 10:00:00 [INFO] Processing 100 records
+2026-07-25 10:00:00 [WARNING] Disk space below 10%
+2026-07-25 10:00:00 [ERROR] Failed to connect</pre></div>
+
+<div class="section-block"><h4>FileHandler</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> logging
+
+logger <span class="op">=</span> logging.<span class="fn">getLogger</span>(<span class="st">"automation"</span>)
+logger.<span class="fn">setLevel</span>(logging.DEBUG)
+
+fh <span class="op">=</span> logging.<span class="bi">FileHandler</span>(<span class="st">"automation.log"</span>)
+fh.<span class="fn">setLevel</span>(logging.INFO)
+fh.<span class="fn">setFormatter</span>(logging.<span class="bi">Formatter</span>(<span class="st">"%(asctime)s %(levelname)s %(message)s"</span>))
+logger.<span class="fn">addHandler</span>(fh)
+
+logger.<span class="fn">info</span>(<span class="st">"Job started"</span>)
+logger.<span class="fn">error</span>(<span class="st">"Import failed: file not found"</span>)
+<span class="fn">print</span>(<span class="fn">open</span>(<span class="st">"automation.log"</span>).<span class="fn">read</span>())</pre>
+<div class="out-label">Output</div><pre class="output">2026-07-25 10:00:01 INFO Job started
+2026-07-25 10:00:01 ERROR Import failed: file not found</pre></div>
+
+<div class="section-block"><h4>RotatingFileHandler</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> logging
+<span class="kw">from</span> logging.handlers <span class="kw">import</span> RotatingFileHandler
+
+handler <span class="op">=</span> <span class="bi">RotatingFileHandler</span>(
+    <span class="st">"app.log"</span>, maxBytes<span class="op">=</span><span class="nm">5</span><span class="op">*</span><span class="nm">1024</span><span class="op">*</span><span class="nm">1024</span>, backupCount<span class="op">=</span><span class="nm">5</span>
+)
+logging.<span class="fn">basicConfig</span>(handlers<span class="op">=</span>[handler], level<span class="op">=</span>logging.INFO)
+logging.<span class="fn">info</span>(<span class="st">"App started — logs rotate at 5MB, keep 5 backups"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">[app.log created; rotates to app.log.1 .. app.log.5 when full]</pre></div>
+
+<div class="section-block"><h4>Alert Hook (ERROR → action)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> logging
+
+<span class="kw">class</span> <span class="bi">AlertHandler</span>(logging.<span class="bi">Handler</span>):
+    <span class="kw">def</span> <span class="fn">emit</span>(<span class="nm">self</span>, record):
+        <span class="kw">if</span> record.levelno <span class="op">&gt;=</span> logging.ERROR:
+            <span class="cm"># In real use: send email / Slack / PagerDuty</span>
+            <span class="fn">print</span>(<span class="st">f"🚨 ALERT: {record.getMessage()}"</span>)
+
+logger <span class="op">=</span> logging.<span class="fn">getLogger</span>(<span class="st">"monitor"</span>)
+logger.<span class="fn">addHandler</span>(<span class="bi">AlertHandler</span>())
+logger.<span class="fn">setLevel</span>(logging.DEBUG)
+
+logger.<span class="fn">info</span>(<span class="st">"All good"</span>)
+logger.<span class="fn">error</span>(<span class="st">"Database went down"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">🚨 ALERT: Database went down</pre>
+<div class="example-note">Custom handlers let you trigger any action on certain log levels — send email, post to Slack, write to a database, or page on-call.</div></div>
+`;}
+  },
+  {
+    id:'argparse-cli',icon:'🖥️',title:'CLI with argparse',
+    desc:'ArgumentParser, subcommands, types, required flags, help.',
+    content(){return `
+<div class="detail-header"><span class="icon">🖥️</span>
+<h2>CLI with argparse</h2>
+<p><strong>argparse</strong> turns Python scripts into proper command-line tools with help text, type validation, and subcommands — all built-in.</p></div>
+
+<div class="section-block"><h4>Basic ArgumentParser</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> argparse
+
+parser <span class="op">=</span> argparse.<span class="bi">ArgumentParser</span>(
+    description<span class="op">=</span><span class="st">"CSV processing tool"</span>,
+    epilog<span class="op">=</span><span class="st">"Example: process.py data.csv --output out.csv"</span>
+)
+parser.<span class="fn">add_argument</span>(<span class="st">"input"</span>, help<span class="op">=</span><span class="st">"input CSV file"</span>)
+parser.<span class="fn">add_argument</span>(<span class="st">"--output"</span>, <span class="st">"-o"</span>, default<span class="op">=</span><span class="st">"result.csv"</span>)
+
+args <span class="op">=</span> parser.<span class="fn">parse_args</span>([<span class="st">"data.csv"</span>])
+<span class="fn">print</span>(args.input, args.output)</pre>
+<div class="out-label">Output</div><pre class="output">data.csv result.csv</pre></div>
+
+<div class="section-block"><h4>Types, Choices &amp; Required Flags</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> argparse
+
+parser <span class="op">=</span> argparse.<span class="bi">ArgumentParser</span>()
+parser.<span class="fn">add_argument</span>(<span class="st">"--workers"</span>, type<span class="op">=</span><span class="bi">int</span>, default<span class="op">=</span><span class="nm">4</span>)
+parser.<span class="fn">add_argument</span>(<span class="st">"--format"</span>, choices<span class="op">=</span>[<span class="st">"csv"</span>,<span class="st">"json"</span>,<span class="st">"xlsx"</span>], required<span class="op">=</span><span class="kw">True</span>)
+parser.<span class="fn">add_argument</span>(<span class="st">"--verbose"</span>, action<span class="op">=</span><span class="st">"store_true"</span>)
+parser.<span class="fn">add_argument</span>(<span class="st">"--tags"</span>, nargs<span class="op">=</span><span class="st">"+"</span>)  <span class="cm"># 1 or more values</span>
+
+args <span class="op">=</span> parser.<span class="fn">parse_args</span>([<span class="st">"--format"</span>,<span class="st">"json"</span>,<span class="st">"--verbose"</span>,<span class="st">"--tags"</span>,<span class="st">"a"</span>,<span class="st">"b"</span>])
+<span class="fn">print</span>(args.format, args.verbose, args.tags)</pre>
+<div class="out-label">Output</div><pre class="output">json True ['a', 'b']</pre></div>
+
+<div class="section-block"><h4>Subcommands</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> argparse
+
+parser <span class="op">=</span> argparse.<span class="bi">ArgumentParser</span>(prog<span class="op">=</span><span class="st">"tool"</span>)
+sub <span class="op">=</span> parser.<span class="fn">add_subparsers</span>(dest<span class="op">=</span><span class="st">"command"</span>)
+
+<span class="cm"># tool import --file data.csv</span>
+p_import <span class="op">=</span> sub.<span class="fn">add_parser</span>(<span class="st">"import"</span>, help<span class="op">=</span><span class="st">"import data"</span>)
+p_import.<span class="fn">add_argument</span>(<span class="st">"--file"</span>, required<span class="op">=</span><span class="kw">True</span>)
+
+<span class="cm"># tool export --format pdf</span>
+p_export <span class="op">=</span> sub.<span class="fn">add_parser</span>(<span class="st">"export"</span>, help<span class="op">=</span><span class="st">"export data"</span>)
+p_export.<span class="fn">add_argument</span>(<span class="st">"--format"</span>, choices<span class="op">=</span>[<span class="st">"pdf"</span>,<span class="st">"csv"</span>])
+
+args <span class="op">=</span> parser.<span class="fn">parse_args</span>([<span class="st">"import"</span>, <span class="st">"--file"</span>, <span class="st">"data.csv"</span>])
+<span class="fn">print</span>(args.command, args.file)</pre>
+<div class="out-label">Output</div><pre class="output">import data.csv</pre></div>
+`;}
+  },
+  {
+    id:'threading-tasks',icon:'🧵',title:'Threading & Task Queues',
+    desc:'Thread, ThreadPoolExecutor, Queue, Event.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧵</span>
+<h2>Threading &amp; Task Queues</h2>
+<p>Threading lets automation scripts do multiple things concurrently — fetch many URLs, process multiple files, or run a background monitor while the main loop continues.</p></div>
+
+<div class="section-block"><h4>Thread</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> threading, time
+
+<span class="kw">def</span> <span class="fn">download</span>(url, delay):
+    time.<span class="fn">sleep</span>(delay)
+    <span class="fn">print</span>(<span class="st">f"Downloaded {url}"</span>)
+
+threads <span class="op">=</span> [
+    threading.<span class="bi">Thread</span>(target<span class="op">=</span>download, args<span class="op">=</span>(<span class="st">f"file{i}.pdf"</span>, <span class="nm">0.1</span>))
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>)
+]
+<span class="kw">for</span> t <span class="kw">in</span> threads: t.<span class="fn">start</span>()
+<span class="kw">for</span> t <span class="kw">in</span> threads: t.<span class="fn">join</span>()
+<span class="fn">print</span>(<span class="st">"All done"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Downloaded file0.pdf
+Downloaded file1.pdf
+Downloaded file2.pdf
+All done</pre></div>
+
+<div class="section-block"><h4>ThreadPoolExecutor</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+<span class="kw">import</span> time
+
+<span class="kw">def</span> <span class="fn">process_file</span>(name):
+    time.<span class="fn">sleep</span>(<span class="nm">0.05</span>)
+    <span class="kw">return</span> <span class="st">f"done:{name}"</span>
+
+files <span class="op">=</span> [<span class="st">f"report_{i}.csv"</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)]
+<span class="kw">with</span> <span class="bi">ThreadPoolExecutor</span>(max_workers<span class="op">=</span><span class="nm">3</span>) <span class="kw">as</span> exe:
+    results <span class="op">=</span> <span class="fn">list</span>(exe.<span class="fn">map</span>(process_file, files))
+<span class="fn">print</span>(results)</pre>
+<div class="out-label">Output</div><pre class="output">['done:report_0.csv', 'done:report_1.csv', 'done:report_2.csv', 'done:report_3.csv', 'done:report_4.csv']</pre></div>
+
+<div class="section-block"><h4>Queue — Producer / Consumer</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> threading, queue, time
+
+q <span class="op">=</span> queue.<span class="bi">Queue</span>()
+
+<span class="kw">def</span> <span class="fn">producer</span>():
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>):
+        q.<span class="fn">put</span>(<span class="st">f"task-{i}"</span>)
+    q.<span class="fn">put</span>(<span class="kw">None</span>)  <span class="cm"># sentinel</span>
+
+<span class="kw">def</span> <span class="fn">consumer</span>():
+    <span class="kw">while</span> <span class="kw">True</span>:
+        item <span class="op">=</span> q.<span class="fn">get</span>()
+        <span class="kw">if</span> item <span class="kw">is</span> <span class="kw">None</span>: <span class="kw">break</span>
+        <span class="fn">print</span>(<span class="st">f"Processing {item}"</span>)
+
+t1 <span class="op">=</span> threading.<span class="bi">Thread</span>(target<span class="op">=</span>producer)
+t2 <span class="op">=</span> threading.<span class="bi">Thread</span>(target<span class="op">=</span>consumer)
+t1.<span class="fn">start</span>(); t2.<span class="fn">start</span>()
+t1.<span class="fn">join</span>(); t2.<span class="fn">join</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Processing task-0
+Processing task-1
+Processing task-2
+Processing task-3
+Processing task-4</pre></div>
+
+<div class="section-block"><h4>Event — Stop Signal</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> threading, time
+
+stop_event <span class="op">=</span> threading.<span class="bi">Event</span>()
+
+<span class="kw">def</span> <span class="fn">monitor</span>():
+    <span class="kw">while</span> <span class="kw">not</span> stop_event.<span class="fn">is_set</span>():
+        <span class="fn">print</span>(<span class="st">"monitoring..."</span>)
+        stop_event.<span class="fn">wait</span>(<span class="nm">1</span>)  <span class="cm"># sleep 1s, wake early if set</span>
+
+t <span class="op">=</span> threading.<span class="bi">Thread</span>(target<span class="op">=</span>monitor, daemon<span class="op">=</span><span class="kw">True</span>)
+t.<span class="fn">start</span>()
+time.<span class="fn">sleep</span>(<span class="nm">2.5</span>)
+stop_event.<span class="fn">set</span>()
+<span class="fn">print</span>(<span class="st">"stopped"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">monitoring...
+monitoring...
+stopped</pre>
+<div class="example-note">Event.wait(timeout) is better than time.sleep() in threads — it can be interrupted immediately when the event is set.</div></div>
+`;}
+  },
+  {
+    id:'dotenv',icon:'🔑',title:'dotenv & Config',
+    desc:'dotenv, configparser, os.environ, secrets module.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔑</span>
+<h2>dotenv &amp; Config</h2>
+<p>Automation scripts need configuration — API keys, database URLs, feature flags. The golden rule: <strong>never hardcode secrets in code</strong>. Use environment variables and config files.</p></div>
+
+<div class="section-block"><h4>dotenv</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># .env file:</span>
+<span class="cm"># DATABASE_URL=postgresql://user:pass@localhost/db</span>
+<span class="cm"># API_KEY=sk-abc123</span>
+<span class="cm"># DEBUG=true</span>
+
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">import</span> os
+
+<span class="fn">load_dotenv</span>()   <span class="cm"># loads .env into os.environ</span>
+db  <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"DATABASE_URL"</span>, <span class="st">"sqlite:///local.db"</span>)
+key <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"API_KEY"</span>)
+<span class="fn">print</span>(<span class="st">"DB:"</span>, db)
+<span class="fn">print</span>(<span class="st">"Key set:"</span>, key <span class="kw">is not</span> <span class="kw">None</span>)</pre>
+<div class="out-label">Output</div><pre class="output">DB: postgresql://user:pass@localhost/db
+Key set: True</pre>
+<div class="example-note">Install: pip install python-dotenv. Add .env to .gitignore — never commit it. load_dotenv() does nothing if .env doesn't exist, so safe in production.</div></div>
+
+<div class="section-block"><h4>configparser</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> configparser
+
+config <span class="op">=</span> configparser.<span class="bi">ConfigParser</span>()
+config.<span class="fn">read_string</span>(<span class="st">"""
+[database]
+host = localhost
+port = 5432
+name = myapp
+
+[email]
+smtp_host = smtp.gmail.com
+smtp_port = 465
+"""</span>)
+
+<span class="fn">print</span>(config[<span class="st">"database"</span>][<span class="st">"host"</span>])
+<span class="fn">print</span>(config.<span class="fn">getint</span>(<span class="st">"database"</span>, <span class="st">"port"</span>))
+<span class="fn">print</span>(config.<span class="fn">sections</span>())</pre>
+<div class="out-label">Output</div><pre class="output">localhost
+5432
+['database', 'email']</pre>
+<div class="example-note">configparser reads .ini style files. getint/getfloat/getboolean auto-convert types. Good for non-secret configuration like feature flags, timeouts, and host names.</div></div>
+
+<div class="section-block"><h4>os.environ Patterns</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> os
+
+<span class="cm"># Required variable — crash early if missing</span>
+<span class="kw">def</span> <span class="fn">require_env</span>(key):
+    val <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(key)
+    <span class="kw">if</span> <span class="kw">not</span> val:
+        <span class="kw">raise</span> <span class="bi">EnvironmentError</span>(<span class="st">f"Required env var {key!r} not set"</span>)
+    <span class="kw">return</span> val
+
+<span class="cm"># Type-safe boolean env var</span>
+debug <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"DEBUG"</span>, <span class="st">"false"</span>).<span class="fn">lower</span>() <span class="op">==</span> <span class="st">"true"</span>
+port  <span class="op">=</span> <span class="fn">int</span>(os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"PORT"</span>, <span class="st">"8080"</span>))
+<span class="fn">print</span>(<span class="st">f"Debug: {debug}, Port: {port}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Debug: False, Port: 8080</pre></div>
+
+<div class="section-block"><h4>secrets Module</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> secrets, string
+
+<span class="cm"># Cryptographically secure random token</span>
+token <span class="op">=</span> secrets.<span class="fn">token_hex</span>(<span class="nm">32</span>)
+<span class="fn">print</span>(<span class="st">"API token:"</span>, token)
+
+<span class="cm"># Secure URL-safe token</span>
+url_token <span class="op">=</span> secrets.<span class="fn">token_urlsafe</span>(<span class="nm">24</span>)
+<span class="fn">print</span>(<span class="st">"URL token:"</span>, url_token)
+
+<span class="cm"># Secure random password</span>
+alphabet <span class="op">=</span> string.ascii_letters <span class="op">+</span> string.digits <span class="op">+</span> <span class="st">"!@#$"</span>
+password <span class="op">=</span> <span class="st">""</span>.<span class="fn">join</span>(secrets.<span class="fn">choice</span>(alphabet) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">16</span>))
+<span class="fn">print</span>(<span class="st">"Password:"</span>, password)</pre>
+<div class="out-label">Output</div><pre class="output">API token: 3f8a2b1c...64 hex chars
+URL token: xK9mN2pQ...32 url-safe chars
+Password: rT7!mK2@nP8#vL5$</pre>
+<div class="example-note">Use secrets (not random) for anything security-related — tokens, passwords, CSRF keys. random is predictable; secrets is cryptographically secure.</div></div>
+`;}
+  },
+  {
+    id:'json-yaml',icon:'📝',title:'JSON & YAML',
+    desc:'json load/dump, yaml load/dump, nested data, merge configs.',
+    content(){return `
+<div class="detail-header"><span class="icon">📝</span>
+<h2>JSON &amp; YAML</h2>
+<p><strong>JSON</strong> is built into Python. <strong>YAML</strong> needs <code>pip install pyyaml</code>. Both are common config and data exchange formats — YAML is more human-readable for config files.</p></div>
+
+<div class="section-block"><h4>json load &amp; dump</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json
+
+data <span class="op">=</span> {<span class="st">"app"</span>: <span class="st">"mybot"</span>, <span class="st">"version"</span>: <span class="nm">2</span>, <span class="st">"features"</span>: [<span class="st">"email"</span>, <span class="st">"slack"</span>]}
+
+<span class="cm"># dict → JSON string</span>
+text <span class="op">=</span> json.<span class="fn">dumps</span>(data, indent<span class="op">=</span><span class="nm">2</span>)
+<span class="fn">print</span>(text)
+
+<span class="cm"># JSON string → dict</span>
+back <span class="op">=</span> json.<span class="fn">loads</span>(text)
+<span class="fn">print</span>(back[<span class="st">"features"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">{
+  "app": "mybot",
+  "version": 2,
+  "features": ["email", "slack"]
+}
+['email', 'slack']</pre></div>
+
+<div class="section-block"><h4>json file read &amp; write</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json
+
+config <span class="op">=</span> {<span class="st">"host"</span>: <span class="st">"localhost"</span>, <span class="st">"port"</span>: <span class="nm">8080</span>, <span class="st">"debug"</span>: <span class="kw">True</span>}
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"config.json"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    json.<span class="fn">dump</span>(config, f, indent<span class="op">=</span><span class="nm">2</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"config.json"</span>) <span class="kw">as</span> f:
+    loaded <span class="op">=</span> json.<span class="fn">load</span>(f)
+<span class="fn">print</span>(loaded[<span class="st">"port"</span>], <span class="fn">type</span>(loaded[<span class="st">"debug"</span>]))</pre>
+<div class="out-label">Output</div><pre class="output">8080 &lt;class 'bool'&gt;</pre></div>
+
+<div class="section-block"><h4>yaml load &amp; dump</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> yaml
+
+yaml_text <span class="op">=</span> <span class="st">"""
+app: mybot
+version: 2
+database:
+  host: localhost
+  port: 5432
+features:
+  - email
+  - slack
+"""</span>
+
+data <span class="op">=</span> yaml.<span class="fn">safe_load</span>(yaml_text)
+<span class="fn">print</span>(data[<span class="st">"database"</span>][<span class="st">"port"</span>])
+<span class="fn">print</span>(data[<span class="st">"features"</span>])
+<span class="fn">print</span>(yaml.<span class="fn">dump</span>(data, default_flow_style<span class="op">=</span><span class="kw">False</span>)[:<span class="nm">50</span>])</pre>
+<div class="out-label">Output</div><pre class="output">5432
+['email', 'slack']
+app: mybot
+database:
+  host: localhost
+  port: 5</pre>
+<div class="example-note">Always use yaml.safe_load() — not yaml.load(). safe_load prevents arbitrary Python object execution from untrusted YAML files.</div></div>
+
+<div class="section-block"><h4>Merge Configs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json
+
+defaults <span class="op">=</span> {<span class="st">"debug"</span>: <span class="kw">False</span>, <span class="st">"port"</span>: <span class="nm">8080</span>, <span class="st">"log_level"</span>: <span class="st">"INFO"</span>, <span class="st">"timeout"</span>: <span class="nm">30</span>}
+overrides <span class="op">=</span> {<span class="st">"debug"</span>: <span class="kw">True</span>, <span class="st">"port"</span>: <span class="nm">9000</span>}
+
+config <span class="op">=</span> {<span class="op">**</span>defaults, <span class="op">**</span>overrides}
+<span class="fn">print</span>(json.<span class="fn">dumps</span>(config, indent<span class="op">=</span><span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">{
+  "debug": true,
+  "port": 9000,
+  "log_level": "INFO",
+  "timeout": 30
+}</pre>
+<div class="example-note">The ** merge pattern applies defaults first, then overrides on top — a clean way to layer configs (defaults → env-specific → runtime flags).</div></div>
+`;}
+  },
+  {
+    id:'watchdog',icon:'👁️',title:'File Watching',
+    desc:'watchdog Observer, FileSystemEventHandler, on_created, on_modified.',
+    content(){return `
+<div class="detail-header"><span class="icon">👁️</span>
+<h2>File Watching — watchdog</h2>
+<p><strong>watchdog</strong> monitors filesystem events in real-time. Install: <code>pip install watchdog</code>. Useful for auto-processing files dropped into a folder, hot-reloading configs, or syncing.</p></div>
+
+<div class="section-block"><h4>Observer Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> watchdog.observers <span class="kw">import</span> Observer
+<span class="kw">from</span> watchdog.events <span class="kw">import</span> FileSystemEventHandler
+<span class="kw">import</span> time
+
+<span class="kw">class</span> <span class="bi">MyHandler</span>(<span class="bi">FileSystemEventHandler</span>):
+    <span class="kw">def</span> <span class="fn">on_any_event</span>(<span class="nm">self</span>, event):
+        <span class="fn">print</span>(<span class="st">f"Event: {event.event_type} → {event.src_path}"</span>)
+
+observer <span class="op">=</span> <span class="bi">Observer</span>()
+observer.<span class="fn">schedule</span>(<span class="bi">MyHandler</span>(), path<span class="op">=</span><span class="st">"."</span>, recursive<span class="op">=</span><span class="kw">False</span>)
+observer.<span class="fn">start</span>()
+<span class="fn">print</span>(<span class="st">"Watching... (Ctrl+C to stop)"</span>)
+<span class="cm"># time.sleep(10); observer.stop(); observer.join()</span></pre>
+<div class="out-label">Output</div><pre class="output">Watching... (Ctrl+C to stop)
+Event: created → ./new_file.txt
+Event: modified → ./new_file.txt</pre></div>
+
+<div class="section-block"><h4>FileSystemEventHandler — on_created</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> watchdog.events <span class="kw">import</span> FileSystemEventHandler
+<span class="kw">from</span> watchdog.observers <span class="kw">import</span> Observer
+<span class="kw">import</span> time
+
+<span class="kw">class</span> <span class="bi">InboxHandler</span>(<span class="bi">FileSystemEventHandler</span>):
+    <span class="kw">def</span> <span class="fn">on_created</span>(<span class="nm">self</span>, event):
+        <span class="kw">if</span> <span class="kw">not</span> event.is_directory:
+            <span class="fn">print</span>(<span class="st">f"New file: {event.src_path}"</span>)
+            <span class="cm"># auto-process: parse, move, notify, etc.</span>
+
+observer <span class="op">=</span> <span class="bi">Observer</span>()
+observer.<span class="fn">schedule</span>(<span class="bi">InboxHandler</span>(), path<span class="op">=</span><span class="st">"inbox/"</span>, recursive<span class="op">=</span><span class="kw">False</span>)
+observer.<span class="fn">start</span>()
+<span class="fn">print</span>(<span class="st">"Watching inbox/ for new files"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Watching inbox/ for new files
+New file: inbox/report_jan.csv</pre></div>
+
+<div class="section-block"><h4>on_modified — Config Hot Reload</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> watchdog.events <span class="kw">import</span> FileSystemEventHandler
+<span class="kw">import</span> json
+
+<span class="kw">class</span> <span class="bi">ConfigWatcher</span>(<span class="bi">FileSystemEventHandler</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, config_path):
+        <span class="nm">self</span>.config_path <span class="op">=</span> config_path
+        <span class="nm">self</span>.config <span class="op">=</span> <span class="nm">self</span>.<span class="fn">_load</span>()
+
+    <span class="kw">def</span> <span class="fn">_load</span>(<span class="nm">self</span>):
+        <span class="kw">with</span> <span class="fn">open</span>(<span class="nm">self</span>.config_path) <span class="kw">as</span> f:
+            <span class="kw">return</span> json.<span class="fn">load</span>(f)
+
+    <span class="kw">def</span> <span class="fn">on_modified</span>(<span class="nm">self</span>, event):
+        <span class="kw">if</span> event.src_path <span class="op">==</span> <span class="nm">self</span>.config_path:
+            <span class="nm">self</span>.config <span class="op">=</span> <span class="nm">self</span>.<span class="fn">_load</span>()
+            <span class="fn">print</span>(<span class="st">"Config reloaded:"</span>, <span class="nm">self</span>.config)
+
+<span class="fn">print</span>(<span class="st">"ConfigWatcher ready — edits to config.json reload automatically"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">ConfigWatcher ready — edits to config.json reload automatically
+Config reloaded: {'port': 9000, 'debug': True}</pre></div>
+`;}
+  },
+  {
+    id:'selenium',icon:'🌐',title:'Selenium',
+    desc:'webdriver, find_element, click, send_keys, explicit waits.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌐</span>
+<h2>Selenium</h2>
+<p><strong>Selenium</strong> automates real browsers — useful when a site requires JavaScript or login. Install: <code>pip install selenium</code>. Needs a browser driver (ChromeDriver for Chrome).</p></div>
+
+<div class="section-block"><h4>webdriver Setup</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> selenium <span class="kw">import</span> webdriver
+<span class="kw">from</span> selenium.webdriver.chrome.options <span class="kw">import</span> Options
+
+opts <span class="op">=</span> <span class="bi">Options</span>()
+opts.<span class="fn">add_argument</span>(<span class="st">"--headless"</span>)          <span class="cm"># no window</span>
+opts.<span class="fn">add_argument</span>(<span class="st">"--no-sandbox"</span>)
+opts.<span class="fn">add_argument</span>(<span class="st">"--disable-dev-shm-usage"</span>)
+
+driver <span class="op">=</span> webdriver.<span class="bi">Chrome</span>(options<span class="op">=</span>opts)
+driver.<span class="fn">get</span>(<span class="st">"https://example.com"</span>)
+<span class="fn">print</span>(driver.title)
+driver.<span class="fn">quit</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Example Domain</pre>
+<div class="example-note">--headless runs Chrome without a visible window — ideal for servers and CI. Always call driver.quit() to free resources.</div></div>
+
+<div class="section-block"><h4>find_element</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> selenium <span class="kw">import</span> webdriver
+<span class="kw">from</span> selenium.webdriver.common.by <span class="kw">import</span> By
+
+driver <span class="op">=</span> webdriver.<span class="bi">Chrome</span>()
+driver.<span class="fn">get</span>(<span class="st">"https://example.com"</span>)
+
+<span class="cm"># Find by various selectors</span>
+h1 <span class="op">=</span> driver.<span class="fn">find_element</span>(By.<span class="bi">TAG_NAME</span>, <span class="st">"h1"</span>)
+<span class="fn">print</span>(h1.text)
+
+link <span class="op">=</span> driver.<span class="fn">find_element</span>(By.<span class="bi">CSS_SELECTOR</span>, <span class="st">"a[href]"</span>)
+<span class="fn">print</span>(link.<span class="fn">get_attribute</span>(<span class="st">"href"</span>))
+driver.<span class="fn">quit</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Example Domain
+https://www.iana.org/domains/reserved</pre></div>
+
+<div class="section-block"><h4>click &amp; send_keys</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> selenium <span class="kw">import</span> webdriver
+<span class="kw">from</span> selenium.webdriver.common.by <span class="kw">import</span> By
+<span class="kw">from</span> selenium.webdriver.common.keys <span class="kw">import</span> Keys
+
+driver <span class="op">=</span> webdriver.<span class="bi">Chrome</span>()
+driver.<span class="fn">get</span>(<span class="st">"https://google.com"</span>)
+
+search_box <span class="op">=</span> driver.<span class="fn">find_element</span>(By.<span class="bi">NAME</span>, <span class="st">"q"</span>)
+search_box.<span class="fn">send_keys</span>(<span class="st">"Python automation"</span>)
+search_box.<span class="fn">send_keys</span>(Keys.<span class="bi">RETURN</span>)
+<span class="fn">print</span>(<span class="st">"Searched. Page title:"</span>, driver.title)
+driver.<span class="fn">quit</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Searched. Page title: Python automation - Google Search</pre></div>
+
+<div class="section-block"><h4>Explicit Waits</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> selenium <span class="kw">import</span> webdriver
+<span class="kw">from</span> selenium.webdriver.common.by <span class="kw">import</span> By
+<span class="kw">from</span> selenium.webdriver.support.ui <span class="kw">import</span> WebDriverWait
+<span class="kw">from</span> selenium.webdriver.support <span class="kw">import</span> expected_conditions <span class="kw">as</span> EC
+
+driver <span class="op">=</span> webdriver.<span class="bi">Chrome</span>()
+driver.<span class="fn">get</span>(<span class="st">"https://example.com"</span>)
+
+<span class="cm"># Wait up to 10s for element to be visible</span>
+element <span class="op">=</span> <span class="bi">WebDriverWait</span>(driver, <span class="nm">10</span>).<span class="fn">until</span>(
+    EC.<span class="fn">visibility_of_element_located</span>((By.<span class="bi">TAG_NAME</span>, <span class="st">"h1"</span>))
+)
+<span class="fn">print</span>(<span class="st">"Found:"</span>, element.text)
+driver.<span class="fn">quit</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Found: Example Domain</pre>
+<div class="example-note">Explicit waits are better than time.sleep() — they wait until the condition is met, up to the timeout. Handles slow pages and JS-rendered content reliably.</div></div>
+`;}
+  }
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

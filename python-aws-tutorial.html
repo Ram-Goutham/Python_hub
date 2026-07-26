@@ -1,0 +1,2268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python + AWS</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link active" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+<div class="site-header">
+  <div class="level-badge">Cloud</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Python + AWS</h1>
+  <p>boto3, S3, Lambda, DynamoDB, RDS, SQS, SNS, EventBridge, CloudWatch, CDK and more — automate and build on AWS with Python.</p>
+</div>
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+<script>
+const topics = [
+  {
+    id:'boto3-setup',icon:'🔧',title:'boto3 Setup & IAM',
+    desc:'credentials, profiles, sessions, regions, IAM best practices.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔧</span>
+<h2>boto3 Setup &amp; IAM</h2>
+<p><strong>boto3</strong> is the official AWS SDK for Python. Install: <code>pip install boto3</code>. It reads credentials from environment variables, ~/.aws/credentials, or IAM roles.</p></div>
+
+<div class="section-block"><h4>Credentials &amp; Configuration</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Option 1: Environment variables (recommended for CI/CD)</span>
+<span class="cm"># export AWS_ACCESS_KEY_ID=AKIA...</span>
+<span class="cm"># export AWS_SECRET_ACCESS_KEY=...</span>
+<span class="cm"># export AWS_DEFAULT_REGION=ap-south-1</span>
+
+<span class="cm"># Option 2: AWS CLI profile (~/.aws/credentials)</span>
+<span class="cm"># aws configure</span>
+
+<span class="kw">import</span> boto3
+
+<span class="cm"># Default session (uses env vars or ~/.aws/credentials)</span>
+s3 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"s3"</span>)
+
+<span class="cm"># Explicit region</span>
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+<span class="fn">print</span>(<span class="st">"boto3 clients ready"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">boto3 clients ready</pre></div>
+
+<div class="section-block"><h4>Sessions &amp; Profiles</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+<span class="cm"># Named profile from ~/.aws/credentials</span>
+session <span class="op">=</span> boto3.<span class="bi">Session</span>(profile_name<span class="op">=</span><span class="st">"production"</span>)
+s3 <span class="op">=</span> session.<span class="fn">client</span>(<span class="st">"s3"</span>)
+
+<span class="cm"># Explicit credentials (use only when necessary)</span>
+session2 <span class="op">=</span> boto3.<span class="bi">Session</span>(
+    aws_access_key_id<span class="op">=</span><span class="st">"AKIA..."</span>,
+    aws_secret_access_key<span class="op">=</span><span class="st">"..."</span>,
+    region_name<span class="op">=</span><span class="st">"us-east-1"</span>
+)
+
+<span class="cm"># Check current identity</span>
+sts <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"sts"</span>)
+identity <span class="op">=</span> sts.<span class="fn">get_caller_identity</span>()
+<span class="fn">print</span>(<span class="st">"Account:"</span>, identity[<span class="st">"Account"</span>])
+<span class="fn">print</span>(<span class="st">"ARN:"</span>,     identity[<span class="st">"Arn"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Account: 123456789012
+ARN: arn:aws:iam::123456789012:user/myuser</pre></div>
+
+<div class="section-block"><h4>client vs resource</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+<span class="cm"># client — low-level, 1:1 with AWS API</span>
+s3_client <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"s3"</span>)
+buckets <span class="op">=</span> s3_client.<span class="fn">list_buckets</span>()[<span class="st">"Buckets"</span>]
+<span class="fn">print</span>([b[<span class="st">"Name"</span>] <span class="kw">for</span> b <span class="kw">in</span> buckets])
+
+<span class="cm"># resource — high-level, Pythonic OOP</span>
+s3_res <span class="op">=</span> boto3.<span class="fn">resource</span>(<span class="st">"s3"</span>)
+<span class="kw">for</span> bucket <span class="kw">in</span> s3_res.buckets.<span class="fn">all</span>():
+    <span class="fn">print</span>(bucket.name)</pre>
+<div class="out-label">Output</div><pre class="output">['my-data-bucket', 'my-logs-bucket']
+my-data-bucket
+my-logs-bucket</pre>
+<div class="example-note">Use client for full control and newer services. Use resource for S3, EC2, DynamoDB where the OOP interface is cleaner. Both use the same credentials.</div></div>
+
+<div class="section-block"><h4>IAM Best Practices</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># NEVER do this:</span>
+<span class="cm"># aws_access_key_id = "AKIAIOSFODNN7EXAMPLE"  ← hardcoded in code</span>
+
+<span class="cm"># DO this — read from environment:</span>
+<span class="kw">import</span> os, boto3
+
+client <span class="op">=</span> boto3.<span class="fn">client</span>(
+    <span class="st">"s3"</span>,
+    aws_access_key_id<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"AWS_ACCESS_KEY_ID"</span>],
+    aws_secret_access_key<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"AWS_SECRET_ACCESS_KEY"</span>]
+)
+
+<span class="cm"># On EC2/Lambda: use IAM Role — no keys needed at all
+# The instance/function assumes a role automatically</span>
+<span class="fn">print</span>(<span class="st">"Use IAM roles on AWS — no keys in code or environment"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Use IAM roles on AWS — no keys in code or environment</pre></div>
+`;}
+  },
+  {
+    id:'s3',icon:'🪣',title:'S3',
+    desc:'upload, download, list, delete, presigned URLs, bucket operations.',
+    content(){return `
+<div class="detail-header"><span class="icon">🪣</span>
+<h2>S3 — Simple Storage Service</h2>
+<p>S3 stores objects (files) in buckets. It's the most-used AWS service — used for backups, static websites, data lakes, and ML datasets.</p></div>
+
+<div class="section-block"><h4>Upload &amp; Download</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+s3 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"s3"</span>)
+BUCKET <span class="op">=</span> <span class="st">"my-data-bucket"</span>
+
+<span class="cm"># Upload a file</span>
+s3.<span class="fn">upload_file</span>(<span class="st">"report.pdf"</span>, BUCKET, <span class="st">"reports/2026/report.pdf"</span>)
+<span class="fn">print</span>(<span class="st">"Uploaded"</span>)
+
+<span class="cm"># Upload from memory</span>
+<span class="kw">import</span> io
+data <span class="op">=</span> io.<span class="fn">BytesIO</span>(<span class="nm">b</span><span class="st">"Hello S3!"</span>)
+s3.<span class="fn">upload_fileobj</span>(data, BUCKET, <span class="st">"notes/hello.txt"</span>)
+
+<span class="cm"># Download a file</span>
+s3.<span class="fn">download_file</span>(BUCKET, <span class="st">"reports/2026/report.pdf"</span>, <span class="st">"local_report.pdf"</span>)
+<span class="fn">print</span>(<span class="st">"Downloaded"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Uploaded
+Downloaded</pre></div>
+
+<div class="section-block"><h4>List &amp; Delete Objects</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+s3 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"s3"</span>)
+BUCKET <span class="op">=</span> <span class="st">"my-data-bucket"</span>
+
+<span class="cm"># List objects with prefix</span>
+resp <span class="op">=</span> s3.<span class="fn">list_objects_v2</span>(Bucket<span class="op">=</span>BUCKET, Prefix<span class="op">=</span><span class="st">"reports/"</span>)
+<span class="kw">for</span> obj <span class="kw">in</span> resp.<span class="fn">get</span>(<span class="st">"Contents"</span>, []):
+    <span class="fn">print</span>(obj[<span class="st">"Key"</span>], obj[<span class="st">"Size"</span>])
+
+<span class="cm"># Delete a single object</span>
+s3.<span class="fn">delete_object</span>(Bucket<span class="op">=</span>BUCKET, Key<span class="op">=</span><span class="st">"reports/old.pdf"</span>)
+
+<span class="cm"># Delete multiple objects</span>
+s3.<span class="fn">delete_objects</span>(Bucket<span class="op">=</span>BUCKET, Delete<span class="op">=</span>{
+    <span class="st">"Objects"</span>: [{<span class="st">"Key"</span>: <span class="st">"a.txt"</span>}, {<span class="st">"Key"</span>: <span class="st">"b.txt"</span>}]
+})</pre>
+<div class="out-label">Output</div><pre class="output">reports/2026/report.pdf 24576
+reports/2025/summary.pdf 8192</pre></div>
+
+<div class="section-block"><h4>Presigned URLs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+s3 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"s3"</span>)
+
+<span class="cm"># Generate a temporary download URL (valid 1 hour)</span>
+url <span class="op">=</span> s3.<span class="fn">generate_presigned_url</span>(
+    <span class="st">"get_object"</span>,
+    Params<span class="op">=</span>{<span class="st">"Bucket"</span>: <span class="st">"my-bucket"</span>, <span class="st">"Key"</span>: <span class="st">"invoice.pdf"</span>},
+    ExpiresIn<span class="op">=</span><span class="nm">3600</span>
+)
+<span class="fn">print</span>(<span class="st">"Download URL:"</span>, url[:<span class="nm">80</span>] <span class="op">+</span> <span class="st">"..."</span>)
+
+<span class="cm"># Presigned POST — let a client upload directly</span>
+resp <span class="op">=</span> s3.<span class="fn">generate_presigned_post</span>(
+    <span class="st">"my-bucket"</span>, <span class="st">"uploads/photo.jpg"</span>, ExpiresIn<span class="op">=</span><span class="nm">300</span>
+)
+<span class="fn">print</span>(<span class="st">"Upload fields:"</span>, <span class="fn">list</span>(resp[<span class="st">"fields"</span>].<span class="fn">keys</span>()))</pre>
+<div class="out-label">Output</div><pre class="output">Download URL: https://my-bucket.s3.amazonaws.com/invoice.pdf?X-Amz-...
+Upload fields: ['key', 'AWSAccessKeyId', 'policy', 'signature']</pre>
+<div class="example-note">Presigned URLs allow temporary access to private objects without exposing credentials. Share download links with customers, or let clients upload directly to S3 bypassing your server.</div></div>
+
+<div class="section-block"><h4>Bucket Operations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+s3 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"s3"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create bucket</span>
+s3.<span class="fn">create_bucket</span>(Bucket<span class="op">=</span><span class="st">"my-new-bucket"</span>,
+    CreateBucketConfiguration<span class="op">=</span>{<span class="st">"LocationConstraint"</span>: <span class="st">"ap-south-1"</span>})
+
+<span class="cm"># Enable versioning</span>
+s3.<span class="fn">put_bucket_versioning</span>(Bucket<span class="op">=</span><span class="st">"my-new-bucket"</span>,
+    VersioningConfiguration<span class="op">=</span>{<span class="st">"Status"</span>: <span class="st">"Enabled"</span>})
+
+<span class="cm"># Set lifecycle rule — delete objects after 90 days</span>
+s3.<span class="fn">put_bucket_lifecycle_configuration</span>(
+    Bucket<span class="op">=</span><span class="st">"my-new-bucket"</span>,
+    LifecycleConfiguration<span class="op">=</span>{<span class="st">"Rules"</span>: [{
+        <span class="st">"ID"</span>: <span class="st">"expire-old"</span>, <span class="st">"Status"</span>: <span class="st">"Enabled"</span>,
+        <span class="st">"Filter"</span>: {<span class="st">"Prefix"</span>: <span class="st">"logs/"</span>},
+        <span class="st">"Expiration"</span>: {<span class="st">"Days"</span>: <span class="nm">90</span>}
+    }]}
+)
+<span class="fn">print</span>(<span class="st">"Bucket configured"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Bucket configured</pre></div>
+`;}
+  },
+  {
+    id:'lambda',icon:'λ',title:'Lambda',
+    desc:'create function, invoke, deploy from Python, environment variables, layers.',
+    content(){return `
+<div class="detail-header"><span class="icon">λ</span>
+<h2>Lambda</h2>
+<p>AWS Lambda runs code without managing servers. You pay only for execution time. Python 3.x is a first-class runtime. Triggers: API Gateway, S3 events, SQS, EventBridge, etc.</p></div>
+
+<div class="section-block"><h4>Lambda Handler Structure</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># lambda_function.py — deployed to AWS</span>
+<span class="kw">import</span> json, os
+
+<span class="kw">def</span> <span class="fn">handler</span>(event, context):
+    <span class="cm"># event — the trigger payload (dict)</span>
+    <span class="cm"># context — runtime info (function name, timeout, etc.)</span>
+    <span class="fn">print</span>(<span class="st">f"Function: {context.function_name}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Event: {json.dumps(event)}"</span>)
+
+    name <span class="op">=</span> event.<span class="fn">get</span>(<span class="st">"name"</span>, <span class="st">"World"</span>)
+    env <span class="op">=</span> os.<span class="fn">environ</span>.<span class="fn">get</span>(<span class="st">"STAGE"</span>, <span class="st">"dev"</span>)
+
+    <span class="kw">return</span> {
+        <span class="st">"statusCode"</span>: <span class="nm">200</span>,
+        <span class="st">"body"</span>: json.<span class="fn">dumps</span>({<span class="st">"message"</span>: <span class="st">f"Hello {name} from {env}"</span>})
+    }</pre>
+<div class="out-label">Output</div><pre class="output">Function: my-function
+Event: {"name":"Ravi"}
+→ {"statusCode":200,"body":"{\"message\":\"Hello Ravi from prod\"}"}</pre></div>
+
+<div class="section-block"><h4>Invoke Lambda from Python</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+client <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"lambda"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Synchronous invoke</span>
+response <span class="op">=</span> client.<span class="fn">invoke</span>(
+    FunctionName<span class="op">=</span><span class="st">"my-function"</span>,
+    InvocationType<span class="op">=</span><span class="st">"RequestResponse"</span>,
+    Payload<span class="op">=</span>json.<span class="fn">dumps</span>({<span class="st">"name"</span>: <span class="st">"Ravi"</span>})
+)
+result <span class="op">=</span> json.<span class="fn">loads</span>(response[<span class="st">"Payload"</span>].<span class="fn">read</span>())
+<span class="fn">print</span>(result)
+
+<span class="cm"># Async invoke (fire and forget)</span>
+client.<span class="fn">invoke</span>(
+    FunctionName<span class="op">=</span><span class="st">"my-function"</span>,
+    InvocationType<span class="op">=</span><span class="st">"Event"</span>,
+    Payload<span class="op">=</span>json.<span class="fn">dumps</span>({<span class="st">"name"</span>: <span class="st">"Ana"</span>})
+)</pre>
+<div class="out-label">Output</div><pre class="output">{'statusCode': 200, 'body': '{"message":"Hello Ravi from prod"}'}</pre></div>
+
+<div class="section-block"><h4>Deploy Lambda with boto3</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, zipfile, io
+
+<span class="cm"># Zip the function code</span>
+buf <span class="op">=</span> io.<span class="bi">BytesIO</span>()
+<span class="kw">with</span> zipfile.<span class="bi">ZipFile</span>(buf, <span class="st">"w"</span>) <span class="kw">as</span> zf:
+    zf.<span class="fn">write</span>(<span class="st">"lambda_function.py"</span>)
+buf.<span class="fn">seek</span>(<span class="nm">0</span>)
+
+client <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"lambda"</span>)
+
+<span class="cm"># Create or update function</span>
+client.<span class="fn">update_function_code</span>(
+    FunctionName<span class="op">=</span><span class="st">"my-function"</span>,
+    ZipFile<span class="op">=</span>buf.<span class="fn">read</span>()
+)
+
+<span class="cm"># Update environment variables</span>
+client.<span class="fn">update_function_configuration</span>(
+    FunctionName<span class="op">=</span><span class="st">"my-function"</span>,
+    Environment<span class="op">=</span>{<span class="st">"Variables"</span>: {<span class="st">"STAGE"</span>: <span class="st">"prod"</span>, <span class="st">"DB_URL"</span>: <span class="st">"..."</span>}}
+)
+<span class="fn">print</span>(<span class="st">"Function updated"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Function updated</pre></div>
+`;}
+  },
+  {
+    id:'dynamodb',icon:'🗄️',title:'DynamoDB',
+    desc:'put_item, get_item, query, scan, batch operations, GSI.',
+    content(){return `
+<div class="detail-header"><span class="icon">🗄️</span>
+<h2>DynamoDB</h2>
+<p>DynamoDB is AWS's serverless NoSQL database — millisecond latency at any scale. Data is stored as items (rows) in tables, accessed by partition key and optional sort key.</p></div>
+
+<div class="section-block"><h4>put_item &amp; get_item</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+dynamodb <span class="op">=</span> boto3.<span class="fn">resource</span>(<span class="st">"dynamodb"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+table <span class="op">=</span> dynamodb.<span class="bi">Table</span>(<span class="st">"Users"</span>)
+
+<span class="cm"># Put item</span>
+table.<span class="fn">put_item</span>(Item<span class="op">=</span>{
+    <span class="st">"user_id"</span>: <span class="st">"u001"</span>,
+    <span class="st">"name"</span>: <span class="st">"Ravi"</span>,
+    <span class="st">"email"</span>: <span class="st">"r@x.com"</span>,
+    <span class="st">"score"</span>: <span class="nm">95</span>
+})
+
+<span class="cm"># Get item by primary key</span>
+resp <span class="op">=</span> table.<span class="fn">get_item</span>(Key<span class="op">=</span>{<span class="st">"user_id"</span>: <span class="st">"u001"</span>})
+item <span class="op">=</span> resp.<span class="fn">get</span>(<span class="st">"Item"</span>)
+<span class="fn">print</span>(item)</pre>
+<div class="out-label">Output</div><pre class="output">{'user_id': 'u001', 'name': 'Ravi', 'email': 'r@x.com', 'score': Decimal('95')}</pre></div>
+
+<div class="section-block"><h4>query &amp; scan</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+<span class="kw">from</span> boto3.dynamodb.conditions <span class="kw">import</span> Key, Attr
+
+dynamodb <span class="op">=</span> boto3.<span class="fn">resource</span>(<span class="st">"dynamodb"</span>)
+table <span class="op">=</span> dynamodb.<span class="bi">Table</span>(<span class="st">"Orders"</span>)
+
+<span class="cm"># Query — efficient, uses index (partition key required)</span>
+resp <span class="op">=</span> table.<span class="fn">query</span>(
+    KeyConditionExpression<span class="op">=</span><span class="fn">Key</span>(<span class="st">"user_id"</span>).<span class="fn">eq</span>(<span class="st">"u001"</span>) <span class="op">&amp;</span>
+                           <span class="fn">Key</span>(<span class="st">"order_date"</span>).<span class="fn">begins_with</span>(<span class="st">"2026"</span>)
+)
+<span class="fn">print</span>(<span class="st">"Orders:"</span>, resp[<span class="st">"Count"</span>])
+
+<span class="cm"># Scan — reads entire table (slow, use sparingly)</span>
+resp <span class="op">=</span> table.<span class="fn">scan</span>(
+    FilterExpression<span class="op">=</span><span class="fn">Attr</span>(<span class="st">"status"</span>).<span class="fn">eq</span>(<span class="st">"pending"</span>)
+)
+<span class="fn">print</span>(<span class="st">"Pending:"</span>, resp[<span class="st">"Count"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Orders: 12
+Pending: 3</pre>
+<div class="example-note">Query is O(log n) — fast. Scan is O(n) — reads every item. Always prefer query. Use GSI (Global Secondary Index) to query on non-primary-key attributes.</div></div>
+
+<div class="section-block"><h4>update_item &amp; batch operations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+dynamodb <span class="op">=</span> boto3.<span class="fn">resource</span>(<span class="st">"dynamodb"</span>)
+table <span class="op">=</span> dynamodb.<span class="bi">Table</span>(<span class="st">"Users"</span>)
+
+<span class="cm"># Atomic update</span>
+table.<span class="fn">update_item</span>(
+    Key<span class="op">=</span>{<span class="st">"user_id"</span>: <span class="st">"u001"</span>},
+    UpdateExpression<span class="op">=</span><span class="st">"SET score = :s, #st = :status"</span>,
+    ExpressionAttributeValues<span class="op">=</span>{<span class="st">":s"</span>: <span class="nm">99</span>, <span class="st">":status"</span>: <span class="st">"gold"</span>},
+    ExpressionAttributeNames<span class="op">=</span>{<span class="st">"#st"</span>: <span class="st">"status"</span>}
+)
+
+<span class="cm"># Batch write up to 25 items at once</span>
+<span class="kw">with</span> table.<span class="fn">batch_writer</span>() <span class="kw">as</span> batch:
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">50</span>):
+        batch.<span class="fn">put_item</span>(Item<span class="op">=</span>{<span class="st">"user_id"</span>: <span class="st">f"u{i:03d}"</span>, <span class="st">"name"</span>: <span class="st">f"User{i}"</span>})
+<span class="fn">print</span>(<span class="st">"50 items written"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">50 items written</pre></div>
+`;}
+  },
+  {
+    id:'rds',icon:'🐘',title:'RDS',
+    desc:'connect with psycopg2/pymysql, execute queries, connection pooling.',
+    content(){return `
+<div class="detail-header"><span class="icon">🐘</span>
+<h2>RDS — Relational Database Service</h2>
+<p>RDS manages PostgreSQL, MySQL, and other relational databases on AWS. Connect using standard Python DB drivers — psycopg2 for PostgreSQL, pymysql for MySQL.</p></div>
+
+<div class="section-block"><h4>Connect with psycopg2 (PostgreSQL)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> psycopg2, os
+
+conn <span class="op">=</span> psycopg2.<span class="fn">connect</span>(
+    host<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_HOST"</span>],      <span class="cm"># mydb.xyz.rds.amazonaws.com</span>
+    database<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_DB"</span>],
+    user<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_USER"</span>],
+    password<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_PASS"</span>],
+    port<span class="op">=</span><span class="nm">5432</span>,
+    sslmode<span class="op">=</span><span class="st">"require"</span>       <span class="cm"># always use SSL on RDS</span>
+)
+cur <span class="op">=</span> conn.<span class="fn">cursor</span>()
+cur.<span class="fn">execute</span>(<span class="st">"SELECT version();"</span>)
+<span class="fn">print</span>(cur.<span class="fn">fetchone</span>()[<span class="nm">0</span>][:<span class="nm">30</span>])</pre>
+<div class="out-label">Output</div><pre class="output">PostgreSQL 15.4 on x86_64-pc-lin</pre></div>
+
+<div class="section-block"><h4>Execute Queries</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> psycopg2
+
+conn <span class="op">=</span> psycopg2.<span class="fn">connect</span>(host<span class="op">=</span><span class="st">"..."</span>, database<span class="op">=</span><span class="st">"app"</span>, user<span class="op">=</span><span class="st">"..."</span>, password<span class="op">=</span><span class="st">"..."</span>)
+cur <span class="op">=</span> conn.<span class="fn">cursor</span>()
+
+<span class="cm"># Always use parameterised queries</span>
+cur.<span class="fn">execute</span>(
+    <span class="st">"INSERT INTO users (name, email) VALUES (%s, %s)"</span>,
+    (<span class="st">"Ravi"</span>, <span class="st">"r@x.com"</span>)
+)
+conn.<span class="fn">commit</span>()
+
+cur.<span class="fn">execute</span>(<span class="st">"SELECT id, name FROM users WHERE email = %s"</span>, (<span class="st">"r@x.com"</span>,))
+row <span class="op">=</span> cur.<span class="fn">fetchone</span>()
+<span class="fn">print</span>(<span class="st">"Found:"</span>, row)
+conn.<span class="fn">close</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Found: (1, 'Ravi')</pre></div>
+
+<div class="section-block"><h4>pymysql (MySQL / Aurora)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> pymysql, os
+
+conn <span class="op">=</span> pymysql.<span class="fn">connect</span>(
+    host<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_HOST"</span>],
+    user<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_USER"</span>],
+    password<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_PASS"</span>],
+    database<span class="op">=</span>os.<span class="fn">environ</span>[<span class="st">"RDS_DB"</span>],
+    charset<span class="op">=</span><span class="st">"utf8mb4"</span>,
+    cursorclass<span class="op">=</span>pymysql.cursors.<span class="bi">DictCursor</span>
+)
+<span class="kw">with</span> conn.<span class="fn">cursor</span>() <span class="kw">as</span> cur:
+    cur.<span class="fn">execute</span>(<span class="st">"SELECT * FROM orders LIMIT 3"</span>)
+    <span class="kw">for</span> row <span class="kw">in</span> cur.<span class="fn">fetchall</span>():
+        <span class="fn">print</span>(row[<span class="st">"id"</span>], row[<span class="st">"status"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">1 completed
+2 pending
+3 completed</pre>
+<div class="example-note">DictCursor returns rows as dicts instead of tuples — row["id"] instead of row[0]. Install: pip install pymysql psycopg2-binary</div></div>
+`;}
+  },
+  {
+    id:'sqs',icon:'📨',title:'SQS',
+    desc:'send message, receive, delete, visibility timeout, DLQ, FIFO queues.',
+    content(){return `
+<div class="detail-header"><span class="icon">📨</span>
+<h2>SQS — Simple Queue Service</h2>
+<p>SQS decouples services — producer sends messages to a queue, consumer processes them independently. Handles millions of messages/second. Retry, DLQ, and FIFO built-in.</p></div>
+
+<div class="section-block"><h4>Send Message</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+sqs <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"sqs"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+QUEUE_URL <span class="op">=</span> <span class="st">"https://sqs.ap-south-1.amazonaws.com/123456/my-queue"</span>
+
+<span class="cm"># Send a single message</span>
+resp <span class="op">=</span> sqs.<span class="fn">send_message</span>(
+    QueueUrl<span class="op">=</span>QUEUE_URL,
+    MessageBody<span class="op">=</span>json.<span class="fn">dumps</span>({<span class="st">"order_id"</span>: <span class="st">"ord-001"</span>, <span class="st">"amount"</span>: <span class="nm">5000</span>}),
+    MessageAttributes<span class="op">=</span>{
+        <span class="st">"event_type"</span>: {<span class="st">"DataType"</span>: <span class="st">"String"</span>, <span class="st">"StringValue"</span>: <span class="st">"order.placed"</span>}
+    }
+)
+<span class="fn">print</span>(<span class="st">"MessageId:"</span>, resp[<span class="st">"MessageId"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">MessageId: a1b2c3d4-e5f6-7890-abcd-ef1234567890</pre></div>
+
+<div class="section-block"><h4>Receive &amp; Delete</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+sqs <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"sqs"</span>)
+QUEUE_URL <span class="op">=</span> <span class="st">"https://sqs.ap-south-1.amazonaws.com/123456/my-queue"</span>
+
+<span class="cm"># Poll for messages (up to 10 at a time)</span>
+resp <span class="op">=</span> sqs.<span class="fn">receive_message</span>(
+    QueueUrl<span class="op">=</span>QUEUE_URL,
+    MaxNumberOfMessages<span class="op">=</span><span class="nm">10</span>,
+    WaitTimeSeconds<span class="op">=</span><span class="nm">20</span>,      <span class="cm"># long polling — cost efficient</span>
+    VisibilityTimeout<span class="op">=</span><span class="nm">30</span>     <span class="cm"># hide for 30s while processing</span>
+)
+<span class="kw">for</span> msg <span class="kw">in</span> resp.<span class="fn">get</span>(<span class="st">"Messages"</span>, []):
+    body <span class="op">=</span> json.<span class="fn">loads</span>(msg[<span class="st">"Body"</span>])
+    <span class="fn">print</span>(<span class="st">"Processing:"</span>, body)
+    <span class="cm"># Delete after successful processing</span>
+    sqs.<span class="fn">delete_message</span>(QueueUrl<span class="op">=</span>QUEUE_URL, ReceiptHandle<span class="op">=</span>msg[<span class="st">"ReceiptHandle"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Processing: {'order_id': 'ord-001', 'amount': 5000}</pre>
+<div class="example-note">Always delete messages only after successful processing. If your code crashes during processing, the visibility timeout expires and SQS re-delivers the message automatically.</div></div>
+
+<div class="section-block"><h4>Dead Letter Queue (DLQ)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+sqs <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"sqs"</span>)
+
+<span class="cm"># Create DLQ first</span>
+dlq <span class="op">=</span> sqs.<span class="fn">create_queue</span>(QueueName<span class="op">=</span><span class="st">"my-queue-dlq"</span>)
+dlq_arn <span class="op">=</span> sqs.<span class="fn">get_queue_attributes</span>(
+    QueueUrl<span class="op">=</span>dlq[<span class="st">"QueueUrl"</span>], AttributeNames<span class="op">=</span>[<span class="st">"QueueArn"</span>]
+)[<span class="st">"Attributes"</span>][<span class="st">"QueueArn"</span>]
+
+<span class="cm"># Create main queue with DLQ — after 3 failures, move to DLQ</span>
+sqs.<span class="fn">create_queue</span>(
+    QueueName<span class="op">=</span><span class="st">"my-queue"</span>,
+    Attributes<span class="op">=</span>{<span class="st">"RedrivePolicy"</span>: <span class="kw">str</span>({<span class="st">"deadLetterTargetArn"</span>: dlq_arn, <span class="st">"maxReceiveCount"</span>: <span class="st">"3"</span>})}
+)
+<span class="fn">print</span>(<span class="st">"Queue + DLQ configured"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Queue + DLQ configured</pre></div>
+`;}
+  },
+  {
+    id:'sns',icon:'📣',title:'SNS',
+    desc:'create topic, publish, subscribe, fanout pattern, filter policies.',
+    content(){return `
+<div class="detail-header"><span class="icon">📣</span>
+<h2>SNS — Simple Notification Service</h2>
+<p>SNS is a pub/sub messaging service. Publishers send to a topic; all subscribers receive the message instantly. Great for fanout — one event triggers multiple actions.</p></div>
+
+<div class="section-block"><h4>Create Topic &amp; Publish</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+sns <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"sns"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create topic</span>
+topic <span class="op">=</span> sns.<span class="fn">create_topic</span>(Name<span class="op">=</span><span class="st">"order-events"</span>)
+TOPIC_ARN <span class="op">=</span> topic[<span class="st">"TopicArn"</span>]
+
+<span class="cm"># Publish a message</span>
+sns.<span class="fn">publish</span>(
+    TopicArn<span class="op">=</span>TOPIC_ARN,
+    Message<span class="op">=</span>json.<span class="fn">dumps</span>({<span class="st">"order_id"</span>: <span class="st">"ord-001"</span>, <span class="st">"total"</span>: <span class="nm">5000</span>}),
+    Subject<span class="op">=</span><span class="st">"New Order Placed"</span>,
+    MessageAttributes<span class="op">=</span>{
+        <span class="st">"event_type"</span>: {<span class="st">"DataType"</span>: <span class="st">"String"</span>, <span class="st">"StringValue"</span>: <span class="st">"order.placed"</span>}
+    }
+)
+<span class="fn">print</span>(<span class="st">"Published to"</span>, TOPIC_ARN)</pre>
+<div class="out-label">Output</div><pre class="output">Published to arn:aws:sns:ap-south-1:123456:order-events</pre></div>
+
+<div class="section-block"><h4>Subscribe</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+sns <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"sns"</span>)
+TOPIC_ARN <span class="op">=</span> <span class="st">"arn:aws:sns:ap-south-1:123456:order-events"</span>
+
+<span class="cm"># Email subscription</span>
+sns.<span class="fn">subscribe</span>(TopicArn<span class="op">=</span>TOPIC_ARN, Protocol<span class="op">=</span><span class="st">"email"</span>, Endpoint<span class="op">=</span><span class="st">"ops@company.com"</span>)
+
+<span class="cm"># SQS subscription (fanout: SNS → multiple SQS queues)</span>
+sns.<span class="fn">subscribe</span>(
+    TopicArn<span class="op">=</span>TOPIC_ARN,
+    Protocol<span class="op">=</span><span class="st">"sqs"</span>,
+    Endpoint<span class="op">=</span><span class="st">"arn:aws:sqs:ap-south-1:123456:fulfillment-queue"</span>
+)
+
+<span class="cm"># Lambda subscription</span>
+sns.<span class="fn">subscribe</span>(
+    TopicArn<span class="op">=</span>TOPIC_ARN,
+    Protocol<span class="op">=</span><span class="st">"lambda"</span>,
+    Endpoint<span class="op">=</span><span class="st">"arn:aws:lambda:ap-south-1:123456:function:send-receipt"</span>
+)
+<span class="fn">print</span>(<span class="st">"3 subscribers added"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">3 subscribers added</pre>
+<div class="example-note">SNS fanout: one publish triggers email to ops, fulfillment via SQS, and receipt Lambda simultaneously. This decouples your services — adding a new action = new subscription, no code change to publisher.</div></div>
+`;}
+  },
+  {
+    id:'eventbridge',icon:'⚡',title:'EventBridge',
+    desc:'event bus, put_events, rules, targets, event patterns, scheduled rules.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚡</span>
+<h2>EventBridge</h2>
+<p>EventBridge is a serverless event bus — route events from AWS services, your apps, or SaaS tools to Lambda, SQS, Step Functions, and more using rules and patterns.</p></div>
+
+<div class="section-block"><h4>put_events — Send Custom Events</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+events <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"events"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+resp <span class="op">=</span> events.<span class="fn">put_events</span>(Entries<span class="op">=</span>[
+    {
+        <span class="st">"Source"</span>: <span class="st">"com.myapp.orders"</span>,
+        <span class="st">"DetailType"</span>: <span class="st">"OrderPlaced"</span>,
+        <span class="st">"Detail"</span>: json.<span class="fn">dumps</span>({
+            <span class="st">"order_id"</span>: <span class="st">"ord-001"</span>,
+            <span class="st">"user_id"</span>: <span class="st">"u001"</span>,
+            <span class="st">"amount"</span>: <span class="nm">5000</span>
+        }),
+        <span class="st">"EventBusName"</span>: <span class="st">"default"</span>
+    }
+])
+<span class="fn">print</span>(<span class="st">"Failed entries:"</span>, resp[<span class="st">"FailedEntryCount"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Failed entries: 0</pre></div>
+
+<div class="section-block"><h4>Create Rule &amp; Target</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+events <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"events"</span>)
+
+<span class="cm"># Create rule matching OrderPlaced events</span>
+events.<span class="fn">put_rule</span>(
+    Name<span class="op">=</span><span class="st">"on-order-placed"</span>,
+    EventPattern<span class="op">=</span>json.<span class="fn">dumps</span>({
+        <span class="st">"source"</span>: [<span class="st">"com.myapp.orders"</span>],
+        <span class="st">"detail-type"</span>: [<span class="st">"OrderPlaced"</span>]
+    }),
+    State<span class="op">=</span><span class="st">"ENABLED"</span>
+)
+
+<span class="cm"># Route to Lambda function</span>
+events.<span class="fn">put_targets</span>(
+    Rule<span class="op">=</span><span class="st">"on-order-placed"</span>,
+    Targets<span class="op">=</span>[{
+        <span class="st">"Id"</span>: <span class="st">"send-email"</span>,
+        <span class="st">"Arn"</span>: <span class="st">"arn:aws:lambda:ap-south-1:123456:function:send-receipt"</span>
+    }]
+)
+<span class="fn">print</span>(<span class="st">"Rule and target created"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Rule and target created</pre></div>
+
+<div class="section-block"><h4>Scheduled Rules (cron)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+events <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"events"</span>)
+
+<span class="cm"># Run Lambda every day at 9am IST (3:30 UTC)</span>
+events.<span class="fn">put_rule</span>(
+    Name<span class="op">=</span><span class="st">"daily-report"</span>,
+    ScheduleExpression<span class="op">=</span><span class="st">"cron(30 3 * * ? *)"</span>,
+    State<span class="op">=</span><span class="st">"ENABLED"</span>,
+    Description<span class="op">=</span><span class="st">"Trigger daily report at 9am IST"</span>
+)
+
+<span class="cm"># Every 5 minutes</span>
+events.<span class="fn">put_rule</span>(
+    Name<span class="op">=</span><span class="st">"health-check"</span>,
+    ScheduleExpression<span class="op">=</span><span class="st">"rate(5 minutes)"</span>,
+    State<span class="op">=</span><span class="st">"ENABLED"</span>
+)
+<span class="fn">print</span>(<span class="st">"Scheduled rules created"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Scheduled rules created</pre>
+<div class="example-note">EventBridge scheduled rules replace cron jobs on EC2. The Lambda runs serverlessly — no server to manage, you pay only for executions.</div></div>
+`;}
+  },
+  {
+    id:'secrets-manager',icon:'🔐',title:'Secrets Manager',
+    desc:'store secret, get_secret_value, rotate, cache, IAM policy.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔐</span>
+<h2>Secrets Manager</h2>
+<p>AWS Secrets Manager stores database passwords, API keys, and other secrets securely with automatic rotation. Never hardcode secrets — retrieve them at runtime.</p></div>
+
+<div class="section-block"><h4>Store &amp; Retrieve a Secret</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+sm <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"secretsmanager"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Store a secret</span>
+sm.<span class="fn">create_secret</span>(
+    Name<span class="op">=</span><span class="st">"prod/myapp/db"</span>,
+    SecretString<span class="op">=</span>json.<span class="fn">dumps</span>({
+        <span class="st">"username"</span>: <span class="st">"dbadmin"</span>,
+        <span class="st">"password"</span>: <span class="st">"SuperSecret123!"</span>,
+        <span class="st">"host"</span>: <span class="st">"mydb.xyz.rds.amazonaws.com"</span>
+    })
+)
+
+<span class="cm"># Retrieve a secret</span>
+resp <span class="op">=</span> sm.<span class="fn">get_secret_value</span>(SecretId<span class="op">=</span><span class="st">"prod/myapp/db"</span>)
+secret <span class="op">=</span> json.<span class="fn">loads</span>(resp[<span class="st">"SecretString"</span>])
+<span class="fn">print</span>(<span class="st">"Host:"</span>, secret[<span class="st">"host"</span>])
+<span class="fn">print</span>(<span class="st">"User:"</span>, secret[<span class="st">"username"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Host: mydb.xyz.rds.amazonaws.com
+User: dbadmin</pre></div>
+
+<div class="section-block"><h4>Cache Secrets (best practice)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+<span class="cm"># Cache secret to avoid calling Secrets Manager on every request</span>
+_secret_cache <span class="op">=</span> {}
+
+<span class="kw">def</span> <span class="fn">get_secret</span>(name):
+    <span class="kw">if</span> name <span class="kw">not in</span> _secret_cache:
+        sm <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"secretsmanager"</span>)
+        resp <span class="op">=</span> sm.<span class="fn">get_secret_value</span>(SecretId<span class="op">=</span>name)
+        _secret_cache[name] <span class="op">=</span> json.<span class="fn">loads</span>(resp[<span class="st">"SecretString"</span>])
+        <span class="fn">print</span>(<span class="st">f"Fetched {name} from Secrets Manager"</span>)
+    <span class="kw">return</span> _secret_cache[name]
+
+db_creds <span class="op">=</span> <span class="fn">get_secret</span>(<span class="st">"prod/myapp/db"</span>)
+<span class="fn">print</span>(<span class="st">"Using cached credentials"</span>)
+db_creds2 <span class="op">=</span> <span class="fn">get_secret</span>(<span class="st">"prod/myapp/db"</span>)  <span class="cm"># no API call</span></pre>
+<div class="out-label">Output</div><pre class="output">Fetched prod/myapp/db from Secrets Manager
+Using cached credentials</pre>
+<div class="example-note">For production, use aws-secretsmanager-caching-python (pip install aws-secretsmanager-caching) which handles TTL and automatic refresh on rotation.</div></div>
+`;}
+  },
+  {
+    id:'cloudwatch',icon:'📊',title:'CloudWatch',
+    desc:'put_metric_data, log groups, log events, alarms, insights queries.',
+    content(){return `
+<div class="detail-header"><span class="icon">📊</span>
+<h2>CloudWatch</h2>
+<p>CloudWatch is AWS's monitoring and observability service — collect metrics, centralize logs, set alarms, and run analytics queries across all your AWS resources.</p></div>
+
+<div class="section-block"><h4>put_metric_data</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+cw <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"cloudwatch"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+cw.<span class="fn">put_metric_data</span>(
+    Namespace<span class="op">=</span><span class="st">"MyApp/Orders"</span>,
+    MetricData<span class="op">=</span>[
+        {<span class="st">"MetricName"</span>: <span class="st">"OrdersProcessed"</span>, <span class="st">"Value"</span>: <span class="nm">42</span>, <span class="st">"Unit"</span>: <span class="st">"Count"</span>},
+        {<span class="st">"MetricName"</span>: <span class="st">"ProcessingTime"</span>, <span class="st">"Value"</span>: <span class="nm">1.5</span>, <span class="st">"Unit"</span>: <span class="st">"Seconds"</span>},
+        {<span class="st">"MetricName"</span>: <span class="st">"Revenue"</span>, <span class="st">"Value"</span>: <span class="nm">50000</span>, <span class="st">"Unit"</span>: <span class="st">"None"</span>,
+         <span class="st">"Dimensions"</span>: [{<span class="st">"Name"</span>: <span class="st">"Region"</span>, <span class="st">"Value"</span>: <span class="st">"South"</span>}]}
+    ]
+)
+<span class="fn">print</span>(<span class="st">"Metrics published"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Metrics published</pre></div>
+
+<div class="section-block"><h4>Log Events</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, time
+
+logs <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"logs"</span>)
+GROUP <span class="op">=</span> <span class="st">"/myapp/orders"</span>
+STREAM <span class="op">=</span> <span class="st">"processor-1"</span>
+
+<span class="cm"># Create log group and stream if not exist</span>
+<span class="kw">try</span>:
+    logs.<span class="fn">create_log_group</span>(logGroupName<span class="op">=</span>GROUP)
+    logs.<span class="fn">create_log_stream</span>(logGroupName<span class="op">=</span>GROUP, logStreamName<span class="op">=</span>STREAM)
+<span class="kw">except</span> logs.exceptions.<span class="bi">ResourceAlreadyExistsException</span>:
+    <span class="kw">pass</span>
+
+logs.<span class="fn">put_log_events</span>(
+    logGroupName<span class="op">=</span>GROUP,
+    logStreamName<span class="op">=</span>STREAM,
+    logEvents<span class="op">=</span>[
+        {<span class="st">"timestamp"</span>: <span class="fn">int</span>(time.<span class="fn">time</span>()<span class="op">*</span><span class="nm">1000</span>), <span class="st">"message"</span>: <span class="st">"Order processed: ord-001"</span>},
+        {<span class="st">"timestamp"</span>: <span class="fn">int</span>(time.<span class="fn">time</span>()<span class="op">*</span><span class="nm">1000</span>)<span class="op">+</span><span class="nm">100</span>, <span class="st">"message"</span>: <span class="st">"Payment confirmed"</span>}
+    ]
+)
+<span class="fn">print</span>(<span class="st">"Logs sent"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Logs sent</pre></div>
+
+<div class="section-block"><h4>Create Alarm</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+cw <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"cloudwatch"</span>)
+
+cw.<span class="fn">put_metric_alarm</span>(
+    AlarmName<span class="op">=</span><span class="st">"HighErrorRate"</span>,
+    MetricName<span class="op">=</span><span class="st">"Errors"</span>,
+    Namespace<span class="op">=</span><span class="st">"MyApp/Orders"</span>,
+    Statistic<span class="op">=</span><span class="st">"Sum"</span>,
+    Period<span class="op">=</span><span class="nm">300</span>,             <span class="cm"># 5 min window</span>
+    EvaluationPeriods<span class="op">=</span><span class="nm">2</span>,    <span class="cm"># 2 consecutive periods</span>
+    Threshold<span class="op">=</span><span class="nm">10</span>,
+    ComparisonOperator<span class="op">=</span><span class="st">"GreaterThanThreshold"</span>,
+    AlarmActions<span class="op">=</span>[<span class="st">"arn:aws:sns:ap-south-1:123456:alerts"</span>],
+    TreatMissingData<span class="op">=</span><span class="st">"notBreaching"</span>
+)
+<span class="fn">print</span>(<span class="st">"Alarm created — SNS alert when errors > 10 in 10min"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Alarm created — SNS alert when errors > 10 in 10min</pre></div>
+`;}
+  },
+  {
+    id:'cdk',icon:'🏗️',title:'AWS CDK (Python)',
+    desc:'CDK app, Stack, constructs, synth, deploy, Lambda + API Gateway.',
+    content(){return `
+<div class="detail-header"><span class="icon">🏗️</span>
+<h2>AWS CDK — Infrastructure as Code</h2>
+<p><strong>AWS CDK</strong> lets you define cloud infrastructure in Python — no YAML/JSON. Install: <code>pip install aws-cdk-lib constructs</code>, <code>npm install -g aws-cdk</code></p></div>
+
+<div class="section-block"><h4>CDK App &amp; Stack</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># app.py</span>
+<span class="kw">import</span> aws_cdk <span class="kw">as</span> cdk
+<span class="kw">from</span> my_stack <span class="kw">import</span> MyStack
+
+app <span class="op">=</span> cdk.<span class="bi">App</span>()
+<span class="bi">MyStack</span>(app, <span class="st">"MyStack"</span>, env<span class="op">=</span>cdk.<span class="bi">Environment</span>(
+    account<span class="op">=</span><span class="st">"123456789012"</span>,
+    region<span class="op">=</span><span class="st">"ap-south-1"</span>
+))
+app.<span class="fn">synth</span>()
+
+<span class="cm"># Deploy:</span>
+<span class="cm"># cdk synth   → generates CloudFormation template</span>
+<span class="cm"># cdk deploy  → deploys to AWS</span>
+<span class="cm"># cdk diff    → shows what will change</span>
+<span class="cm"># cdk destroy → removes all resources</span></pre>
+<div class="out-label">Output</div><pre class="output">cdk synth → CloudFormation template generated
+cdk deploy → Stack deployed successfully</pre></div>
+
+<div class="section-block"><h4>Lambda + API Gateway Stack</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># my_stack.py</span>
+<span class="kw">from</span> aws_cdk <span class="kw">import</span> Stack
+<span class="kw">from</span> aws_cdk <span class="kw">import</span> aws_lambda <span class="kw">as</span> _lambda
+<span class="kw">from</span> aws_cdk <span class="kw">import</span> aws_apigateway <span class="kw">as</span> apigw
+<span class="kw">from</span> constructs <span class="kw">import</span> Construct
+
+<span class="kw">class</span> <span class="bi">MyStack</span>(<span class="bi">Stack</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, scope: <span class="bi">Construct</span>, id: <span class="bi">str</span>, <span class="op">**</span>kwargs):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(scope, id, <span class="op">**</span>kwargs)
+
+        fn <span class="op">=</span> _lambda.<span class="bi">Function</span>(<span class="nm">self</span>, <span class="st">"MyFn"</span>,
+            runtime<span class="op">=</span>_lambda.<span class="bi">Runtime</span>.<span class="bi">PYTHON_3_11</span>,
+            handler<span class="op">=</span><span class="st">"index.handler"</span>,
+            code<span class="op">=</span>_lambda.<span class="bi">Code</span>.<span class="fn">from_asset</span>(<span class="st">"lambda"</span>),
+            environment<span class="op">=</span>{<span class="st">"STAGE"</span>: <span class="st">"prod"</span>}
+        )
+        apigw.<span class="bi">LambdaRestApi</span>(<span class="nm">self</span>, <span class="st">"MyApi"</span>, handler<span class="op">=</span>fn)</pre>
+<div class="out-label">Output</div><pre class="output">MyFn: Lambda function created
+MyApi: REST API → https://abc123.execute-api.ap-south-1.amazonaws.com/prod/</pre></div>
+
+<div class="section-block"><h4>S3 Bucket + IAM Role Construct</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> aws_cdk <span class="kw">import</span> aws_s3 <span class="kw">as</span> s3
+<span class="kw">from</span> aws_cdk <span class="kw">import</span> aws_iam <span class="kw">as</span> iam
+<span class="kw">from</span> aws_cdk <span class="kw">import</span> RemovalPolicy
+
+bucket <span class="op">=</span> s3.<span class="bi">Bucket</span>(<span class="nm">self</span>, <span class="st">"DataBucket"</span>,
+    versioned<span class="op">=</span><span class="kw">True</span>,
+    encryption<span class="op">=</span>s3.<span class="bi">BucketEncryption</span>.<span class="bi">S3_MANAGED</span>,
+    removal_policy<span class="op">=</span><span class="bi">RemovalPolicy</span>.<span class="bi">RETAIN</span>
+)
+
+role <span class="op">=</span> iam.<span class="bi">Role</span>(<span class="nm">self</span>, <span class="st">"AppRole"</span>,
+    assumed_by<span class="op">=</span>iam.<span class="bi">ServicePrincipal</span>(<span class="st">"lambda.amazonaws.com"</span>)
+)
+bucket.<span class="fn">grant_read_write</span>(role)
+<span class="fn">print</span>(<span class="st">"S3 bucket + IAM role with least-privilege access"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">S3 bucket + IAM role with least-privilege access</pre>
+<div class="example-note">grant_read_write() automatically creates the minimum IAM policy needed. CDK handles the details — no manually written IAM JSON policies.</div></div>
+`;}
+  },
+  {
+    id:'step-functions',icon:'🔄',title:'Step Functions',
+    desc:'state machine, task states, parallel, choice, wait, error handling.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔄</span>
+<h2>Step Functions</h2>
+<p>AWS Step Functions orchestrates multi-step workflows — coordinate Lambda functions, API calls, and waits into a visual state machine with built-in error handling and retries.</p></div>
+
+<div class="section-block"><h4>Define &amp; Create State Machine</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+sf <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"stepfunctions"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+definition <span class="op">=</span> {
+    <span class="st">"Comment"</span>: <span class="st">"Order processing workflow"</span>,
+    <span class="st">"StartAt"</span>: <span class="st">"ValidateOrder"</span>,
+    <span class="st">"States"</span>: {
+        <span class="st">"ValidateOrder"</span>: {
+            <span class="st">"Type"</span>: <span class="st">"Task"</span>,
+            <span class="st">"Resource"</span>: <span class="st">"arn:aws:lambda:ap-south-1:123456:function:validate"</span>,
+            <span class="st">"Next"</span>: <span class="st">"ProcessPayment"</span>
+        },
+        <span class="st">"ProcessPayment"</span>: {
+            <span class="st">"Type"</span>: <span class="st">"Task"</span>,
+            <span class="st">"Resource"</span>: <span class="st">"arn:aws:lambda:ap-south-1:123456:function:payment"</span>,
+            <span class="st">"Next"</span>: <span class="st">"SendConfirmation"</span>
+        },
+        <span class="st">"SendConfirmation"</span>: {<span class="st">"Type"</span>: <span class="st">"Task"</span>,
+            <span class="st">"Resource"</span>: <span class="st">"arn:aws:lambda:ap-south-1:123456:function:notify"</span>,
+            <span class="st">"End"</span>: <span class="kw">True</span>}
+    }
+}
+<span class="fn">print</span>(json.<span class="fn">dumps</span>(definition, indent<span class="op">=</span><span class="nm">2</span>)[:<span class="nm">100</span>])</pre>
+<div class="out-label">Output</div><pre class="output">{
+  "Comment": "Order processing workflow",
+  "StartAt": "ValidateOrder",
+  "States": {
+    "ValidateOrder":</pre></div>
+
+<div class="section-block"><h4>Start &amp; Monitor Execution</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+sf <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"stepfunctions"</span>)
+STATE_MACHINE_ARN <span class="op">=</span> <span class="st">"arn:aws:states:ap-south-1:123456:stateMachine:OrderWorkflow"</span>
+
+<span class="cm"># Start execution</span>
+resp <span class="op">=</span> sf.<span class="fn">start_execution</span>(
+    stateMachineArn<span class="op">=</span>STATE_MACHINE_ARN,
+    name<span class="op">=</span><span class="st">"exec-ord-001"</span>,
+    input<span class="op">=</span>json.<span class="fn">dumps</span>({<span class="st">"order_id"</span>: <span class="st">"ord-001"</span>, <span class="st">"amount"</span>: <span class="nm">5000</span>})
+)
+execution_arn <span class="op">=</span> resp[<span class="st">"executionArn"</span>]
+
+<span class="cm"># Check status</span>
+status <span class="op">=</span> sf.<span class="fn">describe_execution</span>(executionArn<span class="op">=</span>execution_arn)
+<span class="fn">print</span>(<span class="st">"Status:"</span>, status[<span class="st">"status"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Status: RUNNING</pre>
+<div class="example-note">Step Functions give you visual workflow tracking, automatic retries, and timeouts. Each Lambda does one thing — the state machine orchestrates the sequence.</div></div>
+`;}
+  },
+  {
+    id:'parameter-store',icon:'⚙️',title:'Parameter Store',
+    desc:'put_parameter, get_parameter, SecureString, hierarchies, versioning.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>Systems Manager Parameter Store</h2>
+<p>Parameter Store is a lighter alternative to Secrets Manager for storing config values and non-sensitive secrets. Free tier is generous. Supports String, StringList, and encrypted SecureString.</p></div>
+
+<div class="section-block"><h4>put_parameter &amp; get_parameter</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ssm <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ssm"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Store config values in a hierarchy</span>
+ssm.<span class="fn">put_parameter</span>(Name<span class="op">=</span><span class="st">"/myapp/prod/db_host"</span>, Value<span class="op">=</span><span class="st">"rds.xyz.amazonaws.com"</span>, Type<span class="op">=</span><span class="st">"String"</span>, Overwrite<span class="op">=</span><span class="kw">True</span>)
+ssm.<span class="fn">put_parameter</span>(Name<span class="op">=</span><span class="st">"/myapp/prod/api_key"</span>, Value<span class="op">=</span><span class="st">"sk-secret123"</span>, Type<span class="op">=</span><span class="st">"SecureString"</span>, Overwrite<span class="op">=</span><span class="kw">True</span>)
+
+<span class="cm"># Retrieve</span>
+resp <span class="op">=</span> ssm.<span class="fn">get_parameter</span>(Name<span class="op">=</span><span class="st">"/myapp/prod/db_host"</span>)
+<span class="fn">print</span>(<span class="st">"DB Host:"</span>, resp[<span class="st">"Parameter"</span>][<span class="st">"Value"</span>])
+
+<span class="cm"># Decrypt SecureString automatically</span>
+resp <span class="op">=</span> ssm.<span class="fn">get_parameter</span>(Name<span class="op">=</span><span class="st">"/myapp/prod/api_key"</span>, WithDecryption<span class="op">=</span><span class="kw">True</span>)
+<span class="fn">print</span>(<span class="st">"Key:"</span>, resp[<span class="st">"Parameter"</span>][<span class="st">"Value"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">DB Host: rds.xyz.amazonaws.com
+Key: sk-secret123</pre></div>
+
+<div class="section-block"><h4>Get All Params in a Path</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ssm <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ssm"</span>)
+
+resp <span class="op">=</span> ssm.<span class="fn">get_parameters_by_path</span>(
+    Path<span class="op">=</span><span class="st">"/myapp/prod/"</span>,
+    Recursive<span class="op">=</span><span class="kw">True</span>,
+    WithDecryption<span class="op">=</span><span class="kw">True</span>
+)
+config <span class="op">=</span> {p[<span class="st">"Name"</span>].<span class="fn">split</span>(<span class="st">"/"</span>)[<span class="op">-</span><span class="nm">1</span>]: p[<span class="st">"Value"</span>] <span class="kw">for</span> p <span class="kw">in</span> resp[<span class="st">"Parameters"</span>]}
+<span class="fn">print</span>(config)</pre>
+<div class="out-label">Output</div><pre class="output">{'db_host': 'rds.xyz.amazonaws.com', 'api_key': 'sk-secret123'}</pre>
+<div class="example-note">Use hierarchies (/app/env/key) to load all config for an environment in one API call. IAM can restrict Lambda to only read /myapp/prod/* — clean least-privilege access.</div></div>
+`;}
+  },
+  {
+    id:'glue-athena',icon:'🔍',title:'Glue & Athena',
+    desc:'Glue catalog, crawler, ETL job, Athena query S3 with SQL.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔍</span>
+<h2>Glue &amp; Athena</h2>
+<p><strong>AWS Glue</strong> is a serverless ETL service. <strong>Athena</strong> runs standard SQL directly against S3 — no database needed. Together they form the core of a serverless data lake.</p></div>
+
+<div class="section-block"><h4>Glue Crawler</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+glue <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"glue"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create crawler to auto-discover S3 schema</span>
+glue.<span class="fn">create_crawler</span>(
+    Name<span class="op">=</span><span class="st">"orders-crawler"</span>,
+    Role<span class="op">=</span><span class="st">"arn:aws:iam::123456:role/GlueRole"</span>,
+    DatabaseName<span class="op">=</span><span class="st">"data_lake"</span>,
+    Targets<span class="op">=</span>{<span class="st">"S3Targets"</span>: [{<span class="st">"Path"</span>: <span class="st">"s3://my-data-bucket/orders/"</span>}]}
+)
+
+<span class="cm"># Start crawler</span>
+glue.<span class="fn">start_crawler</span>(Name<span class="op">=</span><span class="st">"orders-crawler"</span>)
+<span class="fn">print</span>(<span class="st">"Crawler started — will discover schema from S3 CSV/Parquet files"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Crawler started — will discover schema from S3 CSV/Parquet files</pre></div>
+
+<div class="section-block"><h4>Glue ETL Job</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># glue_job.py — runs inside Glue</span>
+<span class="kw">from</span> awsglue.context <span class="kw">import</span> GlueContext
+<span class="kw">from</span> pyspark.context <span class="kw">import</span> SparkContext
+
+sc <span class="op">=</span> <span class="fn">SparkContext</span>()
+glueContext <span class="op">=</span> <span class="fn">GlueContext</span>(sc)
+
+df <span class="op">=</span> glueContext.<span class="fn">create_dynamic_frame</span>.<span class="fn">from_catalog</span>(
+    database<span class="op">=</span><span class="st">"data_lake"</span>, table_name<span class="op">=</span><span class="st">"orders"</span>
+)
+<span class="cm"># Filter and transform</span>
+filtered <span class="op">=</span> df.<span class="fn">filter</span>(<span class="kw">lambda</span> x: x[<span class="st">"status"</span>] <span class="op">==</span> <span class="st">"completed"</span>)
+
+glueContext.<span class="fn">write_dynamic_frame</span>.<span class="fn">from_options</span>(
+    frame<span class="op">=</span>filtered,
+    connection_type<span class="op">=</span><span class="st">"s3"</span>,
+    connection_options<span class="op">=</span>{<span class="st">"path"</span>: <span class="st">"s3://my-output/completed_orders/"</span>},
+    format<span class="op">=</span><span class="st">"parquet"</span>
+)</pre>
+<div class="out-label">Output</div><pre class="output">ETL job: read from catalog → filter → write Parquet to S3</pre></div>
+
+<div class="section-block"><h4>Athena — Query S3 with SQL</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, time
+
+athena <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"athena"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+resp <span class="op">=</span> athena.<span class="fn">start_query_execution</span>(
+    QueryString<span class="op">=</span><span class="st">"SELECT status, COUNT(*) as cnt FROM data_lake.orders GROUP BY status"</span>,
+    QueryExecutionContext<span class="op">=</span>{<span class="st">"Database"</span>: <span class="st">"data_lake"</span>},
+    ResultConfiguration<span class="op">=</span>{<span class="st">"OutputLocation"</span>: <span class="st">"s3://my-results/athena/"</span>}
+)
+qid <span class="op">=</span> resp[<span class="st">"QueryExecutionId"</span>]
+
+<span class="kw">while</span> <span class="kw">True</span>:
+    status <span class="op">=</span> athena.<span class="fn">get_query_execution</span>(QueryExecutionId<span class="op">=</span>qid)[<span class="st">"QueryExecution"</span>][<span class="st">"Status"</span>][<span class="st">"State"</span>]
+    <span class="kw">if</span> status <span class="kw">in</span> [<span class="st">"SUCCEEDED"</span>,<span class="st">"FAILED"</span>]: <span class="kw">break</span>
+    time.<span class="fn">sleep</span>(<span class="nm">1</span>)
+
+results <span class="op">=</span> athena.<span class="fn">get_query_results</span>(QueryExecutionId<span class="op">=</span>qid)
+<span class="kw">for</span> row <span class="kw">in</span> results[<span class="st">"ResultSet"</span>][<span class="st">"Rows"</span>][<span class="nm">1</span>:]:
+    <span class="fn">print</span>([c[<span class="st">"VarCharValue"</span>] <span class="kw">for</span> c <span class="kw">in</span> row[<span class="st">"Data"</span>]])</pre>
+<div class="out-label">Output</div><pre class="output">['completed', '8423']
+['pending', '312']
+['failed', '47']</pre></div>
+`;}
+  },
+  {
+    id:'ecs-ecr',icon:'🐳',title:'ECS & ECR',
+    desc:'push Docker image to ECR, run task on ECS, Fargate, task definition.',
+    content(){return `
+<div class="detail-header"><span class="icon">🐳</span>
+<h2>ECS &amp; ECR</h2>
+<p><strong>ECR</strong> (Elastic Container Registry) stores Docker images. <strong>ECS</strong> (Elastic Container Service) runs containers. <strong>Fargate</strong> is the serverless mode — no EC2 to manage.</p></div>
+
+<div class="section-block"><h4>Push Image to ECR</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, subprocess
+
+ecr <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ecr"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+ACCOUNT <span class="op">=</span> <span class="st">"123456789012"</span>
+REGION <span class="op">=</span> <span class="st">"ap-south-1"</span>
+REPO <span class="op">=</span> <span class="st">"my-app"</span>
+
+<span class="cm"># Get ECR login token and authenticate Docker</span>
+token <span class="op">=</span> ecr.<span class="fn">get_authorization_token</span>()
+<span class="fn">print</span>(<span class="st">"ECR login token obtained"</span>)
+
+<span class="cm"># Shell commands to push:</span>
+<span class="cm"># aws ecr get-login-password | docker login --username AWS --password-stdin {ACCOUNT}.dkr.ecr.{REGION}.amazonaws.com</span>
+<span class="cm"># docker build -t my-app .</span>
+<span class="cm"># docker tag my-app:latest {ACCOUNT}.dkr.ecr.{REGION}.amazonaws.com/{REPO}:latest</span>
+<span class="cm"># docker push {ACCOUNT}.dkr.ecr.{REGION}.amazonaws.com/{REPO}:latest</span>
+<span class="fn">print</span>(<span class="st">f"Image URL: {ACCOUNT}.dkr.ecr.{REGION}.amazonaws.com/{REPO}:latest"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">ECR login token obtained
+Image URL: 123456789012.dkr.ecr.ap-south-1.amazonaws.com/my-app:latest</pre></div>
+
+<div class="section-block"><h4>ECS Task Definition</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ecs <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ecs"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+ecs.<span class="fn">register_task_definition</span>(
+    family<span class="op">=</span><span class="st">"my-app-task"</span>,
+    networkMode<span class="op">=</span><span class="st">"awsvpc"</span>,
+    requiresCompatibilities<span class="op">=</span>[<span class="st">"FARGATE"</span>],
+    cpu<span class="op">=</span><span class="st">"256"</span>, memory<span class="op">=</span><span class="st">"512"</span>,
+    executionRoleArn<span class="op">=</span><span class="st">"arn:aws:iam::123456:role/ecsTaskExecutionRole"</span>,
+    containerDefinitions<span class="op">=</span>[{
+        <span class="st">"name"</span>: <span class="st">"app"</span>,
+        <span class="st">"image"</span>: <span class="st">"123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:latest"</span>,
+        <span class="st">"portMappings"</span>: [{<span class="st">"containerPort"</span>: <span class="nm">8000</span>}],
+        <span class="st">"environment"</span>: [{<span class="st">"name"</span>: <span class="st">"STAGE"</span>, <span class="st">"value"</span>: <span class="st">"prod"</span>}],
+        <span class="st">"logConfiguration"</span>: {<span class="st">"logDriver"</span>: <span class="st">"awslogs"</span>,
+            <span class="st">"options"</span>: {<span class="st">"awslogs-group"</span>: <span class="st">"/ecs/my-app"</span>, <span class="st">"awslogs-region"</span>: <span class="st">"ap-south-1"</span>, <span class="st">"awslogs-stream-prefix"</span>: <span class="st">"ecs"</span>}}
+    }]
+)
+<span class="fn">print</span>(<span class="st">"Task definition registered"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Task definition registered</pre></div>
+`;}
+  },
+  {
+    id:'cost-monitoring',icon:'💰',title:'Cost & Monitoring',
+    desc:'Cost Explorer, budgets, trusted advisor, billing alerts.',
+    content(){return `
+<div class="detail-header"><span class="icon">💰</span>
+<h2>Cost &amp; Monitoring</h2>
+<p>AWS bills by usage — unexpected usage = unexpected bills. Set budgets and billing alerts from day 1. Cost Explorer and Trusted Advisor help identify waste.</p></div>
+
+<div class="section-block"><h4>Cost Explorer</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ce <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ce"</span>, region_name<span class="op">=</span><span class="st">"us-east-1"</span>)  <span class="cm"># always us-east-1</span>
+
+resp <span class="op">=</span> ce.<span class="fn">get_cost_and_usage</span>(
+    TimePeriod<span class="op">=</span>{<span class="st">"Start"</span>: <span class="st">"2026-07-01"</span>, <span class="st">"End"</span>: <span class="st">"2026-07-25"</span>},
+    Granularity<span class="op">=</span><span class="st">"DAILY"</span>,
+    Metrics<span class="op">=</span>[<span class="st">"UnblendedCost"</span>],
+    GroupBy<span class="op">=</span>[{<span class="st">"Type"</span>: <span class="st">"DIMENSION"</span>, <span class="st">"Key"</span>: <span class="st">"SERVICE"</span>}]
+)
+
+<span class="kw">for</span> result <span class="kw">in</span> resp[<span class="st">"ResultsByTime"</span>][:<span class="nm">2</span>]:
+    <span class="fn">print</span>(result[<span class="st">"TimePeriod"</span>][<span class="st">"Start"</span>])
+    <span class="kw">for</span> group <span class="kw">in</span> result[<span class="st">"Groups"</span>][:<span class="nm">3</span>]:
+        svc <span class="op">=</span> group[<span class="st">"Keys"</span>][<span class="nm">0</span>]
+        amt <span class="op">=</span> group[<span class="st">"Metrics"</span>][<span class="st">"UnblendedCost"</span>][<span class="st">"Amount"</span>]
+        <span class="fn">print</span>(<span class="st">f"  {svc}: \${float(amt):.4f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">2026-07-01
+  Amazon EC2: $1.2400
+  Amazon S3: $0.0231
+  AWS Lambda: $0.0001</pre></div>
+
+<div class="section-block"><h4>Budget Alert</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+budgets <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"budgets"</span>, region_name<span class="op">=</span><span class="st">"us-east-1"</span>)
+ACCOUNT_ID <span class="op">=</span> <span class="st">"123456789012"</span>
+
+budgets.<span class="fn">create_budget</span>(
+    AccountId<span class="op">=</span>ACCOUNT_ID,
+    Budget<span class="op">=</span>{
+        <span class="st">"BudgetName"</span>: <span class="st">"MonthlyLimit"</span>,
+        <span class="st">"BudgetLimit"</span>: {<span class="st">"Amount"</span>: <span class="st">"50"</span>, <span class="st">"Unit"</span>: <span class="st">"USD"</span>},
+        <span class="st">"TimeUnit"</span>: <span class="st">"MONTHLY"</span>,
+        <span class="st">"BudgetType"</span>: <span class="st">"COST"</span>
+    },
+    NotificationsWithSubscribers<span class="op">=</span>[{
+        <span class="st">"Notification"</span>: {
+            <span class="st">"NotificationType"</span>: <span class="st">"ACTUAL"</span>,
+            <span class="st">"ComparisonOperator"</span>: <span class="st">"GREATER_THAN"</span>,
+            <span class="st">"Threshold"</span>: <span class="nm">80</span>
+        },
+        <span class="st">"Subscribers"</span>: [{<span class="st">"SubscriptionType"</span>: <span class="st">"EMAIL"</span>, <span class="st">"Address"</span>: <span class="st">"me@company.com"</span>}]
+    }]
+)
+<span class="fn">print</span>(<span class="st">"Budget set: email alert when spend > $40 (80% of $50)"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Budget set: email alert when spend > $40 (80% of $50)</pre>
+<div class="example-note">Set a budget on day 1 of every new AWS account. One runaway Lambda loop or forgotten EC2 instance can cost hundreds overnight. Budget alerts are free.</div></div>
+`;}
+  },
+  {
+    id:'vpc-networking',icon:'🌐',title:'VPC & Networking',
+    desc:'VPC, subnets, security groups, NAT Gateway, Route 53, ALB, VPC peering.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌐</span>
+<h2>VPC &amp; Networking</h2>
+<p>A <strong>VPC</strong> (Virtual Private Cloud) is your isolated network in AWS. Every production architecture needs proper VPC design — public/private subnets, security groups, and load balancers.</p></div>
+
+<div class="section-block"><h4>Create VPC &amp; Subnets</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create VPC</span>
+vpc <span class="op">=</span> ec2.<span class="fn">create_vpc</span>(CidrBlock<span class="op">=</span><span class="st">"10.0.0.0/16"</span>)
+vpc_id <span class="op">=</span> vpc[<span class="st">"Vpc"</span>][<span class="st">"VpcId"</span>]
+ec2.<span class="fn">create_tags</span>(Resources<span class="op">=</span>[vpc_id], Tags<span class="op">=</span>[{<span class="st">"Key"</span>:<span class="st">"Name"</span>,<span class="st">"Value"</span>:<span class="st">"prod-vpc"</span>}])
+
+<span class="cm"># Public subnet (has route to Internet Gateway)</span>
+pub <span class="op">=</span> ec2.<span class="fn">create_subnet</span>(VpcId<span class="op">=</span>vpc_id, CidrBlock<span class="op">=</span><span class="st">"10.0.1.0/24"</span>, AvailabilityZone<span class="op">=</span><span class="st">"ap-south-1a"</span>)
+<span class="cm"># Private subnet (no direct internet access)</span>
+priv <span class="op">=</span> ec2.<span class="fn">create_subnet</span>(VpcId<span class="op">=</span>vpc_id, CidrBlock<span class="op">=</span><span class="st">"10.0.2.0/24"</span>, AvailabilityZone<span class="op">=</span><span class="st">"ap-south-1b"</span>)
+
+<span class="fn">print</span>(<span class="st">f"VPC: {vpc_id}"</span>)
+<span class="fn">print</span>(<span class="st">f"Public:  {pub['Subnet']['SubnetId']}"</span>)
+<span class="fn">print</span>(<span class="st">f"Private: {priv['Subnet']['SubnetId']}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">VPC: vpc-0abc123def456789
+Public:  subnet-0pub123
+Private: subnet-0priv456</pre>
+<div class="example-note">Public subnets: ALB, NAT Gateway, Bastion hosts. Private subnets: RDS, Lambda, ECS tasks, application servers. Never put databases in public subnets.</div></div>
+
+<div class="section-block"><h4>Security Groups</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>)
+vpc_id <span class="op">=</span> <span class="st">"vpc-0abc123"</span>
+
+<span class="cm"># ALB security group — allow HTTP/HTTPS from internet</span>
+alb_sg <span class="op">=</span> ec2.<span class="fn">create_security_group</span>(
+    GroupName<span class="op">=</span><span class="st">"alb-sg"</span>, Description<span class="op">=</span><span class="st">"ALB"</span>, VpcId<span class="op">=</span>vpc_id)
+ec2.<span class="fn">authorize_security_group_ingress</span>(
+    GroupId<span class="op">=</span>alb_sg[<span class="st">"GroupId"</span>],
+    IpPermissions<span class="op">=</span>[
+        {<span class="st">"IpProtocol"</span>:<span class="st">"tcp"</span>,<span class="st">"FromPort"</span>:<span class="nm">80</span>,<span class="st">"ToPort"</span>:<span class="nm">80</span>,<span class="st">"IpRanges"</span>:[{<span class="st">"CidrIp"</span>:<span class="st">"0.0.0.0/0"</span>}]},
+        {<span class="st">"IpProtocol"</span>:<span class="st">"tcp"</span>,<span class="st">"FromPort"</span>:<span class="nm">443</span>,<span class="st">"ToPort"</span>:<span class="nm">443</span>,<span class="st">"IpRanges"</span>:[{<span class="st">"CidrIp"</span>:<span class="st">"0.0.0.0/0"</span>}]}
+    ]
+)
+<span class="fn">print</span>(<span class="st">"ALB SG: allows 80+443 from 0.0.0.0/0"</span>)
+
+<span class="cm"># App security group — allow traffic ONLY from ALB</span>
+app_sg <span class="op">=</span> ec2.<span class="fn">create_security_group</span>(
+    GroupName<span class="op">=</span><span class="st">"app-sg"</span>, Description<span class="op">=</span><span class="st">"App"</span>, VpcId<span class="op">=</span>vpc_id)
+ec2.<span class="fn">authorize_security_group_ingress</span>(
+    GroupId<span class="op">=</span>app_sg[<span class="st">"GroupId"</span>],
+    IpPermissions<span class="op">=</span>[{<span class="st">"IpProtocol"</span>:<span class="st">"tcp"</span>,<span class="st">"FromPort"</span>:<span class="nm">8000</span>,<span class="st">"ToPort"</span>:<span class="nm">8000</span>,
+        <span class="st">"UserIdGroupPairs"</span>:[{<span class="st">"GroupId"</span>:alb_sg[<span class="st">"GroupId"</span>]}]}]
+)
+<span class="fn">print</span>(<span class="st">"App SG: allows 8000 only from ALB SG"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">ALB SG: allows 80+443 from 0.0.0.0/0
+App SG: allows 8000 only from ALB SG</pre>
+<div class="example-note">Reference security groups instead of IP ranges where possible — if you add a new ALB instance, the app SG automatically allows it without any changes.</div></div>
+
+<div class="section-block"><h4>NAT Gateway &amp; Internet Gateway</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>)
+
+<span class="cm"># Internet Gateway — gives public subnet internet access</span>
+igw <span class="op">=</span> ec2.<span class="fn">create_internet_gateway</span>()
+ec2.<span class="fn">attach_internet_gateway</span>(
+    InternetGatewayId<span class="op">=</span>igw[<span class="st">"InternetGateway"</span>][<span class="st">"InternetGatewayId"</span>],
+    VpcId<span class="op">=</span><span class="st">"vpc-0abc123"</span>
+)
+
+<span class="cm"># Elastic IP for NAT Gateway</span>
+eip <span class="op">=</span> ec2.<span class="fn">allocate_address</span>(Domain<span class="op">=</span><span class="st">"vpc"</span>)
+
+<span class="cm"># NAT Gateway in PUBLIC subnet — lets private subnet reach internet</span>
+nat <span class="op">=</span> ec2.<span class="fn">create_nat_gateway</span>(
+    SubnetId<span class="op">=</span><span class="st">"subnet-0pub123"</span>,
+    AllocationId<span class="op">=</span>eip[<span class="st">"AllocationId"</span>]
+)
+<span class="fn">print</span>(<span class="st">"NAT Gateway created:"</span>, nat[<span class="st">"NatGateway"</span>][<span class="st">"NatGatewayId"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">NAT Gateway created: nat-0abc123def456789</pre>
+<div class="example-note">NAT Gateway = private subnet → internet (outbound only). Internet Gateway = public subnet ↔ internet (both ways). NAT Gateway costs ~$0.045/hr — use VPC endpoints for S3/DynamoDB instead.</div></div>
+
+<div class="section-block"><h4>Application Load Balancer (ALB)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+elb <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"elbv2"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create ALB</span>
+alb <span class="op">=</span> elb.<span class="fn">create_load_balancer</span>(
+    Name<span class="op">=</span><span class="st">"prod-alb"</span>, Type<span class="op">=</span><span class="st">"application"</span>, Scheme<span class="op">=</span><span class="st">"internet-facing"</span>,
+    Subnets<span class="op">=</span>[<span class="st">"subnet-0pub123"</span>, <span class="st">"subnet-0pub456"</span>],
+    SecurityGroups<span class="op">=</span>[<span class="st">"sg-alb"</span>]
+)
+alb_arn <span class="op">=</span> alb[<span class="st">"LoadBalancers"</span>][<span class="nm">0</span>][<span class="st">"LoadBalancerArn"</span>]
+
+<span class="cm"># Create target group</span>
+tg <span class="op">=</span> elb.<span class="fn">create_target_group</span>(
+    Name<span class="op">=</span><span class="st">"app-tg"</span>, Protocol<span class="op">=</span><span class="st">"HTTP"</span>, Port<span class="op">=</span><span class="nm">8000</span>,
+    VpcId<span class="op">=</span><span class="st">"vpc-0abc123"</span>, TargetType<span class="op">=</span><span class="st">"ip"</span>,
+    HealthCheckPath<span class="op">=</span><span class="st">"/health"</span>
+)
+<span class="fn">print</span>(<span class="st">"ALB DNS:"</span>, alb[<span class="st">"LoadBalancers"</span>][<span class="nm">0</span>][<span class="st">"DNSName"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">ALB DNS: prod-alb-123456.ap-south-1.elb.amazonaws.com</pre></div>
+
+<div class="section-block"><h4>Route 53</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+r53 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"route53"</span>)
+ZONE_ID <span class="op">=</span> <span class="st">"Z1234567890ABC"</span>
+
+<span class="cm"># Point domain to ALB</span>
+r53.<span class="fn">change_resource_record_sets</span>(
+    HostedZoneId<span class="op">=</span>ZONE_ID,
+    ChangeBatch<span class="op">=</span>{<span class="st">"Changes"</span>: [{
+        <span class="st">"Action"</span>: <span class="st">"UPSERT"</span>,
+        <span class="st">"ResourceRecordSet"</span>: {
+            <span class="st">"Name"</span>: <span class="st">"api.myapp.com"</span>, <span class="st">"Type"</span>: <span class="st">"A"</span>,
+            <span class="st">"AliasTarget"</span>: {
+                <span class="st">"HostedZoneId"</span>: <span class="st">"ZP97RAFLXTNZK"</span>,
+                <span class="st">"DNSName"</span>: <span class="st">"prod-alb-123.ap-south-1.elb.amazonaws.com"</span>,
+                <span class="st">"EvaluateTargetHealth"</span>: <span class="kw">True</span>
+            }
+        }
+    }]}
+)
+<span class="fn">print</span>(<span class="st">"api.myapp.com → ALB"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">api.myapp.com → ALB</pre></div>
+`;}
+  },
+  {
+    id:'observability',icon:'📡',title:'Observability',
+    desc:'X-Ray tracing, CloudWatch Insights, structured logging, OpenTelemetry, dashboards.',
+    content(){return `
+<div class="detail-header"><span class="icon">📡</span>
+<h2>Observability on AWS</h2>
+<p>Observability = metrics + logs + traces. AWS provides <strong>X-Ray</strong> for distributed tracing, <strong>CloudWatch Insights</strong> for log analytics, and supports <strong>OpenTelemetry</strong> for vendor-neutral instrumentation.</p></div>
+
+<div class="section-block"><h4>AWS X-Ray — Distributed Tracing</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># pip install aws-xray-sdk</span>
+<span class="kw">from</span> aws_xray_sdk.core <span class="kw">import</span> xray_recorder, patch_all
+<span class="kw">from</span> flask <span class="kw">import</span> Flask
+
+<span class="cm"># Patch all AWS SDK calls + requests to be traced</span>
+<span class="fn">patch_all</span>()
+
+app <span class="op">=</span> <span class="bi">Flask</span>(__name__)
+xray_recorder.<span class="fn">configure</span>(service<span class="op">=</span><span class="st">"order-service"</span>)
+
+<span class="dec">@app.route</span>(<span class="st">"/order"</span>)
+<span class="kw">def</span> <span class="fn">create_order</span>():
+    <span class="kw">with</span> xray_recorder.<span class="fn">in_subsegment</span>(<span class="st">"validate"</span>):
+        <span class="cm"># validation logic</span>
+        <span class="kw">pass</span>
+    <span class="kw">with</span> xray_recorder.<span class="fn">in_subsegment</span>(<span class="st">"db-write"</span>):
+        <span class="cm"># database write</span>
+        <span class="kw">pass</span>
+    <span class="kw">return</span> {<span class="st">"order"</span>: <span class="st">"created"</span>}</pre>
+<div class="out-label">Output</div><pre class="output">X-Ray trace: order-service → validate (2ms) → db-write (8ms)
+Visible in AWS Console: Service Map, Traces, Segments</pre>
+<div class="example-note">X-Ray shows exactly where latency comes from — is it your code, the database, or a downstream service? patch_all() automatically instruments boto3, requests, SQLAlchemy.</div></div>
+
+<div class="section-block"><h4>Structured Logging</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json, logging, time
+
+<span class="kw">class</span> <span class="bi">JsonFormatter</span>(logging.<span class="bi">Formatter</span>):
+    <span class="kw">def</span> <span class="fn">format</span>(<span class="nm">self</span>, record):
+        <span class="kw">return</span> json.<span class="fn">dumps</span>({
+            <span class="st">"timestamp"</span>: <span class="fn">int</span>(time.<span class="fn">time</span>()<span class="op">*</span><span class="nm">1000</span>),
+            <span class="st">"level"</span>: record.levelname,
+            <span class="st">"service"</span>: <span class="st">"order-service"</span>,
+            <span class="st">"message"</span>: record.<span class="fn">getMessage</span>(),
+            <span class="op">**</span><span class="fn">getattr</span>(record, <span class="st">"extra"</span>, {})
+        })
+
+logger <span class="op">=</span> logging.<span class="fn">getLogger</span>()
+handler <span class="op">=</span> logging.<span class="bi">StreamHandler</span>()
+handler.<span class="fn">setFormatter</span>(<span class="bi">JsonFormatter</span>())
+logger.<span class="fn">addHandler</span>(handler)
+
+logger.<span class="fn">info</span>(<span class="st">"Order processed"</span>, extra<span class="op">=</span>{<span class="st">"order_id"</span>:<span class="st">"ord-001"</span>,<span class="st">"amount"</span>:<span class="nm">5000</span>,<span class="st">"user"</span>:<span class="st">"u001"</span>})</pre>
+<div class="out-label">Output</div><pre class="output">{"timestamp":1721900000000,"level":"INFO","service":"order-service","message":"Order processed","order_id":"ord-001","amount":5000,"user":"u001"}</pre>
+<div class="example-note">Structured JSON logs enable CloudWatch Insights queries like: fields order_id | filter amount > 1000 | stats count() by user. Unstructured text logs are hard to query at scale.</div></div>
+
+<div class="section-block"><h4>CloudWatch Insights Queries</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, time
+
+logs <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"logs"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Query structured logs with Insights</span>
+resp <span class="op">=</span> logs.<span class="fn">start_query</span>(
+    logGroupName<span class="op">=</span><span class="st">"/myapp/orders"</span>,
+    startTime<span class="op">=</span><span class="fn">int</span>(time.<span class="fn">time</span>()) <span class="op">-</span> <span class="nm">3600</span>,
+    endTime<span class="op">=</span><span class="fn">int</span>(time.<span class="fn">time</span>()),
+    queryString<span class="op">=</span><span class="st">"""
+        fields @timestamp, order_id, amount
+        | filter level = "ERROR"
+        | sort @timestamp desc
+        | limit 10
+    """</span>
+)
+qid <span class="op">=</span> resp[<span class="st">"queryId"</span>]
+time.<span class="fn">sleep</span>(<span class="nm">3</span>)
+results <span class="op">=</span> logs.<span class="fn">get_query_results</span>(queryId<span class="op">=</span>qid)
+<span class="kw">for</span> r <span class="kw">in</span> results[<span class="st">"results"</span>][:<span class="nm">3</span>]:
+    <span class="fn">print</span>({f[<span class="st">"field"</span>]: f[<span class="st">"value"</span>] <span class="kw">for</span> f <span class="kw">in</span> r})</pre>
+<div class="out-label">Output</div><pre class="output">{'@timestamp': '2026-07-25 10:01:00', 'order_id': 'ord-099', 'amount': '7500'}
+{'@timestamp': '2026-07-25 09:55:12', 'order_id': 'ord-087', 'amount': '3200'}</pre></div>
+
+<div class="section-block"><h4>OpenTelemetry on AWS</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp</span>
+<span class="kw">from</span> opentelemetry <span class="kw">import</span> trace
+<span class="kw">from</span> opentelemetry.sdk.trace <span class="kw">import</span> TracerProvider
+<span class="kw">from</span> opentelemetry.exporter.otlp.proto.grpc.trace_exporter <span class="kw">import</span> OTLPSpanExporter
+<span class="kw">from</span> opentelemetry.sdk.trace.export <span class="kw">import</span> BatchSpanProcessor
+
+<span class="cm"># Export to AWS Distro for OpenTelemetry (ADOT) collector</span>
+provider <span class="op">=</span> <span class="bi">TracerProvider</span>()
+exporter <span class="op">=</span> <span class="bi">OTLPSpanExporter</span>(endpoint<span class="op">=</span><span class="st">"http://localhost:4317"</span>)
+provider.<span class="fn">add_span_processor</span>(<span class="bi">BatchSpanProcessor</span>(exporter))
+trace.<span class="fn">set_tracer_provider</span>(provider)
+
+tracer <span class="op">=</span> trace.<span class="fn">get_tracer</span>(<span class="st">"order-service"</span>)
+
+<span class="kw">with</span> tracer.<span class="fn">start_as_current_span</span>(<span class="st">"process-order"</span>) <span class="kw">as</span> span:
+    span.<span class="fn">set_attribute</span>(<span class="st">"order.id"</span>, <span class="st">"ord-001"</span>)
+    span.<span class="fn">set_attribute</span>(<span class="st">"order.amount"</span>, <span class="nm">5000</span>)
+    <span class="fn">print</span>(<span class="st">"Span created — exported to X-Ray via ADOT"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Span created — exported to X-Ray via ADOT</pre>
+<div class="example-note">OpenTelemetry is vendor-neutral — the same instrumentation code works with X-Ray, Jaeger, or Datadog. AWS ADOT collector translates OTLP format to X-Ray format automatically.</div></div>
+
+<div class="section-block"><h4>CloudWatch Dashboard</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+cw <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"cloudwatch"</span>)
+
+dashboard_body <span class="op">=</span> {
+    <span class="st">"widgets"</span>: [
+        {<span class="st">"type"</span>:<span class="st">"metric"</span>,<span class="st">"x"</span>:<span class="nm">0</span>,<span class="st">"y"</span>:<span class="nm">0</span>,<span class="st">"width"</span>:<span class="nm">12</span>,<span class="st">"height"</span>:<span class="nm">6</span>,
+         <span class="st">"properties"</span>:{<span class="st">"title"</span>:<span class="st">"Orders/min"</span>,<span class="st">"metrics"</span>:[[<span class="st">"MyApp/Orders"</span>,<span class="st">"OrdersProcessed"</span>]],<span class="st">"period"</span>:<span class="nm">60</span>}},
+        {<span class="st">"type"</span>:<span class="st">"metric"</span>,<span class="st">"x"</span>:<span class="nm">12</span>,<span class="st">"y"</span>:<span class="nm">0</span>,<span class="st">"width"</span>:<span class="nm">12</span>,<span class="st">"height"</span>:<span class="nm">6</span>,
+         <span class="st">"properties"</span>:{<span class="st">"title"</span>:<span class="st">"Error Rate"</span>,<span class="st">"metrics"</span>:[[<span class="st">"MyApp/Orders"</span>,<span class="st">"Errors"</span>]],<span class="st">"period"</span>:<span class="nm">60</span>}}
+    ]
+}
+cw.<span class="fn">put_dashboard</span>(DashboardName<span class="op">=</span><span class="st">"OrdersDashboard"</span>, DashboardBody<span class="op">=</span>json.<span class="fn">dumps</span>(dashboard_body))
+<span class="fn">print</span>(<span class="st">"Dashboard created"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Dashboard created — visible at CloudWatch → Dashboards → OrdersDashboard</pre></div>
+`;}
+  },
+  {
+    id:'eks',icon:'☸️',title:'EKS — Kubernetes on AWS',
+    desc:'cluster setup, kubectl, deployments, services, ConfigMap, Secrets, Ingress.',
+    content(){return `
+<div class="detail-header"><span class="icon">☸️</span>
+<h2>EKS — Elastic Kubernetes Service</h2>
+<p><strong>EKS</strong> is AWS's managed Kubernetes service. Kubernetes orchestrates containers at scale — rolling deployments, auto-healing, auto-scaling, and service discovery.</p></div>
+
+<div class="section-block"><h4>Create EKS Cluster</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+eks <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"eks"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create cluster (takes ~10 minutes)</span>
+eks.<span class="fn">create_cluster</span>(
+    name<span class="op">=</span><span class="st">"prod-cluster"</span>,
+    version<span class="op">=</span><span class="st">"1.29"</span>,
+    roleArn<span class="op">=</span><span class="st">"arn:aws:iam::123456:role/EKSClusterRole"</span>,
+    resourcesVpcConfig<span class="op">=</span>{
+        <span class="st">"subnetIds"</span>: [<span class="st">"subnet-priv1"</span>, <span class="st">"subnet-priv2"</span>],
+        <span class="st">"securityGroupIds"</span>: [<span class="st">"sg-cluster"</span>],
+        <span class="st">"endpointPublicAccess"</span>: <span class="kw">True</span>
+    }
+)
+<span class="fn">print</span>(<span class="st">"EKS cluster creating..."</span>)
+
+<span class="cm"># Get kubeconfig (run in shell):</span>
+<span class="cm"># aws eks update-kubeconfig --name prod-cluster --region ap-south-1</span>
+<span class="cm"># kubectl get nodes</span></pre>
+<div class="out-label">Output</div><pre class="output">EKS cluster creating...
+(~10 minutes later)
+kubectl get nodes → 3 nodes Ready</pre></div>
+
+<div class="section-block"><h4>Kubernetes Deployment YAML</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> yaml
+<span class="kw">from</span> kubernetes <span class="kw">import</span> client, config
+
+<span class="cm"># pip install kubernetes</span>
+config.<span class="fn">load_kube_config</span>()  <span class="cm"># reads ~/.kube/config</span>
+
+deployment <span class="op">=</span> {
+    <span class="st">"apiVersion"</span>: <span class="st">"apps/v1"</span>, <span class="st">"kind"</span>: <span class="st">"Deployment"</span>,
+    <span class="st">"metadata"</span>: {<span class="st">"name"</span>: <span class="st">"my-app"</span>},
+    <span class="st">"spec"</span>: {
+        <span class="st">"replicas"</span>: <span class="nm">3</span>,
+        <span class="st">"selector"</span>: {<span class="st">"matchLabels"</span>: {<span class="st">"app"</span>: <span class="st">"my-app"</span>}},
+        <span class="st">"template"</span>: {
+            <span class="st">"metadata"</span>: {<span class="st">"labels"</span>: {<span class="st">"app"</span>: <span class="st">"my-app"</span>}},
+            <span class="st">"spec"</span>: {<span class="st">"containers"</span>: [{
+                <span class="st">"name"</span>: <span class="st">"app"</span>,
+                <span class="st">"image"</span>: <span class="st">"123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:latest"</span>,
+                <span class="st">"ports"</span>: [{<span class="st">"containerPort"</span>: <span class="nm">8000</span>}],
+                <span class="st">"resources"</span>: {<span class="st">"requests"</span>:{<span class="st">"cpu"</span>:<span class="st">"100m"</span>,<span class="st">"memory"</span>:<span class="st">"128Mi"</span>},
+                              <span class="st">"limits"</span>:{<span class="st">"cpu"</span>:<span class="st">"500m"</span>,<span class="st">"memory"</span>:<span class="st">"512Mi"</span>}}
+            }]}
+        }
+    }
+}
+apps_v1 <span class="op">=</span> client.<span class="bi">AppsV1Api</span>()
+apps_v1.<span class="fn">create_namespaced_deployment</span>(namespace<span class="op">=</span><span class="st">"default"</span>, body<span class="op">=</span>deployment)
+<span class="fn">print</span>(<span class="st">"Deployment created: 3 replicas"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Deployment created: 3 replicas
+kubectl get pods → 3 Running</pre></div>
+
+<div class="section-block"><h4>Service, ConfigMap &amp; Secrets</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> kubernetes <span class="kw">import</span> client, config
+<span class="kw">import</span> base64
+
+config.<span class="fn">load_kube_config</span>()
+v1 <span class="op">=</span> client.<span class="bi">CoreV1Api</span>()
+
+<span class="cm"># Service — exposes pods internally or externally</span>
+svc <span class="op">=</span> {<span class="st">"apiVersion"</span>:<span class="st">"v1"</span>,<span class="st">"kind"</span>:<span class="st">"Service"</span>,<span class="st">"metadata"</span>:{<span class="st">"name"</span>:<span class="st">"my-app-svc"</span>},
+       <span class="st">"spec"</span>:{<span class="st">"selector"</span>:{<span class="st">"app"</span>:<span class="st">"my-app"</span>},<span class="st">"ports"</span>:[{<span class="st">"port"</span>:<span class="nm">80</span>,<span class="st">"targetPort"</span>:<span class="nm">8000</span>}],<span class="st">"type"</span>:<span class="st">"ClusterIP"</span>}}
+v1.<span class="fn">create_namespaced_service</span>(namespace<span class="op">=</span><span class="st">"default"</span>, body<span class="op">=</span>svc)
+
+<span class="cm"># ConfigMap — non-sensitive config</span>
+cm <span class="op">=</span> {<span class="st">"apiVersion"</span>:<span class="st">"v1"</span>,<span class="st">"kind"</span>:<span class="st">"ConfigMap"</span>,<span class="st">"metadata"</span>:{<span class="st">"name"</span>:<span class="st">"app-config"</span>},
+      <span class="st">"data"</span>:{<span class="st">"STAGE"</span>:<span class="st">"prod"</span>,<span class="st">"LOG_LEVEL"</span>:<span class="st">"INFO"</span>}}
+v1.<span class="fn">create_namespaced_config_map</span>(namespace<span class="op">=</span><span class="st">"default"</span>, body<span class="op">=</span>cm)
+
+<span class="cm"># Secret — sensitive values (base64 encoded)</span>
+sec <span class="op">=</span> {<span class="st">"apiVersion"</span>:<span class="st">"v1"</span>,<span class="st">"kind"</span>:<span class="st">"Secret"</span>,<span class="st">"metadata"</span>:{<span class="st">"name"</span>:<span class="st">"app-secret"</span>},
+       <span class="st">"data"</span>:{<span class="st">"DB_PASS"</span>:base64.<span class="fn">b64encode</span>(<span class="nm">b</span><span class="st">"mysecret"</span>).<span class="fn">decode</span>()}}
+v1.<span class="fn">create_namespaced_secret</span>(namespace<span class="op">=</span><span class="st">"default"</span>, body<span class="op">=</span>sec)
+<span class="fn">print</span>(<span class="st">"Service, ConfigMap, Secret created"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Service, ConfigMap, Secret created</pre>
+<div class="example-note">ConfigMaps inject non-sensitive config as env vars or files. Secrets store sensitive values. In production, use External Secrets Operator to sync from AWS Secrets Manager to K8s Secrets.</div></div>
+`;}
+  },
+  {
+    id:'cicd',icon:'🔄',title:'CI/CD with AWS',
+    desc:'CodePipeline, CodeBuild, CodeDeploy, buildspec.yml, GitHub Actions + AWS.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔄</span>
+<h2>CI/CD with AWS</h2>
+<p>CI/CD automates building, testing, and deploying code. AWS provides native tools (CodePipeline, CodeBuild, CodeDeploy) and integrates seamlessly with GitHub Actions.</p></div>
+
+<div class="section-block"><h4>CodeBuild — buildspec.yml</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># buildspec.yml — defines build steps</span>
+<span class="cm"># version: 0.2
+# phases:
+#   install:
+#     runtime-versions:
+#       python: 3.11
+#     commands:
+#       - pip install -r requirements.txt
+#   pre_build:
+#     commands:
+#       - pytest tests/ -v
+#       - aws ecr get-login-password | docker login ...
+#   build:
+#     commands:
+#       - docker build -t my-app .
+#       - docker tag my-app:latest 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:$CODEBUILD_RESOLVED_SOURCE_VERSION
+#       - docker push 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:$CODEBUILD_RESOLVED_SOURCE_VERSION
+#   post_build:
+#     commands:
+#       - echo Build completed
+# artifacts:
+#   files:
+#     - imagedefinitions.json</span>
+<span class="fn">print</span>(<span class="st">"buildspec.yml drives CodeBuild: install → test → build → push"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">buildspec.yml drives CodeBuild: install → test → build → push</pre></div>
+
+<div class="section-block"><h4>Create CodePipeline with boto3</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+cp <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"codepipeline"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+cp.<span class="fn">create_pipeline</span>(pipeline<span class="op">=</span>{
+    <span class="st">"name"</span>: <span class="st">"my-app-pipeline"</span>,
+    <span class="st">"roleArn"</span>: <span class="st">"arn:aws:iam::123456:role/CodePipelineRole"</span>,
+    <span class="st">"artifactStore"</span>: {<span class="st">"type"</span>:<span class="st">"S3"</span>,<span class="st">"location"</span>:<span class="st">"my-pipeline-artifacts"</span>},
+    <span class="st">"stages"</span>: [
+        {<span class="st">"name"</span>:<span class="st">"Source"</span>,<span class="st">"actions"</span>:[{<span class="st">"name"</span>:<span class="st">"GitHub"</span>,<span class="st">"actionTypeId"</span>:
+            {<span class="st">"category"</span>:<span class="st">"Source"</span>,<span class="st">"owner"</span>:<span class="st">"ThirdParty"</span>,<span class="st">"provider"</span>:<span class="st">"GitHub"</span>,<span class="st">"version"</span>:<span class="st">"1"</span>},
+            <span class="st">"configuration"</span>:{<span class="st">"Owner"</span>:<span class="st">"myorg"</span>,<span class="st">"Repo"</span>:<span class="st">"my-app"</span>,<span class="st">"Branch"</span>:<span class="st">"main"</span>},
+            <span class="st">"outputArtifacts"</span>:[{<span class="st">"name"</span>:<span class="st">"SourceOut"</span>}]}]},
+        {<span class="st">"name"</span>:<span class="st">"Build"</span>,<span class="st">"actions"</span>:[{<span class="st">"name"</span>:<span class="st">"CodeBuild"</span>,<span class="st">"actionTypeId"</span>:
+            {<span class="st">"category"</span>:<span class="st">"Build"</span>,<span class="st">"owner"</span>:<span class="st">"AWS"</span>,<span class="st">"provider"</span>:<span class="st">"CodeBuild"</span>,<span class="st">"version"</span>:<span class="st">"1"</span>},
+            <span class="st">"configuration"</span>:{<span class="st">"ProjectName"</span>:<span class="st">"my-app-build"</span>},
+            <span class="st">"inputArtifacts"</span>:[{<span class="st">"name"</span>:<span class="st">"SourceOut"</span>}]}]}
+    ]
+})
+<span class="fn">print</span>(<span class="st">"Pipeline: GitHub → CodeBuild → (Deploy)"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Pipeline: GitHub → CodeBuild → (Deploy)</pre></div>
+
+<div class="section-block"><h4>GitHub Actions + AWS (OIDC — no keys)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># .github/workflows/deploy.yml
+# name: Deploy to ECS
+# on:
+#   push:
+#     branches: [main]
+# permissions:
+#   id-token: write   # required for OIDC
+#   contents: read
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           role-to-assume: arn:aws:iam::123456:role/GitHubActionsRole
+#           aws-region: ap-south-1
+#       - run: |
+#           pip install -r requirements.txt
+#           pytest tests/
+#       - run: |
+#           docker build -t my-app .
+#           aws ecr get-login-password | docker login ...
+#           docker push 123456.dkr.ecr.ap-south-1.amazonaws.com/my-app:$GITHUB_SHA</span>
+<span class="fn">print</span>(<span class="st">"OIDC: no AWS keys stored in GitHub — role assumed via short-lived token"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">OIDC: no AWS keys stored in GitHub — role assumed via short-lived token</pre>
+<div class="example-note">OIDC (OpenID Connect) is the modern secure way to authenticate GitHub Actions with AWS — no long-lived access keys stored as GitHub secrets. The IAM role is assumed via a short-lived JWT.</div></div>
+`;}
+  },
+  {
+    id:'auto-scaling',icon:'📈',title:'Auto Scaling',
+    desc:'Launch Template, Auto Scaling Group, scaling policies, ALB integration, Fargate scaling.',
+    content(){return `
+<div class="detail-header"><span class="icon">📈</span>
+<h2>Auto Scaling</h2>
+<p>Auto Scaling automatically adjusts capacity based on demand — adds instances when traffic spikes, removes them when quiet. Keeps costs low and availability high.</p></div>
+
+<div class="section-block"><h4>Launch Template</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+lt <span class="op">=</span> ec2.<span class="fn">create_launch_template</span>(
+    LaunchTemplateName<span class="op">=</span><span class="st">"app-lt"</span>,
+    LaunchTemplateData<span class="op">=</span>{
+        <span class="st">"ImageId"</span>: <span class="st">"ami-0abcdef1234567890"</span>,
+        <span class="st">"InstanceType"</span>: <span class="st">"t3.micro"</span>,
+        <span class="st">"SecurityGroupIds"</span>: [<span class="st">"sg-app"</span>],
+        <span class="st">"IamInstanceProfile"</span>: {<span class="st">"Name"</span>: <span class="st">"AppInstanceProfile"</span>},
+        <span class="st">"UserData"</span>: <span class="st">"#!/bin/bash\npip install -r /app/requirements.txt\npython /app/main.py"</span>
+    }
+)
+<span class="fn">print</span>(<span class="st">"Launch Template:"</span>, lt[<span class="st">"LaunchTemplate"</span>][<span class="st">"LaunchTemplateId"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Launch Template: lt-0abc123def456789</pre></div>
+
+<div class="section-block"><h4>Auto Scaling Group</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+asg <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"autoscaling"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+asg.<span class="fn">create_auto_scaling_group</span>(
+    AutoScalingGroupName<span class="op">=</span><span class="st">"app-asg"</span>,
+    LaunchTemplate<span class="op">=</span>{<span class="st">"LaunchTemplateName"</span>:<span class="st">"app-lt"</span>,<span class="st">"Version"</span>:<span class="st">"$Latest"</span>},
+    MinSize<span class="op">=</span><span class="nm">2</span>, MaxSize<span class="op">=</span><span class="nm">10</span>, DesiredCapacity<span class="op">=</span><span class="nm">3</span>,
+    VPCZoneIdentifier<span class="op">=</span><span class="st">"subnet-priv1,subnet-priv2"</span>,
+    TargetGroupARNs<span class="op">=</span>[<span class="st">"arn:aws:elasticloadbalancing:...:targetgroup/app-tg/123"</span>],
+    HealthCheckType<span class="op">=</span><span class="st">"ELB"</span>, HealthCheckGracePeriod<span class="op">=</span><span class="nm">60</span>,
+    Tags<span class="op">=</span>[{<span class="st">"Key"</span>:<span class="st">"Name"</span>,<span class="st">"Value"</span>:<span class="st">"app-server"</span>,<span class="st">"PropagateAtLaunch"</span>:<span class="kw">True</span>}]
+)
+<span class="fn">print</span>(<span class="st">"ASG: min=2, desired=3, max=10"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">ASG: min=2, desired=3, max=10</pre></div>
+
+<div class="section-block"><h4>Scaling Policies</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+asg <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"autoscaling"</span>)
+
+<span class="cm"># Target Tracking — keep CPU at 60%</span>
+asg.<span class="fn">put_scaling_policy</span>(
+    AutoScalingGroupName<span class="op">=</span><span class="st">"app-asg"</span>,
+    PolicyName<span class="op">=</span><span class="st">"cpu-target-tracking"</span>,
+    PolicyType<span class="op">=</span><span class="st">"TargetTrackingScaling"</span>,
+    TargetTrackingConfiguration<span class="op">=</span>{
+        <span class="st">"PredefinedMetricSpecification"</span>: {<span class="st">"PredefinedMetricType"</span>:<span class="st">"ASGAverageCPUUtilization"</span>},
+        <span class="st">"TargetValue"</span>: <span class="nm">60.0</span>
+    }
+)
+<span class="fn">print</span>(<span class="st">"Auto scales to keep CPU at 60%"</span>)
+<span class="fn">print</span>(<span class="st">"CPU > 60% → add instances | CPU < 60% → remove instances"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Auto scales to keep CPU at 60%
+CPU > 60% → add instances | CPU < 60% → remove instances</pre>
+<div class="example-note">Target Tracking is the simplest policy — you set a target metric value and AWS handles scaling up and down automatically. Also supports ALB RequestCountPerTarget for traffic-based scaling.</div></div>
+`;}
+  },
+  {
+    id:'terraform-aws',icon:'🏗️',title:'Terraform + AWS',
+    desc:'provider, resources, variables, outputs, state, modules, plan/apply.',
+    content(){return `
+<div class="detail-header"><span class="icon">🏗️</span>
+<h2>Terraform + AWS</h2>
+<p><strong>Terraform</strong> is the industry-standard IaC tool. Define infrastructure in HCL, run <code>terraform plan</code> to preview, <code>terraform apply</code> to deploy. Works with any cloud. Install: <code>brew install terraform</code> or download from hashicorp.com</p></div>
+
+<div class="section-block"><h4>Provider &amp; Basic Resource</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># main.tf</span>
+<span class="cm"># terraform {
+#   required_providers {
+#     aws = { source = "hashicorp/aws", version = "~> 5.0" }
+#   }
+#   backend "s3" {
+#     bucket = "my-tf-state"
+#     key    = "prod/terraform.tfstate"
+#     region = "ap-south-1"
+#   }
+# }
+#
+# provider "aws" {
+#   region = "ap-south-1"
+# }
+#
+# resource "aws_s3_bucket" "data" {
+#   bucket = "my-data-bucket-prod"
+#   tags   = { Environment = "prod" }
+# }
+#
+# resource "aws_s3_bucket_versioning" "data" {
+#   bucket = aws_s3_bucket.data.id
+#   versioning_configuration { status = "Enabled" }
+# }</span>
+<span class="fn">print</span>(<span class="st">"terraform init   → download AWS provider"</span>)
+<span class="fn">print</span>(<span class="st">"terraform plan   → show what will be created/changed"</span>)
+<span class="fn">print</span>(<span class="st">"terraform apply  → create resources"</span>)
+<span class="fn">print</span>(<span class="st">"terraform destroy→ remove all resources"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">terraform init   → download AWS provider
+terraform plan   → show what will be created/changed
+terraform apply  → create resources
+terraform destroy→ remove all resources</pre></div>
+
+<div class="section-block"><h4>Variables &amp; Outputs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># variables.tf
+# variable "environment" {
+#   type    = string
+#   default = "dev"
+# }
+# variable "instance_type" {
+#   type    = string
+#   default = "t3.micro"
+# }
+#
+# outputs.tf
+# output "bucket_name" {
+#   value = aws_s3_bucket.data.bucket
+# }
+# output "alb_dns" {
+#   value = aws_lb.main.dns_name
+# }
+#
+# Usage:
+# terraform apply -var="environment=prod"
+# terraform output alb_dns</span>
+<span class="fn">print</span>(<span class="st">"Variables parameterise configs. Outputs expose values for other modules."</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Variables parameterise configs. Outputs expose values for other modules.</pre></div>
+
+<div class="section-block"><h4>Modules</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># modules/vpc/main.tf  ← reusable VPC module
+# resource "aws_vpc" "main" {
+#   cidr_block = var.cidr
+# }
+# ...
+#
+# main.tf — use the module
+# module "vpc" {
+#   source = "./modules/vpc"
+#   cidr   = "10.0.0.0/16"
+# }
+#
+# module "vpc_prod" {
+#   source = "terraform-aws-modules/vpc/aws"  ← public registry module
+#   version = "5.0"
+#   name   = "prod-vpc"
+#   cidr   = "10.0.0.0/16"
+#   azs    = ["ap-south-1a", "ap-south-1b"]
+#   private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+#   public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
+#   enable_nat_gateway = true
+# }</span>
+<span class="fn">print</span>(<span class="st">"Modules: reusable infrastructure components"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Modules: reusable infrastructure components</pre>
+<div class="example-note">The Terraform Registry has pre-built AWS modules for VPC, EKS, RDS, etc. Use them to avoid writing hundreds of lines of HCL. Always pin module versions.</div></div>
+
+<div class="section-block"><h4>State &amp; Workspaces</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># State is stored in S3 (remote) — never commit .tfstate to git
+# Lock file stored in DynamoDB — prevents concurrent applies
+#
+# backend "s3" {
+#   bucket         = "my-tf-state"
+#   key            = "prod/terraform.tfstate"
+#   region         = "ap-south-1"
+#   dynamodb_table = "tf-state-lock"
+#   encrypt        = true
+# }
+#
+# Workspaces — separate state per environment:
+# terraform workspace new staging
+# terraform workspace select prod
+# terraform workspace list
+# → prod (current)
+#   staging
+#   default</span>
+<span class="fn">print</span>(<span class="st">"Remote state in S3 + DynamoDB lock = safe team collaboration"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Remote state in S3 + DynamoDB lock = safe team collaboration</pre></div>
+`;}
+  },
+  {
+    id:'ec2',icon:'🖥️',title:'EC2',
+    desc:'launch instance, describe, start/stop, key pairs, AMIs, user data.',
+    content(){return `
+<div class="detail-header"><span class="icon">🖥️</span>
+<h2>EC2 — Elastic Compute Cloud</h2>
+<p>EC2 provides virtual machines in the cloud. Even in a serverless/container world, EC2 knowledge is essential — Kubernetes nodes, RDS instances, and NAT Gateways all run on EC2 under the hood.</p></div>
+
+<div class="section-block"><h4>Launch Instance</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+instances <span class="op">=</span> ec2.<span class="fn">run_instances</span>(
+    ImageId<span class="op">=</span><span class="st">"ami-0abcdef1234567890"</span>,   <span class="cm"># Amazon Linux 2023</span>
+    InstanceType<span class="op">=</span><span class="st">"t3.micro"</span>,
+    MinCount<span class="op">=</span><span class="nm">1</span>, MaxCount<span class="op">=</span><span class="nm">1</span>,
+    KeyName<span class="op">=</span><span class="st">"my-key-pair"</span>,
+    SubnetId<span class="op">=</span><span class="st">"subnet-0priv123"</span>,
+    SecurityGroupIds<span class="op">=</span>[<span class="st">"sg-app"</span>],
+    IamInstanceProfile<span class="op">=</span>{<span class="st">"Name"</span>: <span class="st">"AppProfile"</span>},
+    UserData<span class="op">=</span><span class="st">"""#!/bin/bash
+yum update -y
+pip3 install flask gunicorn
+cd /app && gunicorn -w 4 -b 0.0.0.0:8000 app:app"""</span>,
+    TagSpecifications<span class="op">=</span>[{<span class="st">"ResourceType"</span>:<span class="st">"instance"</span>,
+        <span class="st">"Tags"</span>:[{<span class="st">"Key"</span>:<span class="st">"Name"</span>,<span class="st">"Value"</span>:<span class="st">"app-server"}]}]
+)
+iid <span class="op">=</span> instances[<span class="st">"Instances"</span>][<span class="nm">0</span>][<span class="st">"InstanceId"</span>]
+<span class="fn">print</span>(<span class="st">"Launched:"</span>, iid)</pre>
+<div class="out-label">Output</div><pre class="output">Launched: i-0abc123def456789</pre>
+<div class="example-note">UserData is a shell script that runs once on first boot — use it to install packages, pull code, and start services. Always use IAM Instance Profile instead of embedding credentials.</div></div>
+
+<div class="section-block"><h4>describe, start, stop, terminate</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>)
+
+<span class="cm"># Describe instances with filter</span>
+resp <span class="op">=</span> ec2.<span class="fn">describe_instances</span>(Filters<span class="op">=</span>[
+    {<span class="st">"Name"</span>:<span class="st">"tag:Name"</span>,<span class="st">"Values"</span>:[<span class="st">"app-server"</span>]},
+    {<span class="st">"Name"</span>:<span class="st">"instance-state-name"</span>,<span class="st">"Values"</span>:[<span class="st">"running"</span>]}
+])
+<span class="kw">for</span> r <span class="kw">in</span> resp[<span class="st">"Reservations"</span>]:
+    <span class="kw">for</span> i <span class="kw">in</span> r[<span class="st">"Instances"</span>]:
+        <span class="fn">print</span>(i[<span class="st">"InstanceId"</span>], i[<span class="st">"PrivateIpAddress"</span>], i[<span class="st">"State"</span>][<span class="st">"Name"</span>])
+
+ec2.<span class="fn">stop_instances</span>(InstanceIds<span class="op">=</span>[<span class="st">"i-0abc123"</span>])
+ec2.<span class="fn">start_instances</span>(InstanceIds<span class="op">=</span>[<span class="st">"i-0abc123"</span>])
+ec2.<span class="fn">terminate_instances</span>(InstanceIds<span class="op">=</span>[<span class="st">"i-0abc123"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">i-0abc123def456789 10.0.2.45 running</pre></div>
+
+<div class="section-block"><h4>Key Pairs &amp; AMIs</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec2 <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"ec2"</span>)
+
+<span class="cm"># Create key pair — save private key</span>
+kp <span class="op">=</span> ec2.<span class="fn">create_key_pair</span>(KeyName<span class="op">=</span><span class="st">"my-key"</span>, KeyType<span class="op">=</span><span class="st">"ed25519"</span>)
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"my-key.pem"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(kp[<span class="st">"KeyMaterial"</span>])
+<span class="fn">print</span>(<span class="st">"Key saved — chmod 400 my-key.pem"</span>)
+
+<span class="cm"># Create AMI (snapshot) from running instance</span>
+ami <span class="op">=</span> ec2.<span class="fn">create_image</span>(
+    InstanceId<span class="op">=</span><span class="st">"i-0abc123"</span>,
+    Name<span class="op">=</span><span class="st">"app-server-v2-2026-07-25"</span>,
+    NoReboot<span class="op">=</span><span class="kw">True</span>
+)
+<span class="fn">print</span>(<span class="st">"AMI created:"</span>, ami[<span class="st">"ImageId"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Key saved — chmod 400 my-key.pem
+AMI created: ami-0newimage123456</pre>
+<div class="example-note">AMIs are golden images — bake your app + dependencies in, then launch multiple instances from it. Much faster than running UserData every time.</div></div>
+`;}
+  },
+  {
+    id:'api-gateway',icon:'🚪',title:'API Gateway',
+    desc:'REST API, Lambda proxy integration, authorizers, throttling, stages.',
+    content(){return `
+<div class="detail-header"><span class="icon">🚪</span>
+<h2>API Gateway</h2>
+<p>API Gateway sits in front of your Lambda functions or services — providing HTTP endpoints, auth, throttling, and caching. It's the front door for serverless APIs.</p></div>
+
+<div class="section-block"><h4>Create REST API with Lambda Proxy</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+apigw <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"apigateway"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create API</span>
+api <span class="op">=</span> apigw.<span class="fn">create_rest_api</span>(name<span class="op">=</span><span class="st">"my-api"</span>, description<span class="op">=</span><span class="st">"My REST API"</span>)
+api_id <span class="op">=</span> api[<span class="st">"id"</span>]
+
+<span class="cm"># Get root resource /</span>
+resources <span class="op">=</span> apigw.<span class="fn">get_resources</span>(restApiId<span class="op">=</span>api_id)
+root_id <span class="op">=</span> resources[<span class="st">"items"</span>][<span class="nm">0</span>][<span class="st">"id"</span>]
+
+<span class="cm"># Create /users resource</span>
+users_res <span class="op">=</span> apigw.<span class="fn">create_resource</span>(restApiId<span class="op">=</span>api_id, parentId<span class="op">=</span>root_id, pathPart<span class="op">=</span><span class="st">"users"</span>)
+
+<span class="cm"># Add GET method</span>
+apigw.<span class="fn">put_method</span>(restApiId<span class="op">=</span>api_id, resourceId<span class="op">=</span>users_res[<span class="st">"id"</span>],
+    httpMethod<span class="op">=</span><span class="st">"GET"</span>, authorizationType<span class="op">=</span><span class="st">"NONE"</span>)
+<span class="fn">print</span>(<span class="st">f"API ID: {api_id}, /users GET created"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">API ID: abc123xyz, /users GET created</pre></div>
+
+<div class="section-block"><h4>Lambda Integration &amp; Deploy</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+apigw <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"apigateway"</span>)
+LAMBDA_ARN <span class="op">=</span> <span class="st">"arn:aws:lambda:ap-south-1:123456:function:get-users"</span>
+
+<span class="cm"># Lambda proxy integration</span>
+apigw.<span class="fn">put_integration</span>(
+    restApiId<span class="op">=</span><span class="st">"abc123xyz"</span>, resourceId<span class="op">=</span><span class="st">"res123"</span>, httpMethod<span class="op">=</span><span class="st">"GET"</span>,
+    type<span class="op">=</span><span class="st">"AWS_PROXY"</span>, integrationHttpMethod<span class="op">=</span><span class="st">"POST"</span>,
+    uri<span class="op">=</span><span class="st">f"arn:aws:apigateway:ap-south-1:lambda:path/2015-03-31/functions/{LAMBDA_ARN}/invocations"</span>
+)
+
+<span class="cm"># Deploy to a stage</span>
+apigw.<span class="fn">create_deployment</span>(restApiId<span class="op">=</span><span class="st">"abc123xyz"</span>, stageName<span class="op">=</span><span class="st">"prod"</span>)
+<span class="fn">print</span>(<span class="st">"Deployed to: https://abc123xyz.execute-api.ap-south-1.amazonaws.com/prod"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Deployed to: https://abc123xyz.execute-api.ap-south-1.amazonaws.com/prod</pre></div>
+
+<div class="section-block"><h4>Throttling &amp; Usage Plans</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+apigw <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"apigateway"</span>)
+
+<span class="cm"># Usage plan — rate limit per API key</span>
+plan <span class="op">=</span> apigw.<span class="fn">create_usage_plan</span>(
+    name<span class="op">=</span><span class="st">"basic-plan"</span>,
+    throttle<span class="op">=</span>{<span class="st">"rateLimit"</span>: <span class="nm">100</span>, <span class="st">"burstLimit"</span>: <span class="nm">200</span>},  <span class="cm"># 100 req/s, burst 200</span>
+    quota<span class="op">=</span>{<span class="st">"limit"</span>: <span class="nm">10000</span>, <span class="st">"period"</span>: <span class="st">"DAY"</span>},        <span class="cm"># 10k req/day</span>
+    apiStages<span class="op">=</span>[{<span class="st">"apiId"</span>:<span class="st">"abc123xyz"</span>,<span class="st">"stage"</span>:<span class="st">"prod"</span>}]
+)
+
+<span class="cm"># Create API key</span>
+key <span class="op">=</span> apigw.<span class="fn">create_api_key</span>(name<span class="op">=</span><span class="st">"client-key"</span>, enabled<span class="op">=</span><span class="kw">True</span>)
+apigw.<span class="fn">create_usage_plan_key</span>(
+    usagePlanId<span class="op">=</span>plan[<span class="st">"id"</span>], keyId<span class="op">=</span>key[<span class="st">"id"</span>], keyType<span class="op">=</span><span class="st">"API_KEY"</span>)
+<span class="fn">print</span>(<span class="st">"Usage plan: 100 req/s, 10k/day"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Usage plan: 100 req/s, 10k/day</pre>
+<div class="example-note">In production prefer HTTP API (v2) over REST API (v1) — cheaper, faster, and simpler. Use JWT authorizers instead of API keys for user-level auth.</div></div>
+`;}
+  },
+  {
+    id:'elasticache',icon:'⚡',title:'ElastiCache / Redis',
+    desc:'create cluster, connect with redis-py, get/set, pub/sub, session caching.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚡</span>
+<h2>ElastiCache — Redis on AWS</h2>
+<p><strong>ElastiCache</strong> is managed Redis/Memcached. Redis is used for session storage, caching DB queries, rate limiting, leaderboards, and pub/sub messaging. Install: <code>pip install redis</code></p></div>
+
+<div class="section-block"><h4>Create ElastiCache Cluster</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ec <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"elasticache"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+ec.<span class="fn">create_replication_group</span>(
+    ReplicationGroupId<span class="op">=</span><span class="st">"prod-redis"</span>,
+    ReplicationGroupDescription<span class="op">=</span><span class="st">"Production Redis"</span>,
+    NumCacheClusters<span class="op">=</span><span class="nm">2</span>,                    <span class="cm"># 1 primary + 1 replica</span>
+    CacheNodeType<span class="op">=</span><span class="st">"cache.t3.micro"</span>,
+    Engine<span class="op">=</span><span class="st">"redis"</span>, EngineVersion<span class="op">=</span><span class="st">"7.0"</span>,
+    SecurityGroupIds<span class="op">=</span>[<span class="st">"sg-redis"</span>],
+    CacheSubnetGroupName<span class="op">=</span><span class="st">"redis-subnet-group"</span>,
+    AtRestEncryptionEnabled<span class="op">=</span><span class="kw">True</span>,
+    TransitEncryptionEnabled<span class="op">=</span><span class="kw">True</span>
+)
+<span class="fn">print</span>(<span class="st">"Redis cluster creating (takes ~5 min)"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Redis cluster creating (takes ~5 min)
+Endpoint: prod-redis.xyz.cache.amazonaws.com:6379</pre></div>
+
+<div class="section-block"><h4>Connect &amp; Basic Operations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> redis
+
+r <span class="op">=</span> redis.<span class="fn">Redis</span>(
+    host<span class="op">=</span><span class="st">"prod-redis.xyz.cache.amazonaws.com"</span>,
+    port<span class="op">=</span><span class="nm">6379</span>, ssl<span class="op">=</span><span class="kw">True</span>, decode_responses<span class="op">=</span><span class="kw">True</span>
+)
+
+<span class="cm"># String get/set with TTL</span>
+r.<span class="fn">set</span>(<span class="st">"user:u001:name"</span>, <span class="st">"Ravi"</span>, ex<span class="op">=</span><span class="nm">3600</span>)
+<span class="fn">print</span>(r.<span class="fn">get</span>(<span class="st">"user:u001:name"</span>))
+<span class="fn">print</span>(r.<span class="fn">ttl</span>(<span class="st">"user:u001:name"</span>))
+
+<span class="cm"># Hash — store object</span>
+r.<span class="fn">hset</span>(<span class="st">"session:sess-123"</span>, mapping<span class="op">=</span>{<span class="st">"user_id"</span>:<span class="st">"u001"</span>,<span class="st">"role"</span>:<span class="st">"admin"</span>})
+r.<span class="fn">expire</span>(<span class="st">"session:sess-123"</span>, <span class="nm">1800</span>)
+<span class="fn">print</span>(r.<span class="fn">hgetall</span>(<span class="st">"session:sess-123"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Ravi
+3598
+{'user_id': 'u001', 'role': 'admin'}</pre></div>
+
+<div class="section-block"><h4>Cache-Aside Pattern</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> redis, json
+
+r <span class="op">=</span> redis.<span class="fn">Redis</span>(host<span class="op">=</span><span class="st">"localhost"</span>, decode_responses<span class="op">=</span><span class="kw">True</span>)
+
+<span class="kw">def</span> <span class="fn">get_user</span>(user_id):
+    key <span class="op">=</span> <span class="st">f"user:{user_id}"</span>
+    cached <span class="op">=</span> r.<span class="fn">get</span>(key)
+    <span class="kw">if</span> cached:
+        <span class="fn">print</span>(<span class="st">"Cache HIT"</span>)
+        <span class="kw">return</span> json.<span class="fn">loads</span>(cached)
+
+    <span class="cm"># Cache MISS — fetch from DB</span>
+    <span class="fn">print</span>(<span class="st">"Cache MISS — fetching from DB"</span>)
+    user <span class="op">=</span> {<span class="st">"id"</span>: user_id, <span class="st">"name"</span>: <span class="st">"Ravi"</span>}  <span class="cm"># simulate DB call</span>
+    r.<span class="fn">set</span>(key, json.<span class="fn">dumps</span>(user), ex<span class="op">=</span><span class="nm">300</span>)
+    <span class="kw">return</span> user
+
+<span class="fn">print</span>(<span class="fn">get_user</span>(<span class="st">"u001"</span>))
+<span class="fn">print</span>(<span class="fn">get_user</span>(<span class="st">"u001"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Cache MISS — fetching from DB
+{'id': 'u001', 'name': 'Ravi'}
+Cache HIT
+{'id': 'u001', 'name': 'Ravi'}</pre>
+<div class="example-note">Cache-aside: check cache first, on miss fetch from DB and populate cache. Set TTL to match data freshness requirements — short for user data, long for static config.</div></div>
+`;}
+  },
+  {
+    id:'kinesis',icon:'🌊',title:'Kinesis',
+    desc:'data streams, put_record, get_records, shard iterator, consumer patterns.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌊</span>
+<h2>Kinesis — Real-time Data Streaming</h2>
+<p><strong>Kinesis Data Streams</strong> ingests real-time data (events, logs, metrics) and lets multiple consumers process it. Think: high-volume clickstreams, IoT telemetry, application logs.</p></div>
+
+<div class="section-block"><h4>Create Stream &amp; put_record</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json
+
+kinesis <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"kinesis"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create stream</span>
+kinesis.<span class="fn">create_stream</span>(StreamName<span class="op">=</span><span class="st">"order-events"</span>, ShardCount<span class="op">=</span><span class="nm">2</span>)
+
+<span class="cm"># Produce a record</span>
+kinesis.<span class="fn">put_record</span>(
+    StreamName<span class="op">=</span><span class="st">"order-events"</span>,
+    Data<span class="op">=</span>json.<span class="fn">dumps</span>({<span class="st">"order_id"</span>:<span class="st">"ord-001"</span>,<span class="st">"amount"</span>:<span class="nm">5000</span>,<span class="st">"event"</span>:<span class="st">"placed"</span>}),
+    PartitionKey<span class="op">=</span><span class="st">"ord-001"</span>   <span class="cm"># same key → same shard (preserves order)</span>
+)
+
+<span class="cm"># Batch produce (up to 500 records)</span>
+records <span class="op">=</span> [
+    {<span class="st">"Data"</span>:json.<span class="fn">dumps</span>({<span class="st">"id"</span>:i}),<span class="st">"PartitionKey"</span>:<span class="st">f"key-{i}"</span>}
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>)
+]
+kinesis.<span class="fn">put_records</span>(StreamName<span class="op">=</span><span class="st">"order-events"</span>, Records<span class="op">=</span>records)
+<span class="fn">print</span>(<span class="st">"10 records sent"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">10 records sent</pre></div>
+
+<div class="section-block"><h4>Consume with get_records</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3, json, time
+
+kinesis <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"kinesis"</span>)
+
+<span class="cm"># Get shard list</span>
+stream <span class="op">=</span> kinesis.<span class="fn">describe_stream</span>(StreamName<span class="op">=</span><span class="st">"order-events"</span>)
+shard_id <span class="op">=</span> stream[<span class="st">"StreamDescription"</span>][<span class="st">"Shards"</span>][<span class="nm">0</span>][<span class="st">"ShardId"</span>]
+
+<span class="cm"># Get shard iterator (read from LATEST)</span>
+it <span class="op">=</span> kinesis.<span class="fn">get_shard_iterator</span>(
+    StreamName<span class="op">=</span><span class="st">"order-events"</span>, ShardId<span class="op">=</span>shard_id,
+    ShardIteratorType<span class="op">=</span><span class="st">"LATEST"</span>
+)[<span class="st">"ShardIterator"</span>]
+
+<span class="cm"># Poll for records</span>
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>):
+    resp <span class="op">=</span> kinesis.<span class="fn">get_records</span>(ShardIterator<span class="op">=</span>it, Limit<span class="op">=</span><span class="nm">10</span>)
+    <span class="kw">for</span> rec <span class="kw">in</span> resp[<span class="st">"Records"</span>]:
+        <span class="fn">print</span>(json.<span class="fn">loads</span>(rec[<span class="st">"Data"</span>]))
+    it <span class="op">=</span> resp[<span class="st">"NextShardIterator"</span>]
+    time.<span class="fn">sleep</span>(<span class="nm">1</span>)</pre>
+<div class="out-label">Output</div><pre class="output">{'order_id': 'ord-001', 'amount': 5000, 'event': 'placed'}
+{'id': 0}
+{'id': 1}</pre>
+<div class="example-note">TRIM_HORIZON reads from the beginning; LATEST reads new records only. For production, use Lambda + Kinesis trigger instead of manual polling — Lambda auto-scales with shard count.</div></div>
+`;}
+  },
+  {
+    id:'cloudtrail',icon:'🔍',title:'CloudTrail & Security',
+    desc:'CloudTrail audit logs, GuardDuty, WAF, Security Hub, IAM analysis.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔍</span>
+<h2>CloudTrail &amp; Security</h2>
+<p><strong>CloudTrail</strong> logs every AWS API call — who did what, when, from where. Essential for compliance, forensics, and incident response. <strong>GuardDuty</strong> uses ML to detect threats.</p></div>
+
+<div class="section-block"><h4>CloudTrail — Enable &amp; Query</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+ct <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"cloudtrail"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create trail (logs to S3)</span>
+ct.<span class="fn">create_trail</span>(
+    Name<span class="op">=</span><span class="st">"prod-trail"</span>,
+    S3BucketName<span class="op">=</span><span class="st">"my-cloudtrail-logs"</span>,
+    IsMultiRegionTrail<span class="op">=</span><span class="kw">True</span>,
+    EnableLogFileValidation<span class="op">=</span><span class="kw">True</span>   <span class="cm"># detect log tampering</span>
+)
+ct.<span class="fn">start_logging</span>(Name<span class="op">=</span><span class="st">"prod-trail"</span>)
+
+<span class="cm"># Look up events (last 90 days searchable)</span>
+resp <span class="op">=</span> ct.<span class="fn">lookup_events</span>(
+    LookupAttributes<span class="op">=</span>[{<span class="st">"AttributeKey"</span>:<span class="st">"EventName"</span>,<span class="st">"AttributeValue"</span>:<span class="st">"DeleteBucket"</span>}],
+    MaxResults<span class="op">=</span><span class="nm">5</span>
+)
+<span class="kw">for</span> e <span class="kw">in</span> resp[<span class="st">"Events"</span>]:
+    <span class="fn">print</span>(e[<span class="st">"EventTime"</span>], e[<span class="st">"Username"</span>], e[<span class="st">"EventName"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">2026-07-25 09:15:23 john.doe DeleteBucket
+2026-07-24 14:22:01 deploy-bot DeleteBucket</pre>
+<div class="example-note">CloudTrail answers "who deleted that S3 bucket?" every time. Enable IsMultiRegionTrail so events from ALL regions are captured in one place.</div></div>
+
+<div class="section-block"><h4>GuardDuty — Enable &amp; List Findings</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+gd <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"guardduty"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Enable GuardDuty (one-click threat detection)</span>
+detector <span class="op">=</span> gd.<span class="fn">create_detector</span>(Enable<span class="op">=</span><span class="kw">True</span>)
+detector_id <span class="op">=</span> detector[<span class="st">"DetectorId"</span>]
+<span class="fn">print</span>(<span class="st">"GuardDuty enabled:"</span>, detector_id)
+
+<span class="cm"># List HIGH severity findings</span>
+finding_ids <span class="op">=</span> gd.<span class="fn">list_findings</span>(
+    DetectorId<span class="op">=</span>detector_id,
+    FindingCriteria<span class="op">=</span>{<span class="st">"Criterion"</span>:{<span class="st">"severity"</span>:{<span class="st">"Gte"</span>:<span class="nm">7</span>}}}
+)[<span class="st">"FindingIds"</span>]
+
+<span class="kw">if</span> finding_ids:
+    findings <span class="op">=</span> gd.<span class="fn">get_findings</span>(DetectorId<span class="op">=</span>detector_id, FindingIds<span class="op">=</span>finding_ids[:<span class="nm">5</span>])
+    <span class="kw">for</span> f <span class="kw">in</span> findings[<span class="st">"Findings"</span>]:
+        <span class="fn">print</span>(<span class="st">f"[{f['Severity']}] {f['Title']}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">GuardDuty enabled: abc123def456
+[8.0] Unusual API calls from known malicious IP
+[7.5] S3 bucket made public unexpectedly</pre></div>
+
+<div class="section-block"><h4>WAF — Rate Limiting &amp; IP Block</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> boto3
+
+waf <span class="op">=</span> boto3.<span class="fn">client</span>(<span class="st">"wafv2"</span>, region_name<span class="op">=</span><span class="st">"ap-south-1"</span>)
+
+<span class="cm"># Create WebACL with rate limit rule</span>
+waf.<span class="fn">create_web_acl</span>(
+    Name<span class="op">=</span><span class="st">"prod-waf"</span>, Scope<span class="op">=</span><span class="st">"REGIONAL"</span>,
+    DefaultAction<span class="op">=</span>{<span class="st">"Allow"</span>: {}},
+    Rules<span class="op">=</span>[{
+        <span class="st">"Name"</span>: <span class="st">"RateLimit"</span>, <span class="st">"Priority"</span>: <span class="nm">1</span>,
+        <span class="st">"Statement"</span>: {<span class="st">"RateBasedStatement"</span>:{
+            <span class="st">"Limit"</span>: <span class="nm">2000</span>, <span class="st">"AggregateKeyType"</span>: <span class="st">"IP"</span>}},
+        <span class="st">"Action"</span>: {<span class="st">"Block"</span>: {}},
+        <span class="st">"VisibilityConfig"</span>: {<span class="st">"SampledRequestsEnabled"</span>:<span class="kw">True</span>,
+            <span class="st">"CloudWatchMetricsEnabled"</span>:<span class="kw">True</span>,<span class="st">"MetricName"</span>:<span class="st">"RateLimit"</span>}
+    }],
+    VisibilityConfig<span class="op">=</span>{<span class="st">"SampledRequestsEnabled"</span>:<span class="kw">True</span>,
+        <span class="st">"CloudWatchMetricsEnabled"</span>:<span class="kw">True</span>,<span class="st">"MetricName"</span>:<span class="st">"ProdWAF"</span>}
+)
+<span class="fn">print</span>(<span class="st">"WAF: block IPs exceeding 2000 req/5min"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">WAF: block IPs exceeding 2000 req/5min</pre></div>
+`;}
+  }
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

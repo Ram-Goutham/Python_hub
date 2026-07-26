@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux & Bash for DevOps</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link active" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+<div class="site-header">
+  <div class="level-badge">DevOps</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Linux &amp; Bash for DevOps</h1>
+  <p>File system, permissions, processes, networking, SSH, cron, systemd, shell scripting, text processing and everything a Cloud/Platform Engineer uses daily.</p>
+</div>
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+<script>
+const topics = [
+  {
+    id:'filesystem',icon:'📁',title:'File System',
+    desc:'ls, cd, mkdir, cp, mv, rm, find, tree, paths, wildcards.',
+    content(){return `
+<div class="detail-header"><span class="icon">📁</span>
+<h2>File System</h2>
+<p>Linux file system starts at <code>/</code> (root). Everything is a file — devices, sockets, processes. Master navigation and file operations — you'll use these every day.</p></div>
+
+<div class="section-block"><h4>Navigation &amp; Listing</h4>
+<div class="code-label">Code</div>
+<pre class="code">pwd                        # print working directory
+cd /var/log                # absolute path
+cd ~                       # home directory
+cd -                       # previous directory
+ls -la                     # list all with permissions + size
+ls -lh                     # human-readable sizes
+ls -lt                     # sort by modification time
+tree -L 2                  # directory tree 2 levels deep</pre>
+<div class="out-label">Output</div><pre class="output">$ ls -lh /var/log
+drwxr-xr-x  2 root   root   4.0K Jul 25 app/
+-rw-r--r--  1 root   root   1.2M Jul 25 syslog
+-rw-r--r--  1 syslog adm    520K Jul 25 auth.log</pre></div>
+
+<div class="section-block"><h4>Create, Copy, Move, Delete</h4>
+<div class="code-label">Code</div>
+<pre class="code">mkdir -p /opt/app/logs          # create nested dirs
+cp file.txt backup.txt          # copy file
+cp -r src/ dest/                # copy directory recursively
+mv old.txt new.txt              # rename
+mv file.txt /tmp/               # move to directory
+rm file.txt                     # delete file
+rm -rf /tmp/old_dir/            # delete directory recursively (careful!)
+ln -s /opt/app/current link     # create symlink</pre>
+<div class="out-label">Output</div><pre class="output">$ mkdir -p /opt/app/logs
+$ ls /opt/app/
+logs/</pre></div>
+
+<div class="section-block"><h4>find — Powerful Search</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Find files by name
+find /var/log -name "*.log"
+
+# Find files modified in last 24 hours
+find /opt/app -mtime -1
+
+# Find files larger than 100MB
+find / -size +100M -type f
+
+# Find and execute action
+find /tmp -name "*.tmp" -delete
+find /opt -name "*.py" -exec grep -l "import boto3" {} \;
+
+# Find by permission
+find /etc -perm 777 -type f</pre>
+<div class="out-label">Output</div><pre class="output">$ find /var/log -name "*.log" -mtime -1
+/var/log/app/app.log
+/var/log/nginx/access.log</pre></div>
+
+<div class="section-block"><h4>Wildcards &amp; Paths</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Important Linux paths
+# /etc       — system configuration
+# /var/log   — application and system logs
+# /opt       — third-party applications
+# /tmp       — temporary files (cleared on reboot)
+# /home/user — user home directories
+# /proc      — process and kernel info (virtual)
+# /usr/bin   — user binaries (python, git, etc.)
+# /usr/local — locally installed software
+
+ls /var/log/*.log           # wildcard
+ls /opt/app/logs/app-{01..31}.log   # brace expansion
+cat /proc/meminfo | head -5  # memory info from kernel</pre>
+<div class="out-label">Output</div><pre class="output">$ cat /proc/meminfo | head -3
+MemTotal:       16384000 kB
+MemFree:         4096000 kB
+MemAvailable:    8192000 kB</pre></div>
+`;}
+  },
+  {
+    id:'permissions',icon:'🔒',title:'Permissions & Users',
+    desc:'chmod, chown, umask, users, groups, sudo, file permission bits.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔒</span>
+<h2>Permissions &amp; Users</h2>
+<p>Linux permissions control who can read, write, and execute files. Understanding them is essential — misconfigured permissions are a common security vulnerability and deployment problem.</p></div>
+
+<div class="section-block"><h4>Reading Permissions</h4>
+<div class="code-label">Code</div>
+<pre class="code"># -rwxr-xr-- 1 appuser appgroup 4096 Jul 25 script.sh
+#  |||||||||||
+#  |└────────── owner: rwx (read+write+execute)
+#  | └───────── group: r-x (read+execute)
+#  |  └──────── others: r-- (read only)
+#  └─────────── type: - file, d directory, l symlink
+
+ls -la /opt/app/
+# Common patterns:
+# 644  (-rw-r--r--)  config files
+# 755  (-rwxr-xr-x)  scripts, binaries
+# 600  (-rw-------)  SSH keys, secrets
+# 777  (-rwxrwxrwx)  DANGER — avoid this</pre>
+<div class="out-label">Output</div><pre class="output">drwxr-xr-x  app/              directory, owner full, others read+exec
+-rw-r--r--  config.yaml       owner read+write, others read
+-rwx------  deploy.sh         owner only — secret script
+-rw-------  .env              600 — only owner reads secrets</pre></div>
+
+<div class="section-block"><h4>chmod &amp; chown</h4>
+<div class="code-label">Code</div>
+<pre class="code"># chmod — change permissions
+chmod 755 deploy.sh         # numeric: rwxr-xr-x
+chmod +x deploy.sh          # add execute for all
+chmod -w config.yaml        # remove write for all
+chmod 600 ~/.ssh/id_rsa     # SSH key must be 600
+chmod -R 755 /opt/app/      # recursive
+
+# chown — change owner
+chown appuser:appgroup file.txt
+chown -R appuser:appgroup /opt/app/
+chown root:root /etc/config.yaml
+
+# sudo — run as root
+sudo apt update
+sudo -u appuser python app.py   # run as specific user</pre>
+<div class="out-label">Output</div><pre class="output">$ chmod 600 ~/.ssh/id_rsa
+$ ls -la ~/.ssh/id_rsa
+-rw------- 1 ubuntu ubuntu 2610 Jul 25 id_rsa</pre></div>
+
+<div class="section-block"><h4>Users &amp; Groups</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Create user and group for your app
+sudo useradd -r -s /sbin/nologin appuser   # system user, no login
+sudo groupadd appgroup
+sudo usermod -aG appgroup ubuntu   # add ubuntu to appgroup
+
+# Check
+id ubuntu            # show user id, groups
+groups ubuntu        # list groups
+whoami               # current user
+cat /etc/passwd      # all users
+cat /etc/group       # all groups
+
+# Run app as non-root (best practice)
+sudo -u appuser gunicorn app:app</pre>
+<div class="out-label">Output</div><pre class="output">$ id ubuntu
+uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),27(sudo),998(appgroup)
+
+$ whoami
+ubuntu</pre></div>
+`;}
+  },
+  {
+    id:'processes',icon:'⚙️',title:'Process Management',
+    desc:'ps, top, htop, kill, jobs, nohup, systemd, service management.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>Process Management</h2>
+<p>Processes are running programs. Every running application, script, and background job is a process. Knowing how to inspect, control, and manage processes is core DevOps.</p></div>
+
+<div class="section-block"><h4>View Processes</h4>
+<div class="code-label">Code</div>
+<pre class="code">ps aux                     # all processes
+ps aux | grep python       # filter
+ps -ef --forest            # tree view with parent/child
+
+top                        # real-time view (q to quit)
+htop                       # better top (F10 to quit)
+
+# Useful columns:
+# PID    — process ID
+# %CPU   — CPU usage
+# %MEM   — memory usage
+# VSZ    — virtual memory
+# RSS    — resident (physical) memory
+# STAT   — S=sleeping R=running Z=zombie
+
+pgrep gunicorn             # find PIDs by name
+pgrep -a python            # show full command</pre>
+<div class="out-label">Output</div><pre class="output">$ ps aux | grep gunicorn
+appuser  1234  2.1  1.5  gunicorn -w 4 -b 0.0.0.0:8000 app:app
+appuser  1235  0.8  1.2  gunicorn worker [app:app]</pre></div>
+
+<div class="section-block"><h4>kill &amp; Signals</h4>
+<div class="code-label">Code</div>
+<pre class="code">kill 1234              # send SIGTERM (graceful shutdown)
+kill -9 1234           # send SIGKILL (force kill — last resort)
+kill -HUP 1234         # SIGHUP — reload config (nginx, sshd)
+killall gunicorn       # kill all processes named gunicorn
+pkill -f "python app"  # kill by command pattern
+
+# Check what's using a port
+lsof -i :8000
+ss -tlnp | grep 8000   # modern alternative to netstat</pre>
+<div class="out-label">Output</div><pre class="output">$ lsof -i :8000
+COMMAND  PID     USER   FD   TYPE  NODE NAME
+gunicorn 1234 appuser   5u  IPv4  TCP *:8000 (LISTEN)
+
+$ ss -tlnp | grep 8000
+LISTEN  0  128  0.0.0.0:8000  0.0.0.0:*  users:(("gunicorn",pid=1234))</pre></div>
+
+<div class="section-block"><h4>systemd — Service Management</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Create a systemd service
+# /etc/systemd/system/myapp.service
+#
+# [Unit]
+# Description=My Python App
+# After=network.target
+#
+# [Service]
+# Type=exec
+# User=appuser
+# WorkingDirectory=/opt/app
+# ExecStart=/opt/app/venv/bin/gunicorn -w 4 -b 0.0.0.0:8000 app:app
+# Restart=always
+# RestartSec=5
+# EnvironmentFile=/opt/app/.env
+#
+# [Install]
+# WantedBy=multi-user.target
+
+sudo systemctl daemon-reload       # reload systemd config
+sudo systemctl enable myapp        # start on boot
+sudo systemctl start myapp         # start now
+sudo systemctl status myapp        # check status
+sudo systemctl restart myapp       # restart
+sudo systemctl stop myapp          # stop
+journalctl -u myapp -f             # follow logs</pre>
+<div class="out-label">Output</div><pre class="output">$ sudo systemctl status myapp
+● myapp.service - My Python App
+   Active: active (running) since 2026-07-25 10:00:00
+ Main PID: 1234 (gunicorn)
+   Memory: 128.0M
+      CPU: 2.5s</pre></div>
+`;}
+  },
+  {
+    id:'text-processing',icon:'📝',title:'Text Processing',
+    desc:'grep, awk, sed, cut, sort, uniq, wc, head, tail, pipes.',
+    content(){return `
+<div class="detail-header"><span class="icon">📝</span>
+<h2>Text Processing</h2>
+<p>Linux text tools are powerful for log analysis, data extraction, and transformation. Combine them with pipes <code>|</code> to build complex processing pipelines without writing Python.</p></div>
+
+<div class="section-block"><h4>grep — Search Text</h4>
+<div class="code-label">Code</div>
+<pre class="code">grep "ERROR" app.log                 # find lines with ERROR
+grep -i "error" app.log              # case insensitive
+grep -v "DEBUG" app.log              # exclude DEBUG lines
+grep -n "ERROR" app.log              # show line numbers
+grep -c "ERROR" app.log              # count matches
+grep -A 3 "CRITICAL" app.log         # 3 lines after match
+grep -r "DATABASE_URL" /opt/app/     # recursive in directory
+grep -E "ERROR|WARN" app.log         # regex: ERROR or WARN
+grep "2026-07-25 10" app.log | wc -l # count errors in hour</pre>
+<div class="out-label">Output</div><pre class="output">$ grep -c "ERROR" app.log
+47
+
+$ grep "ERROR" app.log | head -3
+2026-07-25 10:01:23 ERROR db connection timeout
+2026-07-25 10:01:45 ERROR payment service unreachable</pre></div>
+
+<div class="section-block"><h4>awk — Column Processing</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Print specific columns (space-delimited)
+awk '{print $1, $3}' app.log          # col 1 and 3
+awk -F',' '{print $2}' data.csv       # CSV, col 2
+awk '$5 > 1000 {print $0}' access.log # filter rows
+
+# Sum a column
+awk '{sum += $5} END {print sum}' access.log
+
+# Count occurrences
+awk '{print $4}' access.log | sort | uniq -c | sort -rn | head -10
+
+# Real example: sum response sizes from nginx access log
+awk '{sum += $10} END {print "Total bytes:", sum}' /var/log/nginx/access.log</pre>
+<div class="out-label">Output</div><pre class="output">$ awk '{print $1, $4}' app.log | head -3
+2026-07-25 INFO
+2026-07-25 ERROR
+2026-07-25 DEBUG
+
+Total bytes: 1073741824</pre></div>
+
+<div class="section-block"><h4>sed — Stream Editor</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Substitute
+sed 's/localhost/prod-db.example.com/g' config.yaml
+
+# Edit in place
+sed -i 's/DEBUG=true/DEBUG=false/g' .env
+
+# Delete lines matching pattern
+sed '/^#/d' config.yaml           # remove comment lines
+sed '/^$/d' config.yaml           # remove empty lines
+
+# Print specific lines
+sed -n '10,20p' app.log           # lines 10-20
+sed -n '/ERROR/,/END/p' app.log   # between patterns</pre>
+<div class="out-label">Output</div><pre class="output">$ sed 's/localhost/prod-db/g' db.conf
+host = prod-db
+port = 5432</pre></div>
+
+<div class="section-block"><h4>Pipes &amp; Combining Tools</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Top 10 IP addresses hitting your API
+awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -rn | head -10
+
+# Count errors per hour
+grep "ERROR" app.log | awk '{print $2}' | cut -d: -f1 | sort | uniq -c
+
+# Find the 5 largest files in /var/log
+find /var/log -type f | xargs du -sh | sort -rh | head -5
+
+# Extract all unique error messages
+grep "ERROR" app.log | awk '{$1=$2=$3=""; print}' | sort -u</pre>
+<div class="out-label">Output</div><pre class="output">$ awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -5
+    342 203.0.113.1
+    156 198.51.100.2
+     89 192.0.2.3</pre></div>
+`;}
+  },
+  {
+    id:'networking',icon:'🌐',title:'Networking',
+    desc:'curl, wget, netstat, ss, nmap, dig, ping, iptables, SSH tunnels.',
+    content(){return `
+<div class="detail-header"><span class="icon">🌐</span>
+<h2>Networking</h2>
+<p>Network troubleshooting is a daily DevOps skill — checking connectivity, inspecting ports, querying DNS, and testing APIs from the command line.</p></div>
+
+<div class="section-block"><h4>curl — HTTP Swiss Army Knife</h4>
+<div class="code-label">Code</div>
+<pre class="code"># GET request
+curl https://api.example.com/users
+
+# POST with JSON
+curl -X POST https://api.example.com/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer mytoken" \
+  -d '{"name":"Ravi","email":"r@x.com"}'
+
+# Follow redirects, show response code
+curl -L -o /dev/null -s -w "%{http_code}" https://example.com
+
+# Download file
+curl -O https://example.com/file.tar.gz
+curl -L -o myfile.gz https://example.com/file.tar.gz
+
+# Verbose — see headers
+curl -v https://api.example.com/health 2>&1 | head -30</pre>
+<div class="out-label">Output</div><pre class="output">$ curl -s https://api.example.com/health
+{"status":"ok","version":"1.5.0"}
+
+$ curl -o /dev/null -s -w "%{http_code}" https://example.com
+200</pre></div>
+
+<div class="section-block"><h4>DNS &amp; Connectivity</h4>
+<div class="code-label">Code</div>
+<pre class="code">ping -c 4 8.8.8.8             # test connectivity
+ping -c 4 api.example.com     # test DNS + connectivity
+
+dig api.example.com           # DNS lookup (detailed)
+dig api.example.com A         # A record only
+dig api.example.com +short    # just the IP
+nslookup api.example.com      # simpler DNS lookup
+
+traceroute api.example.com    # trace network path
+mtr api.example.com           # continuous traceroute</pre>
+<div class="out-label">Output</div><pre class="output">$ dig api.example.com +short
+203.0.113.10
+
+$ ping -c 3 8.8.8.8
+3 packets transmitted, 3 received, 0% packet loss
+rtt min/avg/max = 12.4/13.1/14.2 ms</pre></div>
+
+<div class="section-block"><h4>Port &amp; Connection Checks</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Check what's listening
+ss -tlnp                       # listening TCP sockets
+ss -tlnp | grep :8000          # specific port
+netstat -tlnp                  # older alternative
+
+# Test if port is open
+nc -zv 10.0.2.45 5432          # check postgres port
+nc -zv api.example.com 443     # check HTTPS
+
+# Check from inside K8s pod
+kubectl exec -it my-pod -- bash
+nc -zv my-db-service 5432</pre>
+<div class="out-label">Output</div><pre class="output">$ nc -zv 10.0.2.45 5432
+Connection to 10.0.2.45 5432 port [tcp/postgresql] succeeded!
+
+$ ss -tlnp | grep 8000
+LISTEN 0 128 0.0.0.0:8000 users:(("gunicorn",pid=1234))</pre></div>
+
+<div class="section-block"><h4>SSH &amp; Tunnels</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Connect to server
+ssh -i ~/.ssh/mykey.pem ubuntu@10.0.2.45
+
+# Copy files
+scp -i ~/.ssh/mykey.pem file.txt ubuntu@10.0.2.45:/opt/app/
+rsync -av -e "ssh -i ~/.ssh/mykey.pem" ./app/ ubuntu@10.0.2.45:/opt/app/
+
+# Port forwarding — access private RDS through bastion
+ssh -i key.pem -L 5432:rds.xyz.rds.amazonaws.com:5432 ubuntu@bastion-ip
+# Now connect to localhost:5432 — it tunnels to RDS
+
+# SOCKS proxy through bastion
+ssh -i key.pem -D 1080 ubuntu@bastion-ip
+# Use with browser or curl --proxy socks5://localhost:1080</pre>
+<div class="out-label">Output</div><pre class="output">$ ssh -L 5432:prod-db.rds.amazonaws.com:5432 ubuntu@bastion
+# Now in another terminal:
+$ psql -h localhost -p 5432 -U dbuser appdb
+psql (15.4)
+SSL connection established</pre></div>
+`;}
+  },
+  {
+    id:'bash-scripting',icon:'📜',title:'Bash Scripting',
+    desc:'variables, conditions, loops, functions, arguments, exit codes, traps.',
+    content(){return `
+<div class="detail-header"><span class="icon">📜</span>
+<h2>Bash Scripting</h2>
+<p>Bash scripts automate sequences of shell commands. Every DevOps engineer writes deployment scripts, healthchecks, backup jobs, and CI helpers in Bash.</p></div>
+
+<div class="section-block"><h4>Script Structure &amp; Variables</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+set -euo pipefail        # exit on error, unset var, pipe failure
+
+# Variables
+APP_NAME="my-app"
+VERSION="\${1:-latest}"   # first arg, default "latest"
+DEPLOY_DIR="/opt/$APP_NAME"
+
+echo "Deploying $APP_NAME version $VERSION"
+echo "Deploy dir: $DEPLOY_DIR"
+echo "Date: $(date +%Y-%m-%d)"
+echo "Script: $0, Args: $#, PID: $$"</pre>
+<div class="out-label">Output</div><pre class="output">$ ./deploy.sh 1.5
+Deploying my-app version 1.5
+Deploy dir: /opt/my-app
+Date: 2026-07-25</pre>
+<div class="example-note">Always start scripts with #!/bin/bash and set -euo pipefail — this catches errors (e), undefined variables (u), and pipe failures (pipefail) immediately.</div></div>
+
+<div class="section-block"><h4>Conditions &amp; Exit Codes</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+set -e
+
+SERVICE="myapp"
+
+# Check if service is running
+if systemctl is-active --quiet "$SERVICE"; then
+  echo "$SERVICE is running"
+else
+  echo "$SERVICE is NOT running — starting..."
+  systemctl start "$SERVICE"
+fi
+
+# Check if file exists
+if [[ -f "/opt/app/.env" ]]; then
+  source /opt/app/.env
+else
+  echo "ERROR: .env file missing"
+  exit 1          # non-zero = error
+fi
+
+# String comparison
+if [[ "$STAGE" == "production" ]]; then
+  echo "Production deploy — enabling extra checks"
+fi
+
+# Numeric comparison
+FREE_DISK=$(df -h / | awk 'NR==2{print $5}' | tr -d '%')
+if [[ "$FREE_DISK" -gt 90 ]]; then
+  echo "WARNING: Disk is \${FREE_DISK}% full"
+fi</pre>
+<div class="out-label">Output</div><pre class="output">myapp is running
+Production deploy — enabling extra checks</pre></div>
+
+<div class="section-block"><h4>Loops &amp; Functions</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+
+# Function
+log() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
+}
+
+wait_for_service() {
+  local host="$1" port="$2" retries="\${3:-10}"
+  for i in $(seq 1 $retries); do
+    if nc -z "$host" "$port" 2>/dev/null; then
+      log "Service $host:$port is ready"
+      return 0
+    fi
+    log "Waiting for $host:$port (attempt $i/$retries)..."
+    sleep 3
+  done
+  log "ERROR: $host:$port not ready after $retries attempts"
+  return 1
+}
+
+# For loop
+for ENV in dev staging prod; do
+  log "Checking $ENV environment..."
+done
+
+# While loop
+COUNTER=0
+while [[ $COUNTER -lt 3 ]]; do
+  log "Loop $COUNTER"
+  ((COUNTER++))
+done
+
+wait_for_service "localhost" 5432 5</pre>
+<div class="out-label">Output</div><pre class="output">[2026-07-25 10:00:01] Checking dev environment...
+[2026-07-25 10:00:01] Checking staging environment...
+[2026-07-25 10:00:01] Checking prod environment...
+[2026-07-25 10:00:01] Service localhost:5432 is ready</pre></div>
+
+<div class="section-block"><h4>Error Handling &amp; Traps</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+set -euo pipefail
+
+LOCKFILE="/tmp/deploy.lock"
+
+cleanup() {
+  local exit_code=$?
+  rm -f "$LOCKFILE"
+  if [[ $exit_code -ne 0 ]]; then
+    echo "Deploy FAILED with exit code $exit_code"
+    # send alert, rollback, etc.
+  fi
+}
+trap cleanup EXIT     # always runs on exit
+
+# Prevent concurrent deploys
+if [[ -f "$LOCKFILE" ]]; then
+  echo "Deploy already running (PID: $(cat $LOCKFILE))"
+  exit 1
+fi
+echo $$ > "$LOCKFILE"
+
+echo "Starting deploy..."
+# ... deploy steps ...
+echo "Deploy complete"</pre>
+<div class="out-label">Output</div><pre class="output">Starting deploy...
+Deploy complete
+(lockfile cleaned up by trap)</pre></div>
+`;}
+  },
+  {
+    id:'cron-jobs',icon:'⏰',title:'Cron & Scheduling',
+    desc:'crontab syntax, cron expressions, at, systemd timers, monitoring cron jobs.',
+    content(){return `
+<div class="detail-header"><span class="icon">⏰</span>
+<h2>Cron &amp; Scheduling</h2>
+<p><strong>Cron</strong> schedules commands to run automatically at specified times. Essential for backups, log rotation, cleanup jobs, and report generation.</p></div>
+
+<div class="section-block"><h4>crontab Syntax</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Edit crontab: crontab -e
+# List crontab: crontab -l
+# Remove crontab: crontab -r
+#
+# Format: minute hour day month weekday command
+# *       *    *   *     *
+# |       |    |   |     |
+# |       |    |   |     └── day of week (0=Sunday, 7=Sunday)
+# |       |    |   └──────── month (1-12)
+# |       |    └──────────── day of month (1-31)
+# |       └───────────────── hour (0-23)
+# └───────────────────────── minute (0-59)
+#
+# Examples:
+# 0 2 * * *     /opt/backup.sh          # 2am daily
+# */15 * * * *  /opt/healthcheck.sh     # every 15 minutes
+# 0 9 * * 1     /opt/weekly-report.sh   # 9am every Monday
+# 0 0 1 * *     /opt/monthly-cleanup.sh # midnight 1st of month
+# 30 6 * * 1-5  /opt/workday.sh         # 6:30am weekdays</pre>
+<div class="out-label">Output</div><pre class="output">$ crontab -l
+0 2 * * *  /opt/scripts/backup.sh >> /var/log/backup.log 2>&1
+*/15 * * * * /opt/scripts/healthcheck.sh</pre></div>
+
+<div class="section-block"><h4>Writing Reliable Cron Jobs</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+# backup.sh — reliable cron script
+
+# Always use full paths (cron has minimal PATH)
+PYTHON=/usr/bin/python3
+AWS=/usr/local/bin/aws
+LOGFILE=/var/log/backup.log
+
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOGFILE"; }
+
+log "Backup started"
+if $AWS s3 sync /opt/app/data s3://my-backup-bucket/$(date +%Y-%m-%d)/; then
+  log "Backup completed successfully"
+else
+  log "ERROR: Backup failed"
+  # Send alert
+  curl -s -X POST "$SLACK_WEBHOOK" \
+    -d "{\"text\":\"Backup failed on $(hostname)\"}"
+  exit 1
+fi
+
+# Crontab entry with logging:
+# 0 2 * * * /opt/scripts/backup.sh >> /var/log/backup.log 2>&1</pre>
+<div class="out-label">Output</div><pre class="output">[2026-07-25 02:00:01] Backup started
+[2026-07-25 02:01:23] Backup completed successfully</pre>
+<div class="example-note">Always redirect stdout and stderr to a log file in cron (>> log 2>&1). Use full paths for all commands — cron runs with a minimal PATH that doesn't include /usr/local/bin.</div></div>
+`;}
+  },
+  {
+    id:'log-management',icon:'📋',title:'Log Management',
+    desc:'tail, journalctl, logrotate, rsyslog, log analysis patterns.',
+    content(){return `
+<div class="detail-header"><span class="icon">📋</span>
+<h2>Log Management</h2>
+<p>Logs are your primary debugging tool in production. Knowing how to query, filter, and manage logs efficiently saves hours during incidents.</p></div>
+
+<div class="section-block"><h4>Real-time Log Viewing</h4>
+<div class="code-label">Code</div>
+<pre class="code">tail -f /var/log/app/app.log              # follow file
+tail -n 100 /var/log/app/app.log          # last 100 lines
+tail -f /var/log/app/app.log | grep ERROR # follow + filter
+
+# Multiple files
+tail -f /var/log/app/*.log
+
+# journalctl (systemd logs)
+journalctl -u myapp -f                    # follow service logs
+journalctl -u myapp --since "1 hour ago"
+journalctl -u myapp --since "2026-07-25 09:00:00"
+journalctl -u myapp -p err                # errors only
+journalctl --disk-usage                   # how much space logs use</pre>
+<div class="out-label">Output</div><pre class="output">$ journalctl -u myapp --since "10 minutes ago" -p err
+Jul 25 10:01:23 myapp[1234]: ERROR db connection timeout
+Jul 25 10:02:45 myapp[1234]: ERROR payment service down</pre></div>
+
+<div class="section-block"><h4>logrotate</h4>
+<div class="code-label">Code</div>
+<pre class="code"># /etc/logrotate.d/myapp
+# /var/log/myapp/*.log {
+#     daily                  # rotate daily
+#     missingok              # don't error if file missing
+#     rotate 14              # keep 14 days
+#     compress               # gzip old logs
+#     delaycompress          # compress after 2nd rotation
+#     notifempty             # skip if empty
+#     create 0640 appuser appgroup  # new file permissions
+#     postrotate             # run after rotation
+#       systemctl reload myapp
+#     endscript
+# }
+
+# Test configuration
+sudo logrotate -d /etc/logrotate.d/myapp  # dry run
+sudo logrotate -f /etc/logrotate.d/myapp  # force rotate now</pre>
+<div class="out-label">Output</div><pre class="output">$ ls /var/log/myapp/
+app.log       ← current
+app.log.1     ← yesterday
+app.log.2.gz  ← 2 days ago (compressed)
+app.log.3.gz</pre></div>
+
+<div class="section-block"><h4>Incident Log Analysis</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Count errors per minute during incident
+grep "ERROR" app.log | \
+  awk '{print $1, substr($2,1,5)}' | \
+  sort | uniq -c | sort -k2
+
+# Find slowest API endpoints
+grep "response_time" app.log | \
+  awk '{print $NF, $(NF-1)}' | \
+  sort -rn | head -20
+
+# Check if error started at specific time
+grep "2026-07-25 10:0[0-5]" app.log | grep ERROR | wc -l
+
+# Extract all unique error types
+grep "ERROR" app.log | \
+  sed 's/^.*ERROR //' | \
+  sort | uniq -c | sort -rn | head -10</pre>
+<div class="out-label">Output</div><pre class="output">$ grep "ERROR" app.log | awk '{print substr($2,1,5)}' | sort | uniq -c
+    3 10:00
+    8 10:01
+   42 10:02    ← incident spike
+    5 10:03</pre></div>
+`;}
+  },
+  {
+    id:'env-vars',icon:'🔑',title:'Environment & Config',
+    desc:'env, export, .env files, dotenv, direnv, secrets handling.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔑</span>
+<h2>Environment Variables &amp; Config</h2>
+<p>Environment variables configure apps without changing code. Mastering them is critical for secrets management, multi-environment deployments, and container configuration.</p></div>
+
+<div class="section-block"><h4>env &amp; export</h4>
+<div class="code-label">Code</div>
+<pre class="code">env                         # list all env vars
+printenv PATH               # print specific var
+echo $HOME                  # reference var
+
+export DATABASE_URL="postgresql://user:pass@localhost/mydb"
+export DEBUG=false
+export PORT=8000
+
+# Set for single command only (no export)
+PORT=9000 python app.py
+
+# Unset a variable
+unset DEBUG
+
+# Add to PATH permanently (~/.bashrc or ~/.bash_profile)
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc</pre>
+<div class="out-label">Output</div><pre class="output">$ env | grep PORT
+PORT=8000
+
+$ PORT=9000 python -c "import os; print(os.environ['PORT'])"
+9000</pre></div>
+
+<div class="section-block"><h4>.env Files &amp; Best Practices</h4>
+<div class="code-label">Code</div>
+<pre class="code"># .env file — never commit to git
+# DATABASE_URL=postgresql://user:pass@prod-db:5432/app
+# SECRET_KEY=production-secret-key
+# DEBUG=false
+# AWS_REGION=ap-south-1
+
+# Load in bash script
+set -a; source .env; set +a    # export all vars from .env
+
+# .gitignore — always include
+echo ".env" >> .gitignore
+echo ".env.*" >> .gitignore
+echo "!.env.example" >> .gitignore  # commit example only
+
+# .env.example — commit this (no real values)
+# DATABASE_URL=postgresql://user:pass@localhost/app
+# SECRET_KEY=change-me
+# DEBUG=true</pre>
+<div class="out-label">Output</div><pre class="output">$ set -a; source .env; set +a
+$ echo $DATABASE_URL
+postgresql://user:pass@prod-db:5432/app</pre>
+<div class="example-note">Never commit .env to Git. Always commit .env.example with placeholder values so developers know what variables are needed.</div></div>
+
+<div class="section-block"><h4>direnv — Per-directory Env Vars</h4>
+<div class="code-label">Code</div>
+<pre class="code"># direnv automatically loads .envrc when you cd into a directory
+# Install: apt install direnv, then add to ~/.bashrc:
+# eval "$(direnv hook bash)"
+
+# .envrc in project directory
+# export DATABASE_URL=postgresql://localhost/myapp_dev
+# export DEBUG=true
+# export AWS_PROFILE=dev
+
+# Allow it
+# direnv allow .
+
+# When you cd into the directory:
+# direnv: loading .envrc
+# direnv: export +DATABASE_URL +DEBUG +AWS_PROFILE
+
+# When you cd out:
+# direnv: unloading</pre>
+<div class="out-label">Output</div><pre class="output">$ cd /projects/my-app
+direnv: loading .envrc
+direnv: export +DATABASE_URL +DEBUG
+
+$ cd /tmp
+direnv: unloading</pre></div>
+`;}
+  },
+  {
+    id:'performance',icon:'📈',title:'System Performance',
+    desc:'cpu, memory, disk I/O, iostat, vmstat, strace, perf, tuning.',
+    content(){return `
+<div class="detail-header"><span class="icon">📈</span>
+<h2>System Performance</h2>
+<p>When production slows down, you need to diagnose fast. These tools tell you whether it's CPU, memory, disk I/O, or network causing the problem.</p></div>
+
+<div class="section-block"><h4>CPU &amp; Memory</h4>
+<div class="code-label">Code</div>
+<pre class="code">uptime                      # load average (1, 5, 15 min)
+nproc                       # number of CPU cores
+lscpu | grep "CPU(s)"       # CPU info
+
+free -h                     # memory usage
+vmstat 1 5                  # 5 snapshots every 1 second
+cat /proc/meminfo | head -10
+
+# top / htop interactive
+# Press: M → sort by memory, P → sort by CPU, k → kill, q → quit
+
+# Check if swapping (bad sign)
+free -h | grep Swap
+cat /proc/swaps</pre>
+<div class="out-label">Output</div><pre class="output">$ free -h
+              total  used  free  available
+Mem:          15.6G  8.2G  1.4G  6.8G
+Swap:          2.0G  0B    2.0G
+
+$ uptime
+10:00:01 up 42 days, load average: 0.45, 0.38, 0.35</pre>
+<div class="example-note">Load average > number of CPU cores = system is overloaded. Swap usage > 0 = memory pressure — add RAM or optimize app.</div></div>
+
+<div class="section-block"><h4>Disk I/O</h4>
+<div class="code-label">Code</div>
+<pre class="code">df -h                       # disk space usage
+du -sh /var/log/*           # size of each dir
+du -sh /var/log/ --max-depth=1
+
+iostat -x 1 3               # detailed I/O stats (3 times)
+iotop                       # which process is using disk
+
+# Find what's eating disk space
+du -sh /* 2>/dev/null | sort -rh | head -10
+
+# Check inode usage (different from disk space)
+df -i</pre>
+<div class="out-label">Output</div><pre class="output">$ df -h
+Filesystem  Size  Used Avail Use%
+/dev/xvda1   50G   38G   12G  76%
+
+$ du -sh /var/log/* | sort -rh | head -5
+4.2G  /var/log/app
+1.1G  /var/log/postgresql
+512M  /var/log/nginx</pre></div>
+
+<div class="section-block"><h4>strace — Debug System Calls</h4>
+<div class="code-label">Code</div>
+<pre class="code"># Trace what files a program opens
+strace -e trace=open,read,write python app.py 2>&1 | grep "open("
+
+# Trace network calls
+strace -e trace=network -p 1234 2>&1 | head -20
+
+# Trace and time system calls
+strace -c python app.py    # summary of all syscalls
+
+# Watch what a running process is doing
+strace -p 1234 -e trace=all 2>&1 | head -50</pre>
+<div class="out-label">Output</div><pre class="output">$ strace -e trace=openat python -c "import requests" 2>&1 | grep ".py"
+openat(AT_FDCWD, "/usr/lib/python3/requests/__init__.py", O_RDONLY) = 5
+openat(AT_FDCWD, "/usr/lib/python3/urllib3/__init__.py", O_RDONLY) = 6</pre></div>
+`;}
+  },
+  {
+    id:'security-hardening',icon:'🛡️',title:'Security Hardening',
+    desc:'SSH hardening, firewall, fail2ban, audit, least privilege, secrets.',
+    content(){return `
+<div class="detail-header"><span class="icon">🛡️</span>
+<h2>Security Hardening</h2>
+<p>Production servers need to be hardened — minimal attack surface, strong authentication, firewall rules, and audit logging. This is baseline security for any Cloud engineer.</p></div>
+
+<div class="section-block"><h4>SSH Hardening</h4>
+<div class="code-label">Code</div>
+<pre class="code"># /etc/ssh/sshd_config — harden SSH
+# PermitRootLogin no           ← never allow root SSH
+# PasswordAuthentication no    ← keys only, no passwords
+# PubkeyAuthentication yes
+# AllowUsers ubuntu deploy     ← whitelist users
+# Port 2222                    ← non-standard port (minor help)
+# MaxAuthTries 3
+# ClientAliveInterval 300      ← disconnect idle sessions
+
+# Reload SSH config
+sudo systemctl reload sshd
+
+# Generate strong SSH key
+ssh-keygen -t ed25519 -C "deploy@myserver" -f ~/.ssh/deploy_key
+
+# Only allow your IP in security group (AWS)
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-xxx \
+  --protocol tcp --port 22 \
+  --cidr "$(curl -s ifconfig.me)/32"</pre>
+<div class="out-label">Output</div><pre class="output">SSH hardened:
+- No root login
+- No password auth
+- Key-based only
+- Source IP restricted in SG</pre></div>
+
+<div class="section-block"><h4>UFW Firewall</h4>
+<div class="code-label">Code</div>
+<pre class="code">sudo ufw status                    # check status
+sudo ufw enable                    # enable firewall
+sudo ufw default deny incoming     # block all incoming
+sudo ufw default allow outgoing    # allow all outgoing
+
+# Allow specific ports
+sudo ufw allow 22/tcp              # SSH
+sudo ufw allow 80/tcp              # HTTP
+sudo ufw allow 443/tcp             # HTTPS
+sudo ufw allow from 10.0.0.0/8    # allow internal network
+sudo ufw deny 8080/tcp             # block specific port
+
+sudo ufw status numbered           # list with numbers
+sudo ufw delete 3                  # delete rule #3</pre>
+<div class="out-label">Output</div><pre class="output">$ sudo ufw status
+Status: active
+To          Action    From
+--          ------    ----
+22/tcp      ALLOW     Anywhere
+80/tcp      ALLOW     Anywhere
+443/tcp     ALLOW     Anywhere
+8080/tcp    DENY      Anywhere</pre></div>
+
+<div class="section-block"><h4>fail2ban &amp; Audit</h4>
+<div class="code-label">Code</div>
+<pre class="code"># fail2ban — auto-ban IPs with too many failed logins
+sudo apt install fail2ban
+# /etc/fail2ban/jail.local
+# [sshd]
+# enabled = true
+# bantime = 3600        # ban for 1 hour
+# findtime = 600        # within 10 minutes
+# maxretry = 3          # after 3 failures
+
+sudo systemctl enable fail2ban
+sudo fail2ban-client status sshd  # view bans
+
+# Audit trail
+sudo apt install auditd
+sudo auditctl -w /etc/passwd -p wa -k passwd-changes
+sudo auditctl -w /opt/app/.env -p rwa -k env-access
+sudo ausearch -k passwd-changes | tail -20</pre>
+<div class="out-label">Output</div><pre class="output">$ sudo fail2ban-client status sshd
+Status for the jail: sshd
+  Currently banned: 3
+  Total banned:     47
+  Banned IP list:   192.0.2.1 198.51.100.2 203.0.113.5</pre></div>
+`;}
+  },
+  {
+    id:'devops-scripts',icon:'🤖',title:'DevOps Automation Scripts',
+    desc:'health checks, deployment scripts, backup, monitoring, alerting.',
+    content(){return `
+<div class="detail-header"><span class="icon">🤖</span>
+<h2>DevOps Automation Scripts</h2>
+<p>Real-world DevOps scripts that Platform Engineers write and maintain daily — health checks, automated deployments, backup verification, and on-call alerting.</p></div>
+
+<div class="section-block"><h4>Health Check Script</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+# healthcheck.sh — check multiple services and alert
+
+SLACK_WEBHOOK="\${SLACK_WEBHOOK:-}"
+ALERTS=()
+
+check_http() {
+  local name="$1" url="$2"
+  local code
+  code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "$url")
+  if [[ "$code" != "200" ]]; then
+    ALERTS+=("$name returned HTTP $code (expected 200)")
+  fi
+}
+
+check_port() {
+  local name="$1" host="$2" port="$3"
+  if ! nc -z -w3 "$host" "$port" 2>/dev/null; then
+    ALERTS+=("$name: $host:$port is unreachable")
+  fi
+}
+
+check_disk() {
+  local threshold="\${1:-85}"
+  local usage
+  usage=$(df / | awk 'NR==2{print $5}' | tr -d '%')
+  if [[ "$usage" -gt "$threshold" ]]; then
+    ALERTS+=("Disk usage at \${usage}% (threshold: \${threshold}%)")
+  fi
+}
+
+check_http  "API"       "https://api.myapp.com/health"
+check_port  "Database"  "prod-db.example.com" 5432
+check_port  "Redis"     "prod-cache.example.com" 6379
+check_disk  85
+
+if [[ \${#ALERTS[@]} -gt 0 ]]; then
+  MSG="🚨 Health check failures on $(hostname):\n"
+  for alert in "\${ALERTS[@]}"; do MSG+="• $alert\n"; done
+  curl -s -X POST "$SLACK_WEBHOOK" -d "{\"text\":\"$MSG\"}"
+  exit 1
+fi
+echo "All checks passed"</pre>
+<div class="out-label">Output</div><pre class="output">All checks passed
+(or on failure: Slack alert sent)</pre></div>
+
+<div class="section-block"><h4>Zero-downtime Deploy Script</h4>
+<div class="code-label">Code</div>
+<pre class="code">#!/bin/bash
+set -euo pipefail
+
+VERSION="$1"
+APP_DIR="/opt/myapp"
+ECR="123456.dkr.ecr.ap-south-1.amazonaws.com"
+
+log() { echo "[$(date +%H:%M:%S)] $*"; }
+
+log "Starting deploy of version $VERSION"
+
+# Pull new image
+aws ecr get-login-password | docker login --username AWS \
+  --password-stdin "$ECR"
+docker pull "$ECR/myapp:$VERSION"
+
+# Update docker-compose
+sed -i "s|image: $ECR/myapp:.*|image: $ECR/myapp:$VERSION|" \
+  "$APP_DIR/docker-compose.yml"
+
+# Rolling restart (zero downtime)
+docker compose -f "$APP_DIR/docker-compose.yml" up -d --no-deps \
+  --scale app=4 app
+
+sleep 10  # wait for new containers
+
+docker compose -f "$APP_DIR/docker-compose.yml" up -d \
+  --scale app=2 app
+
+# Verify health
+for i in {1..10}; do
+  if curl -sf "http://localhost:8000/health" > /dev/null; then
+    log "Deploy successful!"
+    exit 0
+  fi
+  sleep 3
+done
+
+log "ERROR: health check failed — rolling back"
+sed -i "s|$VERSION|previous-version|" "$APP_DIR/docker-compose.yml"
+docker compose up -d app
+exit 1</pre>
+<div class="out-label">Output</div><pre class="output">[10:00:01] Starting deploy of version 1.5
+[10:00:15] Deploy successful!</pre></div>
+`;}
+  },
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Basics</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+
+.site-nav{
+  background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);
+  padding:0 20px;overflow-x:auto;display:flex;gap:0;
+  scrollbar-width:none;position:sticky;top:0;z-index:100;
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{
+  display:inline-flex;align-items:center;gap:6px;padding:14px 14px;
+  color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;
+  border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;
+}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link active" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+
+
+<div class="site-header">
+  <div class="level-badge">Level 1</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Python Basics</h1>
+  <p>A hands-on reference covering core Python concepts — click any topic to explore examples with output and explanations.</p>
+</div>
+
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+
+<script>
+const topics = [
+  {
+    id:'variables',icon:'📦',title:'Variables & Data Types',
+    desc:'Storing values: integers, floats, strings, booleans, and None.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">📦</span>
+  <h2>Variables &amp; Data Types</h2>
+  <p>Variables are labels that point to values stored in memory. Python is dynamically typed — you don't declare a type, Python infers it. The main built-in types are <strong>int</strong>, <strong>float</strong>, <strong>str</strong>, <strong>bool</strong>, and <strong>NoneType</strong>.</p>
+</div>
+
+<div class="section-block">
+  <h4>Assigning Variables</h4>
+  <div class="desc">Use <code>=</code> to assign. Variable names are case-sensitive and can contain letters, digits (not at start), and underscores.</div>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">age</span> <span class="op">=</span> <span class="nm">25</span>
+<span class="nm">name</span> <span class="op">=</span> <span class="st">"Ravi"</span>
+<span class="nm">height</span> <span class="op">=</span> <span class="nm">5.9</span>
+<span class="nm">is_student</span> <span class="op">=</span> <span class="kw">True</span>
+<span class="nm">result</span> <span class="op">=</span> <span class="kw">None</span>
+<span class="fn">print</span>(age, name, height, is_student, result)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">25 Ravi 5.9 True None</pre>
+  <div class="example-note">Each variable holds a different type. Python assigns types automatically based on the value.</div>
+</div>
+
+<div class="section-block">
+  <h4>Checking Types with type()</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="fn">type</span>(<span class="nm">25</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="nm">3.14</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="st">"hello"</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="kw">True</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="kw">None</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'str'&gt;
+&lt;class 'bool'&gt;
+&lt;class 'NoneType'&gt;</pre>
+  <div class="example-note">type() returns the class of a value — useful for debugging.</div>
+</div>
+
+<div class="section-block">
+  <h4>Multiple Assignment</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">x</span>, <span class="nm">y</span>, <span class="nm">z</span> <span class="op">=</span> <span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>
+<span class="fn">print</span>(x, y, z)
+
+<span class="nm">a</span> <span class="op">=</span> <span class="nm">b</span> <span class="op">=</span> <span class="nm">c</span> <span class="op">=</span> <span class="nm">100</span>
+<span class="fn">print</span>(a, b, c)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">10 20 30
+100 100 100</pre>
+  <div class="example-note">Unpack multiple values in one line, or assign the same value to many variables at once.</div>
+</div>
+
+<div class="section-block">
+  <h4>Type Conversion</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">n</span> <span class="op">=</span> <span class="fn">int</span>(<span class="st">"42"</span>)
+<span class="nm">f</span> <span class="op">=</span> <span class="fn">float</span>(<span class="st">"3.14"</span>)
+<span class="nm">s</span> <span class="op">=</span> <span class="fn">str</span>(<span class="nm">100</span>)
+<span class="nm">b</span> <span class="op">=</span> <span class="fn">bool</span>(<span class="nm">0</span>)
+<span class="fn">print</span>(n, f, s, b)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">42 3.14 100 False</pre>
+  <div class="example-note">Use int(), float(), str(), bool() to convert between types explicitly.</div>
+</div>
+`;}
+  },
+  {
+    id:'comments',icon:'💬',title:'Comments',
+    desc:'Single-line, multi-line, and docstring comments.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">💬</span>
+  <h2>Comments</h2>
+  <p>Comments are ignored by the Python interpreter. They help explain code to other developers (and your future self). Python has single-line comments with <strong>#</strong> and docstrings with triple quotes.</p>
+</div>
+
+<div class="section-block">
+  <h4>Single-line Comments</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="cm"># This is a single-line comment</span>
+<span class="nm">x</span> <span class="op">=</span> <span class="nm">10</span>  <span class="cm"># Inline comment after code</span>
+<span class="fn">print</span>(x)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">10</pre>
+  <div class="example-note">Everything after # on a line is ignored by Python.</div>
+</div>
+
+<div class="section-block">
+  <h4>Multi-line Comments</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="cm"># Line 1 of comment</span>
+<span class="cm"># Line 2 of comment</span>
+<span class="cm"># Line 3 of comment</span>
+<span class="fn">print</span>(<span class="st">"code runs"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">code runs</pre>
+  <div class="example-note">Python has no block comment syntax — just use multiple # lines.</div>
+</div>
+
+<div class="section-block">
+  <h4>Docstrings</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="st">"""
+    This function greets a person.
+    Parameter: name (str)
+    Returns: greeting string
+    """</span>
+    <span class="kw">return</span> <span class="st">f"Hello, </span><span class="nm">{name}</span><span class="st">!"</span>
+
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="st">"Ravi"</span>))
+<span class="fn">print</span>(<span class="fn">greet</span>.<span class="fn">__doc__</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Hello, Ravi!
+
+    This function greets a person.
+    Parameter: name (str)
+    Returns: greeting string
+    </pre>
+  <div class="example-note">Docstrings use triple quotes and are stored as __doc__ — used by help() and documentation tools.</div>
+</div>
+`;}
+  },
+  {
+    id:'strings',icon:'🔤',title:'Strings',
+    desc:'Creating, indexing, slicing, f-strings, and escape characters.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🔤</span>
+  <h2>Strings</h2>
+  <p>Strings are sequences of characters enclosed in single <code>'...'</code>, double <code>"..."</code>, or triple quotes. They are <strong>immutable</strong> — you can't change a character in place.</p>
+</div>
+
+<div class="section-block">
+  <h4>Creating Strings</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s1</span> <span class="op">=</span> <span class="st">'Hello'</span>
+<span class="nm">s2</span> <span class="op">=</span> <span class="st">"World"</span>
+<span class="nm">s3</span> <span class="op">=</span> <span class="st">"""Multi
+line string"""</span>
+<span class="fn">print</span>(s1, s2)
+<span class="fn">print</span>(s3)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Hello World
+Multi
+line string</pre>
+  <div class="example-note">Single and double quotes work the same. Triple quotes allow multi-line strings.</div>
+</div>
+
+<div class="section-block">
+  <h4>Escape Characters</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="st">"Line1\nLine2"</span>)
+<span class="fn">print</span>(<span class="st">"Tab\there"</span>)
+<span class="fn">print</span>(<span class="st">"She said \"hello\""</span>)
+<span class="fn">print</span>(<span class="st">"Back\\slash"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Line1
+Line2
+Tab	here
+She said "hello"
+Back\slash</pre>
+  <div class="example-note">\n = newline, \t = tab, \\ = backslash, \" = quote inside double-quoted string.</div>
+</div>
+
+<div class="section-block">
+  <h4>Indexing &amp; Slicing</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s</span> <span class="op">=</span> <span class="st">"Python"</span>
+<span class="fn">print</span>(s[<span class="nm">0</span>])      <span class="cm"># first char</span>
+<span class="fn">print</span>(s[<span class="op">-</span><span class="nm">1</span>])     <span class="cm"># last char</span>
+<span class="fn">print</span>(s[<span class="nm">0</span>:<span class="nm">3</span>])    <span class="cm"># slice</span>
+<span class="fn">print</span>(s[::<span class="op">-</span><span class="nm">1</span>])   <span class="cm"># reverse</span>
+<span class="fn">print</span>(<span class="fn">len</span>(s))    <span class="cm"># length</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">P
+n
+Pyt
+nohtyP
+6</pre>
+  <div class="example-note">Indexes start at 0. Negative indexes count from the end. s[start:end:step] is the full slice syntax.</div>
+</div>
+
+<div class="section-block">
+  <h4>f-Strings (Formatted Strings)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">name</span> <span class="op">=</span> <span class="st">"Ravi"</span>
+<span class="nm">age</span> <span class="op">=</span> <span class="nm">25</span>
+<span class="fn">print</span>(<span class="st">f"My name is </span><span class="nm">{name}</span><span class="st"> and I am </span><span class="nm">{age}</span><span class="st"> years old."</span>)
+<span class="fn">print</span>(<span class="st">f"Next year I will be </span><span class="nm">{age <span class="op">+</span> 1}</span><span class="st">."</span>)
+<span class="fn">print</span>(<span class="st">f"Pi is approximately </span><span class="nm">{3.14159:.2f}</span><span class="st">"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">My name is Ravi and I am 25 years old.
+Next year I will be 26.
+Pi is approximately 3.14</pre>
+  <div class="example-note">f-strings (Python 3.6+) embed expressions directly in the string with {}. :.2f formats to 2 decimal places.</div>
+</div>
+
+<div class="section-block">
+  <h4>String Concatenation &amp; Repetition</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">a</span> <span class="op">=</span> <span class="st">"Hello"</span>
+<span class="nm">b</span> <span class="op">=</span> <span class="st">"World"</span>
+<span class="fn">print</span>(a <span class="op">+</span> <span class="st">" "</span> <span class="op">+</span> b)
+<span class="fn">print</span>(<span class="st">"Ha"</span> <span class="op">*</span> <span class="nm">3</span>)
+<span class="fn">print</span>(<span class="st">"py"</span> <span class="kw">in</span> <span class="st">"python"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Hello World
+HaHaHa
+True</pre>
+  <div class="example-note">+ joins strings, * repeats them, in checks membership.</div>
+</div>
+`;}
+  },
+  {
+    id:'string-methods',icon:'🛠️',title:'String Methods',
+    desc:'upper, lower, strip, replace, split, join, find, format and more.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🛠️</span>
+  <h2>String Methods</h2>
+  <p>Strings come with many built-in methods. Since strings are immutable, all methods return a <strong>new string</strong> — they never modify the original.</p>
+</div>
+
+<div class="section-block">
+  <h4>Case Methods</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s</span> <span class="op">=</span> <span class="st">"hello world"</span>
+<span class="fn">print</span>(s.<span class="fn">upper</span>())
+<span class="fn">print</span>(s.<span class="fn">title</span>())
+<span class="fn">print</span>(s.<span class="fn">capitalize</span>())
+<span class="fn">print</span>(<span class="st">"HELLO"</span>.<span class="fn">lower</span>())
+<span class="fn">print</span>(<span class="st">"Hello"</span>.<span class="fn">swapcase</span>())</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">HELLO WORLD
+Hello World
+Hello world
+hello
+hELLO</pre>
+</div>
+
+<div class="section-block">
+  <h4>strip, lstrip, rstrip</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s</span> <span class="op">=</span> <span class="st">"  hello  "</span>
+<span class="fn">print</span>(<span class="st">f"'{s.strip()}'"</span>)
+<span class="fn">print</span>(<span class="st">f"'{s.lstrip()}'"</span>)
+<span class="fn">print</span>(<span class="st">f"'{s.rstrip()}'"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">'hello'
+'hello  '
+'  hello'</pre>
+  <div class="example-note">strip() removes whitespace from both ends. lstrip = left only, rstrip = right only.</div>
+</div>
+
+<div class="section-block">
+  <h4>replace &amp; split &amp; join</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s</span> <span class="op">=</span> <span class="st">"one,two,three"</span>
+<span class="nm">parts</span> <span class="op">=</span> s.<span class="fn">split</span>(<span class="st">","</span>)
+<span class="fn">print</span>(parts)
+<span class="fn">print</span>(<span class="st">" - "</span>.<span class="fn">join</span>(parts))
+<span class="fn">print</span>(s.<span class="fn">replace</span>(<span class="st">","</span>, <span class="st">" | "</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">['one', 'two', 'three']
+one - two - three
+one | two | three</pre>
+  <div class="example-note">split() breaks a string into a list; join() merges a list into a string; replace() swaps substrings.</div>
+</div>
+
+<div class="section-block">
+  <h4>find, count, startswith, endswith</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s</span> <span class="op">=</span> <span class="st">"banana"</span>
+<span class="fn">print</span>(s.<span class="fn">find</span>(<span class="st">"an"</span>))
+<span class="fn">print</span>(s.<span class="fn">count</span>(<span class="st">"a"</span>))
+<span class="fn">print</span>(s.<span class="fn">startswith</span>(<span class="st">"ban"</span>))
+<span class="fn">print</span>(s.<span class="fn">endswith</span>(<span class="st">"na"</span>))
+<span class="fn">print</span>(s.<span class="fn">index</span>(<span class="st">"n"</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">1
+3
+True
+True
+2</pre>
+  <div class="example-note">find() returns -1 if not found; index() raises ValueError if not found.</div>
+</div>
+
+<div class="section-block">
+  <h4>Other Useful Methods</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="st">"  hi  "</span>.<span class="fn">strip</span>().<span class="fn">upper</span>())
+<span class="fn">print</span>(<span class="st">"42"</span>.<span class="fn">zfill</span>(<span class="nm">5</span>))
+<span class="fn">print</span>(<span class="st">"hello"</span>.<span class="fn">center</span>(<span class="nm">11</span>, <span class="st">"-"</span>))
+<span class="fn">print</span>(<span class="st">"abc123"</span>.<span class="fn">isalnum</span>())
+<span class="fn">print</span>(<span class="st">"hello"</span>.<span class="fn">isalpha</span>())</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">HI
+00042
+---hello---
+True
+True</pre>
+  <div class="example-note">Methods can be chained. zfill pads with zeros, center aligns text, isalnum/isalpha check character types.</div>
+</div>
+
+<div class="section-block">
+  <h4>.format() Method</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="st">"Hello, {}!"</span>.<span class="fn">format</span>(<span class="st">"Ravi"</span>))
+<span class="fn">print</span>(<span class="st">"{} + {} = {}"</span>.<span class="fn">format</span>(<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">3</span><span class="op">+</span><span class="nm">4</span>))
+<span class="fn">print</span>(<span class="st">"{name} is {age}"</span>.<span class="fn">format</span>(name<span class="op">=</span><span class="st">"Ana"</span>, age<span class="op">=</span><span class="nm">25</span>))
+<span class="fn">print</span>(<span class="st">"{:.2f}"</span>.<span class="fn">format</span>(<span class="nm">3.14159</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Hello, Ravi!
+3 + 4 = 7
+Ana is 25
+3.14</pre>
+  <div class="example-note">.format() is the older style before f-strings (Python 3.6+). Still widely used. {} are positional, {name} are keyword placeholders.</div>
+</div>
+`;}
+  },
+  {
+    id:'numbers',icon:'🔢',title:'Numbers & Math',
+    desc:'Arithmetic operators, integer division, modulo, power, and math module.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🔢</span>
+  <h2>Numbers &amp; Math</h2>
+  <p>Python has three numeric types: <strong>int</strong> (whole numbers), <strong>float</strong> (decimals), and <strong>complex</strong>. All standard arithmetic operators are built-in.</p>
+</div>
+
+<div class="section-block">
+  <h4>Arithmetic Operators</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="nm">10</span> <span class="op">+</span> <span class="nm">3</span>)   <span class="cm"># addition</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">-</span> <span class="nm">3</span>)   <span class="cm"># subtraction</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">*</span> <span class="nm">3</span>)   <span class="cm"># multiplication</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">/</span> <span class="nm">3</span>)   <span class="cm"># division (float)</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">//</span> <span class="nm">3</span>)  <span class="cm"># floor division</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">%</span> <span class="nm">3</span>)   <span class="cm"># modulo</span>
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">**</span> <span class="nm">3</span>)  <span class="cm"># power</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">13
+7
+30
+3.3333333333333335
+3
+1
+1000</pre>
+</div>
+
+<div class="section-block">
+  <h4>Built-in Math Functions</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="fn">abs</span>(<span class="op">-</span><span class="nm">7</span>))
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="nm">3.7</span>))
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="nm">3.14159</span>, <span class="nm">2</span>))
+<span class="fn">print</span>(<span class="fn">max</span>(<span class="nm">3</span>, <span class="nm">7</span>, <span class="nm">1</span>))
+<span class="fn">print</span>(<span class="fn">min</span>(<span class="nm">3</span>, <span class="nm">7</span>, <span class="nm">1</span>))
+<span class="fn">print</span>(<span class="fn">pow</span>(<span class="nm">2</span>, <span class="nm">8</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">7
+4
+3.14
+7
+1
+256</pre>
+</div>
+
+<div class="section-block">
+  <h4>math Module</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">import</span> math
+<span class="fn">print</span>(math.<span class="nm">pi</span>)
+<span class="fn">print</span>(math.<span class="fn">sqrt</span>(<span class="nm">16</span>))
+<span class="fn">print</span>(math.<span class="fn">floor</span>(<span class="nm">3.9</span>))
+<span class="fn">print</span>(math.<span class="fn">ceil</span>(<span class="nm">3.1</span>))
+<span class="fn">print</span>(math.<span class="fn">factorial</span>(<span class="nm">5</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">3.141592653589793
+4.0
+3
+4
+120</pre>
+  <div class="example-note">The math module provides advanced functions. Import it before use.</div>
+</div>
+`;}
+  },
+  {
+    id:'lists',icon:'📋',title:'Lists',
+    desc:'Ordered, mutable sequences. Indexing, slicing, nesting.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">📋</span>
+  <h2>Lists</h2>
+  <p>Lists are ordered, <strong>mutable</strong> collections that can hold items of any type. Defined with square brackets <code>[]</code>.</p>
+</div>
+
+<div class="section-block">
+  <h4>Creating &amp; Accessing</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">fruits</span> <span class="op">=</span> [<span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"cherry"</span>]
+<span class="fn">print</span>(fruits[<span class="nm">0</span>])
+<span class="fn">print</span>(fruits[<span class="op">-</span><span class="nm">1</span>])
+<span class="fn">print</span>(<span class="fn">len</span>(fruits))
+<span class="fn">print</span>(<span class="st">"banana"</span> <span class="kw">in</span> fruits)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">apple
+cherry
+3
+True</pre>
+</div>
+
+<div class="section-block">
+  <h4>Slicing</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">nums</span> <span class="op">=</span> [<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]
+<span class="fn">print</span>(nums[<span class="nm">1</span>:<span class="nm">4</span>])
+<span class="fn">print</span>(nums[:<span class="nm">3</span>])
+<span class="fn">print</span>(nums[<span class="nm">3</span>:])
+<span class="fn">print</span>(nums[::<span class="nm">2</span>])
+<span class="fn">print</span>(nums[::<span class="op">-</span><span class="nm">1</span>])</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[1, 2, 3]
+[0, 1, 2]
+[3, 4, 5]
+[0, 2, 4]
+[5, 4, 3, 2, 1, 0]</pre>
+</div>
+
+<div class="section-block">
+  <h4>Modifying &amp; Mixed Types</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">lst</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="st">"hello"</span>, <span class="nm">3.14</span>, <span class="kw">True</span>]
+<span class="nm">lst</span>[<span class="nm">0</span>] <span class="op">=</span> <span class="nm">99</span>
+<span class="fn">print</span>(lst)
+
+<span class="nm">nested</span> <span class="op">=</span> [[<span class="nm">1</span>,<span class="nm">2</span>], [<span class="nm">3</span>,<span class="nm">4</span>]]
+<span class="fn">print</span>(nested[<span class="nm">1</span>][<span class="nm">0</span>])</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[99, 'hello', 3.14, True]
+3</pre>
+  <div class="example-note">Lists can hold any mix of types. Access nested lists with chained indexes like nested[row][col].</div>
+</div>
+`;}
+  },
+  {
+    id:'list-methods',icon:'⚙️',title:'List Methods',
+    desc:'append, insert, remove, pop, sort, reverse, index, and more.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">⚙️</span>
+  <h2>List Methods</h2>
+  <p>Lists have many built-in methods. Most modify the list <strong>in place</strong> and return None. A few (like copy()) return a new list.</p>
+</div>
+
+<div class="section-block">
+  <h4>Adding Items</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">lst</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>]
+<span class="nm">lst</span>.<span class="fn">append</span>(<span class="nm">4</span>)
+<span class="fn">print</span>(lst)
+<span class="nm">lst</span>.<span class="fn">insert</span>(<span class="nm">1</span>, <span class="nm">99</span>)
+<span class="fn">print</span>(lst)
+<span class="nm">lst</span>.<span class="fn">extend</span>([<span class="nm">5</span>, <span class="nm">6</span>])
+<span class="fn">print</span>(lst)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[1, 2, 3, 4]
+[1, 99, 2, 3, 4]
+[1, 99, 2, 3, 4, 5, 6]</pre>
+  <div class="example-note">append adds one item at end; insert(index, value) adds at a position; extend adds all items from another list.</div>
+</div>
+
+<div class="section-block">
+  <h4>Removing Items</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">lst</span> <span class="op">=</span> [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>, <span class="st">"b"</span>]
+<span class="nm">lst</span>.<span class="fn">remove</span>(<span class="st">"b"</span>)  <span class="cm"># removes first "b"</span>
+<span class="fn">print</span>(lst)
+<span class="nm">popped</span> <span class="op">=</span> <span class="nm">lst</span>.<span class="fn">pop</span>()  <span class="cm"># removes last</span>
+<span class="fn">print</span>(popped, lst)
+<span class="nm">lst</span>.<span class="fn">clear</span>()
+<span class="fn">print</span>(lst)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">['a', 'c', 'b']
+b ['a', 'c']
+[]</pre>
+</div>
+
+<div class="section-block">
+  <h4>Sorting &amp; Reversing</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">nums</span> <span class="op">=</span> [<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">4</span>, <span class="nm">1</span>, <span class="nm">5</span>]
+<span class="nm">nums</span>.<span class="fn">sort</span>()
+<span class="fn">print</span>(nums)
+<span class="nm">nums</span>.<span class="fn">reverse</span>()
+<span class="fn">print</span>(nums)
+<span class="fn">print</span>(<span class="fn">sorted</span>([<span class="nm">5</span>,<span class="nm">2</span>,<span class="nm">8</span>]))  <span class="cm"># returns new list</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[1, 1, 3, 4, 5]
+[5, 4, 3, 1, 1]
+[2, 5, 8]</pre>
+  <div class="example-note">sort() modifies in place; sorted() returns a new sorted list without touching the original.</div>
+</div>
+
+<div class="section-block">
+  <h4>index, count, copy</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">lst</span> <span class="op">=</span> [<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"c"</span>]
+<span class="fn">print</span>(lst.<span class="fn">index</span>(<span class="st">"a"</span>))
+<span class="fn">print</span>(lst.<span class="fn">count</span>(<span class="st">"a"</span>))
+<span class="nm">copy</span> <span class="op">=</span> lst.<span class="fn">copy</span>()
+<span class="nm">copy</span>.<span class="fn">append</span>(<span class="st">"d"</span>)
+<span class="fn">print</span>(lst)
+<span class="fn">print</span>(copy)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">0
+2
+['a', 'b', 'a', 'c']
+['a', 'b', 'a', 'c', 'd']</pre>
+  <div class="example-note">copy() creates a shallow copy — changes to the copy don't affect the original.</div>
+</div>
+`;}
+  },
+  {
+    id:'tuples',icon:'🔒',title:'Tuples',
+    desc:'Immutable ordered sequences. Packing, unpacking, and methods.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🔒</span>
+  <h2>Tuples</h2>
+  <p>Tuples are like lists but <strong>immutable</strong> — once created you cannot change them. Defined with parentheses <code>()</code>. They are faster than lists and are used for fixed data.</p>
+</div>
+
+<div class="section-block">
+  <h4>Creating &amp; Accessing</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">t</span> <span class="op">=</span> (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)
+<span class="fn">print</span>(t[<span class="nm">0</span>])
+<span class="fn">print</span>(t[<span class="op">-</span><span class="nm">1</span>])
+<span class="fn">print</span>(<span class="fn">len</span>(t))
+<span class="nm">single</span> <span class="op">=</span> (<span class="nm">42</span>,)  <span class="cm"># comma makes it a tuple</span>
+<span class="fn">print</span>(<span class="fn">type</span>(single))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">1
+3
+3
+&lt;class 'tuple'&gt;</pre>
+  <div class="example-note">A single-element tuple requires a trailing comma — (42) is just an int in parentheses.</div>
+</div>
+
+<div class="section-block">
+  <h4>Unpacking</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">point</span> <span class="op">=</span> (<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>)
+<span class="nm">x</span>, <span class="nm">y</span>, <span class="nm">z</span> <span class="op">=</span> point
+<span class="fn">print</span>(x, y, z)
+
+<span class="nm">first</span>, <span class="op">*</span><span class="nm">rest</span> <span class="op">=</span> (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>)
+<span class="fn">print</span>(first, rest)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">10 20 30
+1 [2, 3, 4]</pre>
+  <div class="example-note">Tuple unpacking assigns each element to a variable. * collects remaining items into a list.</div>
+</div>
+
+<div class="section-block">
+  <h4>Tuple Methods &amp; Use Cases</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">t</span> <span class="op">=</span> (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>)
+<span class="fn">print</span>(t.<span class="fn">count</span>(<span class="nm">2</span>))
+<span class="fn">print</span>(t.<span class="fn">index</span>(<span class="nm">3</span>))
+
+<span class="cm"># Swap variables using tuple unpacking</span>
+<span class="nm">a</span>, <span class="nm">b</span> <span class="op">=</span> <span class="nm">5</span>, <span class="nm">10</span>
+<span class="nm">a</span>, <span class="nm">b</span> <span class="op">=</span> <span class="nm">b</span>, <span class="nm">a</span>
+<span class="fn">print</span>(a, b)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">2
+3
+10 5</pre>
+  <div class="example-note">Tuples only have count() and index(). The a, b = b, a swap trick uses tuple packing/unpacking.</div>
+</div>
+`;}
+  },
+  {
+    id:'dicts',icon:'📖',title:'Dictionaries',
+    desc:'Key-value pairs. Creating, accessing, updating, and deleting.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">📖</span>
+  <h2>Dictionaries</h2>
+  <p>Dictionaries store data as <strong>key: value</strong> pairs. Keys must be unique and immutable (strings, numbers, tuples). Values can be anything. Defined with curly braces <code>{}</code>.</p>
+</div>
+
+<div class="section-block">
+  <h4>Creating &amp; Accessing</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">person</span> <span class="op">=</span> {<span class="st">"name"</span>: <span class="st">"Ravi"</span>, <span class="st">"age"</span>: <span class="nm">25</span>, <span class="st">"city"</span>: <span class="st">"Hyd"</span>}
+<span class="fn">print</span>(person[<span class="st">"name"</span>])
+<span class="fn">print</span>(person.<span class="fn">get</span>(<span class="st">"age"</span>))
+<span class="fn">print</span>(person.<span class="fn">get</span>(<span class="st">"email"</span>, <span class="st">"N/A"</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Ravi
+25
+N/A</pre>
+  <div class="example-note">Use [] for direct access (raises KeyError if missing) or .get() for a safe default.</div>
+</div>
+
+<div class="section-block">
+  <h4>Adding, Updating, Deleting</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">d</span> <span class="op">=</span> {<span class="st">"a"</span>: <span class="nm">1</span>}
+<span class="nm">d</span>[<span class="st">"b"</span>] <span class="op">=</span> <span class="nm">2</span>
+<span class="nm">d</span>[<span class="st">"a"</span>] <span class="op">=</span> <span class="nm">99</span>
+<span class="fn">print</span>(d)
+<span class="kw">del</span> <span class="nm">d</span>[<span class="st">"b"</span>]
+<span class="fn">print</span>(d)
+<span class="fn">print</span>(<span class="fn">len</span>(d))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{'a': 99, 'b': 2}
+{'a': 99}
+1</pre>
+</div>
+
+<div class="section-block">
+  <h4>Iterating &amp; Nested Dicts</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">student</span> <span class="op">=</span> {<span class="st">"name"</span>: <span class="st">"Ana"</span>, <span class="st">"grades"</span>: {<span class="st">"math"</span>: <span class="nm">90</span>, <span class="st">"sci"</span>: <span class="nm">85</span>}}
+<span class="fn">print</span>(student[<span class="st">"grades"</span>][<span class="st">"math"</span>])
+<span class="kw">for</span> key, val <span class="kw">in</span> student[<span class="st">"grades"</span>].<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="st">f"  </span><span class="nm">{key}</span><span class="st">: </span><span class="nm">{val}</span><span class="st">"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">90
+  math: 90
+  sci: 85</pre>
+</div>
+`;}
+  },
+  {
+    id:'dict-methods',icon:'🗂️',title:'Dictionary Methods',
+    desc:'keys, values, items, update, pop, setdefault, copy.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🗂️</span>
+  <h2>Dictionary Methods</h2>
+  <p>Dictionaries have powerful methods for inspecting, iterating, and transforming key-value data.</p>
+</div>
+
+<div class="section-block">
+  <h4>keys, values, items</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">d</span> <span class="op">=</span> {<span class="st">"x"</span>: <span class="nm">1</span>, <span class="st">"y"</span>: <span class="nm">2</span>, <span class="st">"z"</span>: <span class="nm">3</span>}
+<span class="fn">print</span>(<span class="fn">list</span>(d.<span class="fn">keys</span>()))
+<span class="fn">print</span>(<span class="fn">list</span>(d.<span class="fn">values</span>()))
+<span class="fn">print</span>(<span class="fn">list</span>(d.<span class="fn">items</span>()))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">['x', 'y', 'z']
+[1, 2, 3]
+[('x', 1), ('y', 2), ('z', 3)]</pre>
+</div>
+
+<div class="section-block">
+  <h4>update, pop, setdefault</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">d</span> <span class="op">=</span> {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+<span class="nm">d</span>.<span class="fn">update</span>({<span class="st">"b"</span>: <span class="nm">20</span>, <span class="st">"c"</span>: <span class="nm">3</span>})
+<span class="fn">print</span>(d)
+<span class="fn">print</span>(d.<span class="fn">pop</span>(<span class="st">"a"</span>))
+<span class="fn">print</span>(d)
+d.<span class="fn">setdefault</span>(<span class="st">"d"</span>, <span class="nm">99</span>)
+<span class="fn">print</span>(d)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{'a': 1, 'b': 20, 'c': 3}
+1
+{'b': 20, 'c': 3}
+{'b': 20, 'c': 3, 'd': 99}</pre>
+  <div class="example-note">update() merges another dict in; pop() removes and returns a value; setdefault() sets a key only if it doesn't exist.</div>
+</div>
+
+<div class="section-block">
+  <h4>Dict Comprehension</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">squares</span> <span class="op">=</span> {x: x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>)}
+<span class="fn">print</span>(squares)
+<span class="nm">flipped</span> <span class="op">=</span> {v: k <span class="kw">for</span> k, v <span class="kw">in</span> squares.<span class="fn">items</span>()}
+<span class="fn">print</span>(flipped)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+{1: 1, 4: 2, 9: 3, 16: 4, 25: 5}</pre>
+</div>
+
+<div class="section-block">
+  <h4>dict.copy()</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">original</span> <span class="op">=</span> {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+<span class="nm">copied</span> <span class="op">=</span> original.<span class="fn">copy</span>()
+<span class="nm">copied</span>[<span class="st">"c"</span>] <span class="op">=</span> <span class="nm">3</span>
+<span class="fn">print</span>(original)
+<span class="fn">print</span>(copied)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{'a': 1, 'b': 2}
+{'a': 1, 'b': 2, 'c': 3}</pre>
+  <div class="example-note">copy() creates a shallow copy — adding keys to the copy doesn't affect the original.</div>
+</div>
+`;}
+  },
+  {
+    id:'sets',icon:'🔵',title:'Sets',
+    desc:'Unordered unique collections. Union, intersection, difference.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🔵</span>
+  <h2>Sets</h2>
+  <p>Sets are <strong>unordered</strong> collections of <strong>unique</strong> elements. Defined with curly braces <code>{}</code> (but <code>set()</code> for empty). Great for removing duplicates and membership testing.</p>
+</div>
+
+<div class="section-block">
+  <h4>Creating &amp; Basic Ops</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">s</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">1</span>}
+<span class="fn">print</span>(s)
+<span class="nm">s</span>.<span class="fn">add</span>(<span class="nm">4</span>)
+<span class="fn">print</span>(s)
+<span class="nm">s</span>.<span class="fn">remove</span>(<span class="nm">2</span>)
+<span class="fn">print</span>(s)
+<span class="fn">print</span>(<span class="nm">3</span> <span class="kw">in</span> s)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{1, 2, 3}
+{1, 2, 3, 4}
+{1, 3, 4}
+True</pre>
+  <div class="example-note">Duplicates are silently removed. Sets are unordered so print order may vary.</div>
+</div>
+
+<div class="section-block">
+  <h4>Set Operations</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">a</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="nm">b</span> <span class="op">=</span> {<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>}
+<span class="fn">print</span>(a <span class="op">|</span> b)   <span class="cm"># union</span>
+<span class="fn">print</span>(a <span class="op">&amp;</span> b)   <span class="cm"># intersection</span>
+<span class="fn">print</span>(a <span class="op">-</span> b)   <span class="cm"># difference</span>
+<span class="fn">print</span>(a <span class="op">^</span> b)   <span class="cm"># symmetric difference</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{1, 2, 3, 4}
+{2, 3}
+{1}
+{1, 4}</pre>
+</div>
+
+<div class="section-block">
+  <h4>Remove Duplicates from a List</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">lst</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">3</span>, <span class="nm">4</span>]
+<span class="nm">unique</span> <span class="op">=</span> <span class="fn">list</span>(<span class="fn">set</span>(lst))
+<span class="fn">print</span>(unique)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[1, 2, 3, 4]</pre>
+  <div class="example-note">Converting a list to a set and back is the quickest way to remove duplicates (order not preserved).</div>
+</div>
+`;}
+  },
+  {
+    id:'booleans',icon:'✅',title:'Booleans & Comparisons',
+    desc:'True/False, comparison operators, logical operators, identity, membership.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">✅</span>
+  <h2>Booleans &amp; Comparisons</h2>
+  <p>Booleans represent <strong>True</strong> or <strong>False</strong>. Comparison and logical operators always produce a boolean result.</p>
+</div>
+
+<div class="section-block">
+  <h4>Comparison Operators</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="nm">5</span> <span class="op">==</span> <span class="nm">5</span>)
+<span class="fn">print</span>(<span class="nm">5</span> <span class="op">!=</span> <span class="nm">3</span>)
+<span class="fn">print</span>(<span class="nm">10</span> <span class="op">&gt;</span> <span class="nm">7</span>)
+<span class="fn">print</span>(<span class="nm">3</span> <span class="op">&lt;=</span> <span class="nm">3</span>)
+<span class="fn">print</span>(<span class="nm">1</span> <span class="op">&lt;</span> <span class="nm">2</span> <span class="op">&lt;</span> <span class="nm">3</span>)  <span class="cm"># chained</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">True
+True
+True
+True
+True</pre>
+</div>
+
+<div class="section-block">
+  <h4>Logical Operators</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="kw">True</span> <span class="kw">and</span> <span class="kw">False</span>)
+<span class="fn">print</span>(<span class="kw">True</span> <span class="kw">or</span> <span class="kw">False</span>)
+<span class="fn">print</span>(<span class="kw">not</span> <span class="kw">True</span>)
+<span class="nm">x</span> <span class="op">=</span> <span class="nm">5</span>
+<span class="fn">print</span>(x <span class="op">&gt;</span> <span class="nm">0</span> <span class="kw">and</span> x <span class="op">&lt;</span> <span class="nm">10</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">False
+True
+False
+True</pre>
+</div>
+
+<div class="section-block">
+  <h4>Truthy &amp; Falsy Values</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">for</span> val <span class="kw">in</span> [<span class="nm">0</span>, <span class="st">""</span>, [], <span class="kw">None</span>, <span class="kw">False</span>, <span class="nm">1</span>, <span class="st">"hi"</span>, [<span class="nm">1</span>]]:
+    <span class="fn">print</span>(<span class="st">f"bool(</span><span class="nm">{repr(val)}</span><span class="st">) = </span><span class="nm">{bool(val)}</span><span class="st">"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">bool(0) = False
+bool('') = False
+bool([]) = False
+bool(None) = False
+bool(False) = False
+bool(1) = True
+bool('hi') = True
+bool([1]) = True</pre>
+  <div class="example-note">0, empty strings, empty collections, and None are all Falsy. Everything else is Truthy.</div>
+</div>
+
+<div class="section-block">
+  <h4>Identity Operators (is / is not)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">a</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>]
+<span class="nm">b</span> <span class="op">=</span> a
+<span class="nm">c</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>]
+<span class="fn">print</span>(a <span class="kw">is</span> b)       <span class="cm"># same object</span>
+<span class="fn">print</span>(a <span class="kw">is</span> c)       <span class="cm"># equal but different objects</span>
+<span class="fn">print</span>(a <span class="op">==</span> c)       <span class="cm"># same values</span>
+<span class="fn">print</span>(<span class="kw">None</span> <span class="kw">is</span> <span class="kw">None</span>) <span class="cm"># idiomatic None check</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">True
+False
+True
+True</pre>
+  <div class="example-note">is checks object identity (same memory address), not equality. Always use <code>is None</code> / <code>is not None</code> to check for None.</div>
+</div>
+
+<div class="section-block">
+  <h4>Membership Operators (in / not in)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="fn">print</span>(<span class="st">"py"</span> <span class="kw">in</span> <span class="st">"python"</span>)
+<span class="fn">print</span>(<span class="nm">3</span> <span class="kw">in</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>])
+<span class="fn">print</span>(<span class="st">"x"</span> <span class="kw">not in</span> {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>})
+<span class="fn">print</span>(<span class="nm">4</span> <span class="kw">not in</span> (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">True
+True
+True
+True</pre>
+  <div class="example-note">in works on strings, lists, tuples, sets, and dict keys. It is O(1) for sets/dicts and O(n) for lists.</div>
+</div>
+`;}
+  },
+  {
+    id:'conditionals',icon:'🔀',title:'Conditionals',
+    desc:'if, elif, else, nested conditions, and ternary expressions.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🔀</span>
+  <h2>Conditionals</h2>
+  <p>Conditionals let your program make decisions. Python uses <strong>if / elif / else</strong> and indentation (4 spaces) instead of braces.</p>
+</div>
+
+<div class="section-block">
+  <h4>if / elif / else</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">score</span> <span class="op">=</span> <span class="nm">75</span>
+<span class="kw">if</span> score <span class="op">&gt;=</span> <span class="nm">90</span>:
+    <span class="fn">print</span>(<span class="st">"A grade"</span>)
+<span class="kw">elif</span> score <span class="op">&gt;=</span> <span class="nm">70</span>:
+    <span class="fn">print</span>(<span class="st">"B grade"</span>)
+<span class="kw">elif</span> score <span class="op">&gt;=</span> <span class="nm">50</span>:
+    <span class="fn">print</span>(<span class="st">"C grade"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"Fail"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">B grade</pre>
+</div>
+
+<div class="section-block">
+  <h4>Ternary (Conditional Expression)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">age</span> <span class="op">=</span> <span class="nm">20</span>
+<span class="nm">status</span> <span class="op">=</span> <span class="st">"adult"</span> <span class="kw">if</span> age <span class="op">&gt;=</span> <span class="nm">18</span> <span class="kw">else</span> <span class="st">"minor"</span>
+<span class="fn">print</span>(status)
+
+<span class="nm">x</span> <span class="op">=</span> <span class="nm">10</span>
+<span class="fn">print</span>(<span class="st">"even"</span> <span class="kw">if</span> x <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span> <span class="kw">else</span> <span class="st">"odd"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">adult
+even</pre>
+  <div class="example-note">value_if_true if condition else value_if_false — a one-line if/else.</div>
+</div>
+
+<div class="section-block">
+  <h4>Nested Conditions</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">x</span> <span class="op">=</span> <span class="nm">15</span>
+<span class="kw">if</span> x <span class="op">&gt;</span> <span class="nm">10</span>:
+    <span class="kw">if</span> x <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>:
+        <span class="fn">print</span>(<span class="st">"big even"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"big odd"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"small"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">big odd</pre>
+</div>
+`;}
+  },
+  {
+    id:'loops',icon:'🔁',title:'Loops',
+    desc:'for, while, range, break, continue, pass, and loop else.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🔁</span>
+  <h2>Loops</h2>
+  <p>Loops repeat a block of code. Python has <strong>for</strong> (iterate over a sequence) and <strong>while</strong> (repeat while a condition is true).</p>
+</div>
+
+<div class="section-block">
+  <h4>for Loop &amp; range()</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>):
+    <span class="fn">print</span>(i, end<span class="op">=</span><span class="st">" "</span>)
+<span class="fn">print</span>()
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>, <span class="nm">10</span>, <span class="nm">3</span>):
+    <span class="fn">print</span>(i, end<span class="op">=</span><span class="st">" "</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">0 1 2 3 4
+2 5 8 </pre>
+</div>
+
+<div class="section-block">
+  <h4>Iterating Collections</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">fruits</span> <span class="op">=</span> [<span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"cherry"</span>]
+<span class="kw">for</span> i, fruit <span class="kw">in</span> <span class="fn">enumerate</span>(fruits):
+    <span class="fn">print</span>(<span class="st">f"</span><span class="nm">{i}</span><span class="st">: </span><span class="nm">{fruit}</span><span class="st">"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">0: apple
+1: banana
+2: cherry</pre>
+</div>
+
+<div class="section-block">
+  <h4>while Loop</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">count</span> <span class="op">=</span> <span class="nm">0</span>
+<span class="kw">while</span> count <span class="op">&lt;</span> <span class="nm">5</span>:
+    <span class="fn">print</span>(count, end<span class="op">=</span><span class="st">" "</span>)
+    count <span class="op">+=</span> <span class="nm">1</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">0 1 2 3 4 </pre>
+</div>
+
+<div class="section-block">
+  <h4>break, continue, pass</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>):
+    <span class="kw">if</span> i <span class="op">==</span> <span class="nm">3</span>: <span class="kw">continue</span>  <span class="cm"># skip 3</span>
+    <span class="kw">if</span> i <span class="op">==</span> <span class="nm">6</span>: <span class="kw">break</span>    <span class="cm"># stop at 6</span>
+    <span class="fn">print</span>(i, end<span class="op">=</span><span class="st">" "</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">0 1 2 4 5 </pre>
+  <div class="example-note">continue skips to next iteration; break exits the loop entirely; pass is a no-op placeholder.</div>
+</div>
+
+<div class="section-block">
+  <h4>Loop else</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="cm"># else runs if the loop completed without hitting break</span>
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">5</span>]:
+    <span class="kw">if</span> n <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>:
+        <span class="fn">print</span>(<span class="st">f"Found even: {n}"</span>)
+        <span class="kw">break</span>
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"No even number found"</span>)
+
+<span class="kw">for</span> n <span class="kw">in</span> [<span class="nm">1</span>, <span class="nm">3</span>, <span class="nm">5</span>]:
+    <span class="kw">if</span> n <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>:
+        <span class="fn">print</span>(<span class="st">f"Found even: {n}"</span>)
+        <span class="kw">break</span>
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"No even number found"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Found even: 2
+No even number found</pre>
+  <div class="example-note">The else clause on a loop runs only when no break occurred. Useful for search loops — "if not found, do this".</div>
+</div>
+`;}
+  },
+  {
+    id:'functions',icon:'🧩',title:'Functions',
+    desc:'def, parameters, return, defaults, *args, **kwargs, and scope.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🧩</span>
+  <h2>Functions</h2>
+  <p>Functions are reusable blocks of code defined with <strong>def</strong>. They take inputs (parameters), do work, and return outputs.</p>
+</div>
+
+<div class="section-block">
+  <h4>Defining &amp; Calling</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="kw">return</span> <span class="st">f"Hello, </span><span class="nm">{name}</span><span class="st">!"</span>
+
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="st">"Ravi"</span>))
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="st">"Ana"</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Hello, Ravi!
+Hello, Ana!</pre>
+</div>
+
+<div class="section-block">
+  <h4>Default Arguments</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">def</span> <span class="fn">power</span>(base, exp<span class="op">=</span><span class="nm">2</span>):
+    <span class="kw">return</span> base <span class="op">**</span> exp
+
+<span class="fn">print</span>(<span class="fn">power</span>(<span class="nm">3</span>))
+<span class="fn">print</span>(<span class="fn">power</span>(<span class="nm">2</span>, <span class="nm">8</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">9
+256</pre>
+</div>
+
+<div class="section-block">
+  <h4>*args and **kwargs</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">def</span> <span class="fn">total</span>(<span class="op">*</span>nums):
+    <span class="kw">return</span> <span class="fn">sum</span>(nums)
+
+<span class="fn">print</span>(<span class="fn">total</span>(<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>))
+
+<span class="kw">def</span> <span class="fn">info</span>(<span class="op">**</span>data):
+    <span class="kw">for</span> k, v <span class="kw">in</span> data.<span class="fn">items</span>():
+        <span class="fn">print</span>(<span class="st">f"  </span><span class="nm">{k}</span><span class="st">: </span><span class="nm">{v}</span><span class="st">"</span>)
+
+<span class="fn">info</span>(name<span class="op">=</span><span class="st">"Ravi"</span>, age<span class="op">=</span><span class="nm">25</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">6
+  name: Ravi
+  age: 25</pre>
+  <div class="example-note">*args collects extra positional arguments as a tuple; **kwargs collects extra keyword arguments as a dict.</div>
+</div>
+
+<div class="section-block">
+  <h4>Multiple Return Values</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">def</span> <span class="fn">min_max</span>(lst):
+    <span class="kw">return</span> <span class="fn">min</span>(lst), <span class="fn">max</span>(lst)
+
+<span class="nm">lo</span>, <span class="nm">hi</span> <span class="op">=</span> <span class="fn">min_max</span>([<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">7</span>, <span class="nm">2</span>])
+<span class="fn">print</span>(lo, hi)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">1 7</pre>
+</div>
+
+<div class="section-block">
+  <h4>Scope (Local vs Global)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">x</span> <span class="op">=</span> <span class="st">"global"</span>
+
+<span class="kw">def</span> <span class="fn">show</span>():
+    <span class="nm">x</span> <span class="op">=</span> <span class="st">"local"</span>   <span class="cm"># new local variable, doesn't affect global</span>
+    <span class="fn">print</span>(x)
+
+<span class="fn">show</span>()
+<span class="fn">print</span>(x)
+
+<span class="kw">def</span> <span class="fn">modify</span>():
+    <span class="kw">global</span> x
+    x <span class="op">=</span> <span class="st">"changed"</span>  <span class="cm"># modifies the global x</span>
+
+<span class="fn">modify</span>()
+<span class="fn">print</span>(x)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">local
+global
+changed</pre>
+  <div class="example-note">Variables inside a function are local by default. Use the global keyword to modify a global variable from inside a function.</div>
+</div>
+`;}
+  },
+  {
+    id:'lambda',icon:'⚡',title:'Lambda & Built-ins',
+    desc:'lambda, map, filter, zip, enumerate, sorted, reversed.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">⚡</span>
+  <h2>Lambda &amp; Built-ins</h2>
+  <p>Lambda creates small anonymous functions in one line. Python's built-in functions like <strong>map</strong>, <strong>filter</strong>, <strong>zip</strong>, and <strong>sorted</strong> work great with them.</p>
+</div>
+
+<div class="section-block">
+  <h4>lambda</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">square</span> <span class="op">=</span> <span class="kw">lambda</span> x: x <span class="op">**</span> <span class="nm">2</span>
+<span class="fn">print</span>(<span class="nm">square</span>(<span class="nm">5</span>))
+
+<span class="nm">add</span> <span class="op">=</span> <span class="kw">lambda</span> a, b: a <span class="op">+</span> b
+<span class="fn">print</span>(<span class="nm">add</span>(<span class="nm">3</span>, <span class="nm">4</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">25
+7</pre>
+</div>
+
+<div class="section-block">
+  <h4>map() and filter()</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">nums</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]
+<span class="nm">squares</span> <span class="op">=</span> <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x<span class="op">**</span><span class="nm">2</span>, nums))
+<span class="fn">print</span>(squares)
+<span class="nm">evens</span> <span class="op">=</span> <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>, nums))
+<span class="fn">print</span>(evens)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[1, 4, 9, 16, 25]
+[2, 4]</pre>
+</div>
+
+<div class="section-block">
+  <h4>zip() and enumerate()</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">names</span> <span class="op">=</span> [<span class="st">"Ravi"</span>, <span class="st">"Ana"</span>]
+<span class="nm">scores</span> <span class="op">=</span> [<span class="nm">90</span>, <span class="nm">85</span>]
+<span class="kw">for</span> name, score <span class="kw">in</span> <span class="fn">zip</span>(names, scores):
+    <span class="fn">print</span>(<span class="st">f"</span><span class="nm">{name}</span><span class="st">: </span><span class="nm">{score}</span><span class="st">"</span>)
+
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(names, start<span class="op">=</span><span class="nm">1</span>):
+    <span class="fn">print</span>(<span class="st">f"</span><span class="nm">{i}</span><span class="st">. </span><span class="nm">{name}</span><span class="st">"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Ravi: 90
+Ana: 85
+1. Ravi
+2. Ana</pre>
+</div>
+
+<div class="section-block">
+  <h4>sorted() with key</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">words</span> <span class="op">=</span> [<span class="st">"banana"</span>, <span class="st">"fig"</span>, <span class="st">"apple"</span>, <span class="st">"kiwi"</span>]
+<span class="fn">print</span>(<span class="fn">sorted</span>(words))
+<span class="fn">print</span>(<span class="fn">sorted</span>(words, key<span class="op">=</span><span class="fn">len</span>))
+<span class="fn">print</span>(<span class="fn">sorted</span>(words, reverse<span class="op">=</span><span class="kw">True</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">['apple', 'banana', 'fig', 'kiwi']
+['fig', 'kiwi', 'apple', 'banana']
+['kiwi', 'fig', 'banana', 'apple']</pre>
+</div>
+
+<div class="section-block">
+  <h4>reversed()</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">nums</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">reversed</span>(nums)))
+
+<span class="kw">for</span> n <span class="kw">in</span> <span class="fn">reversed</span>((<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>)):
+    <span class="fn">print</span>(n, end<span class="op">=</span><span class="st">" "</span>)
+<span class="fn">print</span>()
+
+<span class="cm"># reversed() vs [::-1]</span>
+<span class="fn">print</span>(nums[<span class="op">::</span><span class="op">-</span><span class="nm">1</span>])   <span class="cm"># creates a new list</span></pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[5, 4, 3, 2, 1]
+30 20 10
+[5, 4, 3, 2, 1]</pre>
+  <div class="example-note">reversed() returns a lazy iterator — no new list created. Wrap in list() to get a list. Works on sequences (lists, tuples, strings).</div>
+</div>
+`;}
+  },
+  {
+    id:'comprehensions',icon:'🎯',title:'List Comprehensions',
+    desc:'Compact list, dict, and set comprehensions with conditions.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🎯</span>
+  <h2>List Comprehensions</h2>
+  <p>Comprehensions are a concise way to create lists, dicts, or sets from existing iterables — often replacing a for loop in one readable line.</p>
+</div>
+
+<div class="section-block">
+  <h4>Basic List Comprehension</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">squares</span> <span class="op">=</span> [x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>)]
+<span class="fn">print</span>(squares)
+<span class="nm">words</span> <span class="op">=</span> [w.<span class="fn">upper</span>() <span class="kw">for</span> w <span class="kw">in</span> [<span class="st">"hi"</span>, <span class="st">"bye"</span>, <span class="st">"ok"</span>]]
+<span class="fn">print</span>(words)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[1, 4, 9, 16, 25]
+['HI', 'BYE', 'OK']</pre>
+</div>
+
+<div class="section-block">
+  <h4>With Condition (filter)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">evens</span> <span class="op">=</span> [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>) <span class="kw">if</span> x <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>]
+<span class="fn">print</span>(evens)
+<span class="nm">long_words</span> <span class="op">=</span> [w <span class="kw">for</span> w <span class="kw">in</span> [<span class="st">"cat"</span>,<span class="st">"elephant"</span>,<span class="st">"ox"</span>,<span class="st">"tiger"</span>] <span class="kw">if</span> <span class="fn">len</span>(w) <span class="op">&gt;</span> <span class="nm">3</span>]
+<span class="fn">print</span>(long_words)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">[0, 2, 4, 6, 8]
+['elephant', 'tiger']</pre>
+</div>
+
+<div class="section-block">
+  <h4>Dict &amp; Set Comprehensions</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="nm">sq_dict</span> <span class="op">=</span> {x: x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">5</span>)}
+<span class="fn">print</span>(sq_dict)
+<span class="nm">sq_set</span> <span class="op">=</span> {x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> [<span class="op">-</span><span class="nm">2</span>, <span class="nm">2</span>, <span class="op">-</span><span class="nm">3</span>, <span class="nm">3</span>]}
+<span class="fn">print</span>(sq_set)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">{1: 1, 2: 4, 3: 9, 4: 16}
+{4, 9}</pre>
+  <div class="example-note">Dict comprehension uses {k: v for ...}; set comprehension uses {expr for ...}.</div>
+</div>
+`;}
+  },
+  {
+    id:'exceptions',icon:'🚨',title:'Exception Handling',
+    desc:'try, except, else, finally, raise, and custom exceptions.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">🚨</span>
+  <h2>Exception Handling</h2>
+  <p>Exceptions are runtime errors. Python's <strong>try/except</strong> block catches them so the program can handle errors gracefully instead of crashing.</p>
+</div>
+
+<div class="section-block">
+  <h4>Basic try/except</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">try</span>:
+    result <span class="op">=</span> <span class="nm">10</span> <span class="op">/</span> <span class="nm">0</span>
+<span class="kw">except</span> <span class="bi">ZeroDivisionError</span>:
+    <span class="fn">print</span>(<span class="st">"Cannot divide by zero!"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Cannot divide by zero!</pre>
+</div>
+
+<div class="section-block">
+  <h4>except / else / finally</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">try</span>:
+    n <span class="op">=</span> <span class="fn">int</span>(<span class="st">"42"</span>)
+<span class="kw">except</span> <span class="bi">ValueError</span>:
+    <span class="fn">print</span>(<span class="st">"Not a number"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">f"Got: </span><span class="nm">{n}</span><span class="st">"</span>)
+<span class="kw">finally</span>:
+    <span class="fn">print</span>(<span class="st">"Always runs"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Got: 42
+Always runs</pre>
+  <div class="example-note">else runs if no exception occurred; finally always runs (great for cleanup like closing files).</div>
+</div>
+
+<div class="section-block">
+  <h4>Catching Multiple Exceptions &amp; raise</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">def</span> <span class="fn">safe_divide</span>(a, b):
+    <span class="kw">if</span> b <span class="op">==</span> <span class="nm">0</span>:
+        <span class="kw">raise</span> <span class="bi">ValueError</span>(<span class="st">"b cannot be zero"</span>)
+    <span class="kw">return</span> a <span class="op">/</span> b
+
+<span class="kw">try</span>:
+    <span class="fn">print</span>(<span class="fn">safe_divide</span>(<span class="nm">10</span>, <span class="nm">2</span>))
+    <span class="fn">print</span>(<span class="fn">safe_divide</span>(<span class="nm">5</span>, <span class="nm">0</span>))
+<span class="kw">except</span> <span class="bi">ValueError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="st">f"Error: </span><span class="nm">{e}</span><span class="st">"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">5.0
+Error: b cannot be zero</pre>
+</div>
+
+<div class="section-block">
+  <h4>Custom Exception Classes</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">class</span> <span class="bi">AgeError</span>(<span class="bi">Exception</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, age):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(<span class="st">f"Invalid age: {age}. Must be 0–120."</span>)
+        <span class="nm">self</span>.age <span class="op">=</span> age
+
+<span class="kw">def</span> <span class="fn">set_age</span>(age):
+    <span class="kw">if</span> <span class="kw">not</span> <span class="nm">0</span> <span class="op">&lt;=</span> age <span class="op">&lt;=</span> <span class="nm">120</span>:
+        <span class="kw">raise</span> <span class="bi">AgeError</span>(age)
+    <span class="kw">return</span> age
+
+<span class="kw">try</span>:
+    <span class="fn">set_age</span>(<span class="nm">200</span>)
+<span class="kw">except</span> <span class="bi">AgeError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(e)
+    <span class="fn">print</span>(<span class="st">f"Got age: {e.age}"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Invalid age: 200. Must be 0–120.
+Got age: 200</pre>
+  <div class="example-note">Custom exceptions inherit from Exception. Add __init__ to carry extra data. Catch them by name just like built-in exceptions.</div>
+</div>
+`;}
+  },
+  {
+    id:'files',icon:'📁',title:'File I/O',
+    desc:'open, read, write, append, with statement, readlines.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">📁</span>
+  <h2>File I/O</h2>
+  <p>Python can read and write files using the built-in <strong>open()</strong> function. Always use the <strong>with</strong> statement — it automatically closes the file.</p>
+</div>
+
+<div class="section-block">
+  <h4>Writing a File</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"demo.txt"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(<span class="st">"Line 1\n"</span>)
+    f.<span class="fn">write</span>(<span class="st">"Line 2\n"</span>)
+<span class="fn">print</span>(<span class="st">"File written"</span>)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">File written</pre>
+  <div class="example-note">"w" creates or overwrites the file. "a" appends. "r" reads (default).</div>
+</div>
+
+<div class="section-block">
+  <h4>Reading a File</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"demo.txt"</span>, <span class="st">"r"</span>) <span class="kw">as</span> f:
+    content <span class="op">=</span> f.<span class="fn">read</span>()
+    <span class="fn">print</span>(content)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"demo.txt"</span>) <span class="kw">as</span> f:
+    lines <span class="op">=</span> f.<span class="fn">readlines</span>()
+    <span class="fn">print</span>(lines)</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Line 1
+Line 2
+
+['Line 1\n', 'Line 2\n']</pre>
+  <div class="example-note">read() returns the full file as a string; readlines() returns a list of lines including \n.</div>
+</div>
+
+<div class="section-block">
+  <h4>Iterating Lines</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"demo.txt"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> line <span class="kw">in</span> f:
+        <span class="fn">print</span>(line.<span class="fn">strip</span>())</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">Line 1
+Line 2</pre>
+  <div class="example-note">Iterating the file object reads one line at a time — memory-efficient for large files.</div>
+</div>
+
+<div class="section-block">
+  <h4>Append Mode ("a")</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="cm"># "w" overwrites — "a" adds to the end without erasing</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"log.txt"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(<span class="st">"First entry\n"</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"log.txt"</span>, <span class="st">"a"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(<span class="st">"Second entry\n"</span>)
+    f.<span class="fn">write</span>(<span class="st">"Third entry\n"</span>)
+
+<span class="fn">print</span>(<span class="fn">open</span>(<span class="st">"log.txt"</span>).<span class="fn">read</span>())</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">First entry
+Second entry
+Third entry</pre>
+  <div class="example-note">"a" (append) keeps existing content and adds new lines at the end. "w" would erase everything first.</div>
+</div>
+`;}
+  },
+  {
+    id:'modules',icon:'📦',title:'Modules & Imports',
+    desc:'import, from...import, aliases, math, random, os, datetime.',
+    content(){return `
+<div class="detail-header">
+  <span class="icon">📦</span>
+  <h2>Modules &amp; Imports</h2>
+  <p>A module is a Python file with reusable code. Python ships with a huge <strong>standard library</strong>. Use <strong>import</strong> to bring modules in.</p>
+</div>
+
+<div class="section-block">
+  <h4>import and from...import</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">import</span> math
+<span class="fn">print</span>(math.<span class="fn">sqrt</span>(<span class="nm">25</span>))
+
+<span class="kw">from</span> math <span class="kw">import</span> pi, factorial
+<span class="fn">print</span>(pi)
+<span class="fn">print</span>(<span class="fn">factorial</span>(<span class="nm">6</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">5.0
+3.141592653589793
+720</pre>
+</div>
+
+<div class="section-block">
+  <h4>Aliases (as)</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">import</span> random <span class="kw">as</span> r
+<span class="fn">print</span>(r.<span class="fn">randint</span>(<span class="nm">1</span>, <span class="nm">10</span>))
+<span class="fn">print</span>(r.<span class="fn">choice</span>([<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>]))
+<span class="fn">print</span>(r.<span class="fn">random</span>())</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">7
+b
+0.4732...</pre>
+  <div class="example-note">Output varies — random values. randint(a, b) returns an int between a and b inclusive.</div>
+</div>
+
+<div class="section-block">
+  <h4>os Module</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">import</span> os
+<span class="fn">print</span>(os.<span class="fn">getcwd</span>())
+<span class="fn">print</span>(os.path.<span class="fn">exists</span>(<span class="st">"demo.txt"</span>))
+<span class="fn">print</span>(os.path.<span class="fn">join</span>(<span class="st">"folder"</span>, <span class="st">"file.txt"</span>))</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">/home/user/project
+True
+folder/file.txt</pre>
+</div>
+
+<div class="section-block">
+  <h4>datetime Module</h4>
+  <div class="code-label">Code</div>
+  <pre class="code"><span class="kw">from</span> datetime <span class="kw">import</span> datetime, date
+<span class="nm">now</span> <span class="op">=</span> datetime.<span class="fn">now</span>()
+<span class="fn">print</span>(now.<span class="fn">strftime</span>(<span class="st">"%d/%m/%Y %H:%M"</span>))
+<span class="fn">print</span>(date.<span class="fn">today</span>())</pre>
+  <div class="out-label">Output</div>
+  <pre class="output">25/07/2026 10:30
+2026-07-25</pre>
+  <div class="example-note">strftime formats a datetime as a string. %d=day, %m=month, %Y=year, %H=hour, %M=minute.</div>
+</div>
+`;}
+  },
+];
+
+// ---- Render grid ----
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=> showDetail(t));
+  grid.appendChild(card);
+});
+
+function showDetail(t){
+  document.getElementById('gridView').style.display = 'none';
+  const dv = document.getElementById('detailView');
+  dv.style.display = 'block';
+  document.getElementById('detailContent').innerHTML = t.content();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showGrid(){
+  document.getElementById('detailView').style.display = 'none';
+  document.getElementById('gridView').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>

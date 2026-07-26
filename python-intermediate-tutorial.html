@@ -1,0 +1,1396 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Intermediate</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
+  --border:#d2d2d7;--border-light:#e8e8ed;
+  --text:#1d1d1f;--text-2:#6e6e73;--text-3:#aeaeb2;
+  --accent:#007aff;--accent-bg:rgba(0,122,255,.08);--accent-dark:#0056cc;
+  --green:#34c759;--green-bg:rgba(52,199,89,.1);
+  --red:#ff3b30;--yellow:#ff9500;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.06);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.12),0 1px 4px rgba(0,0,0,.08);
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;
+  --mono:'SF Mono','Fira Code',Menlo,Consolas,'Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.site-nav{background:rgba(255,255,255,.85);border-bottom:1px solid var(--border-light);padding:0 20px;overflow-x:auto;display:flex;gap:0;scrollbar-width:none;position:sticky;top:0;z-index:100;backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);}
+.site-nav::-webkit-scrollbar{display:none;}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:14px 14px;color:var(--text-2);font-size:13px;font-weight:500;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;position:relative;top:1px;transition:.15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent);}
+.nav-link .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.nav-link.active .dot{background:var(--accent);}
+.nav-link:hover .dot{background:var(--text-2);}
+.site-header{text-align:center;padding:56px 24px 40px;border-bottom:1px solid var(--border-light);background:var(--surface);}
+.site-header .eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;font-weight:600;}
+.site-header h1{font-size:clamp(28px,5vw,48px);color:var(--text);font-weight:700;letter-spacing:-.5px;line-height:1.1;}
+.site-header p{color:var(--text-2);font-size:17px;margin-top:12px;max-width:540px;margin-inline:auto;line-height:1.6;}
+.level-badge{display:inline-block;padding:4px 14px;background:var(--accent-bg);color:var(--accent);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:16px;}
+#gridView{max-width:1100px;margin:0 auto;padding:40px 20px;}
+.grid-intro{text-align:center;margin-bottom:28px;color:var(--text-2);font-size:15px;}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.cards-grid{grid-template-columns:1fr;gap:12px;}}
+.topic-card{background:var(--surface);border:1px solid var(--border-light);border-radius:var(--radius);padding:22px 20px;cursor:pointer;transition:all .2s ease;}
+.topic-card:hover{border-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}
+.topic-card .icon{font-size:28px;margin-bottom:12px;display:block;}
+.topic-card h3{font-size:15px;color:var(--text);font-weight:600;margin-bottom:6px;}
+.topic-card p{font-size:12.5px;color:var(--text-2);line-height:1.55;}
+.topic-card .open-hint{font-size:12px;color:var(--accent);margin-top:12px;font-weight:500;}
+#detailView{display:none;max-width:860px;margin:0 auto;padding:32px 20px 80px;}
+.detail-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;margin-bottom:28px;font-family:var(--sans);transition:.15s;}
+.detail-back:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg);}
+.detail-header{margin-bottom:30px;padding-bottom:24px;border-bottom:1px solid var(--border-light);}
+.detail-header .icon{font-size:32px;margin-bottom:10px;display:block;}
+.detail-header h2{font-size:clamp(22px,4vw,30px);color:var(--text);font-weight:700;margin-bottom:8px;letter-spacing:-.3px;}
+.detail-header p{color:var(--text-2);font-size:15px;line-height:1.65;max-width:640px;}
+.section-block{margin-bottom:36px;}
+.section-block h4{font-size:15px;color:var(--text);font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);}
+.section-block .desc{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:14px;}
+pre{border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.7;margin-bottom:8px;font-family:var(--mono);}
+pre.code{background:#1c1c1e;border-left:3px solid var(--accent);color:#e5e5ea;}
+pre.output{background:var(--green-bg);border-left:3px solid var(--green);color:#1c4a2a;}
+.out-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:4px;margin-top:-4px;font-weight:600;}
+.code-label{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:600;}
+.example-note{font-size:13px;color:var(--text-2);line-height:1.65;margin-top:8px;margin-bottom:18px;padding:10px 14px;background:var(--surface-2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);}
+.kw{color:#fc8bde;}.st{color:#a8ff78;}.cm{color:#636366;font-style:italic;}
+.fn{color:#79c0ff;}.nm{color:#ffa657;}.op{color:#ff9f0a;}.bi{color:#f2a365;}.dec{color:#e8d5b0;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+@media(max-width:600px){
+  .site-header{padding:36px 16px 28px;}
+  .site-header h1{font-size:26px;}
+  .site-header p{font-size:15px;}
+  #gridView{padding:20px 14px;}
+  #detailView{padding:20px 14px 60px;}
+  .nav-link{padding:11px 11px;font-size:12px;}
+  pre{font-size:12px;padding:12px 14px;}
+  .topic-card{padding:18px 16px;}
+}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="nav-link" href="python-basics-tutorial.html"><span class="dot"></span>Basics</a>
+  <a class="nav-link active" href="python-intermediate-tutorial.html"><span class="dot"></span>Intermediate</a>
+  <a class="nav-link" href="python-advanced-tutorial.html"><span class="dot"></span>Advanced</a>
+  <a class="nav-link" href="python-aiml-tutorial.html"><span class="dot"></span>AI / ML</a>
+  <a class="nav-link" href="python-automation-tutorial.html"><span class="dot"></span>Automation</a>
+  <a class="nav-link" href="python-web-tutorial.html"><span class="dot"></span>Web</a>
+  <a class="nav-link" href="python-aws-tutorial.html"><span class="dot"></span>AWS</a>
+  <a class="nav-link" href="python-devops-toolkit.html"><span class="dot"></span>DevOps Toolkit</a>
+  <a class="nav-link" href="python-linux-bash.html"><span class="dot"></span>Linux & Bash</a>
+</nav>
+
+
+<div class="site-header">
+  <div class="level-badge">Level 2</div>
+  <div class="eyebrow">Tutorial</div>
+  <h1>Python Intermediate</h1>
+  <p>OOP, decorators, generators, regex, type hints, and the Python standard library — the concepts that make real-world Python code clean and powerful.</p>
+</div>
+
+<div id="gridView">
+  <p class="grid-intro">Click any card to open the full lesson with examples and output.</p>
+  <div class="cards-grid" id="cardsGrid"></div>
+</div>
+
+<div id="detailView">
+  <button class="detail-back" onclick="showGrid()">← Back to Topics</button>
+  <div id="detailContent"></div>
+</div>
+
+<script>
+const topics = [
+  {
+    id:'classes',icon:'🏗️',title:'Classes & Objects',
+    desc:'Define classes, create objects, __init__, instance vs class attributes.',
+    content(){return `
+<div class="detail-header"><span class="icon">🏗️</span>
+<h2>Classes &amp; Objects</h2>
+<p>A class is a blueprint for creating objects. Objects are instances of a class with their own data (attributes) and behaviour (methods).</p></div>
+
+<div class="section-block"><h4>Defining a Class</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Dog</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, name, breed):
+        <span class="nm">self</span>.name <span class="op">=</span> name
+        <span class="nm">self</span>.breed <span class="op">=</span> breed
+
+    <span class="kw">def</span> <span class="fn">bark</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"</span><span class="nm">{self.name}</span><span class="st"> says Woof!"</span>
+
+d <span class="op">=</span> <span class="bi">Dog</span>(<span class="st">"Bruno"</span>, <span class="st">"Lab"</span>)
+<span class="fn">print</span>(d.name)
+<span class="fn">print</span>(d.<span class="fn">bark</span>())</pre>
+<div class="out-label">Output</div><pre class="output">Bruno
+Bruno says Woof!</pre>
+<div class="example-note">__init__ is the constructor — called automatically when you create an instance. self refers to the instance itself.</div></div>
+
+<div class="section-block"><h4>Class vs Instance Attributes</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Counter</span>:
+    count <span class="op">=</span> <span class="nm">0</span>  <span class="cm"># class attribute (shared)</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, label):
+        <span class="nm">self</span>.label <span class="op">=</span> label  <span class="cm"># instance attribute</span>
+        <span class="bi">Counter</span>.count <span class="op">+=</span> <span class="nm">1</span>
+
+a <span class="op">=</span> <span class="bi">Counter</span>(<span class="st">"A"</span>)
+b <span class="op">=</span> <span class="bi">Counter</span>(<span class="st">"B"</span>)
+<span class="fn">print</span>(<span class="bi">Counter</span>.count)
+<span class="fn">print</span>(a.label, b.label)</pre>
+<div class="out-label">Output</div><pre class="output">2
+A B</pre></div>
+
+<div class="section-block"><h4>Methods: instance, class, static</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Temp</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, celsius):
+        <span class="nm">self</span>.celsius <span class="op">=</span> celsius
+
+    <span class="kw">def</span> <span class="fn">to_f</span>(<span class="nm">self</span>):          <span class="cm"># instance method</span>
+        <span class="kw">return</span> <span class="nm">self</span>.celsius <span class="op">*</span> <span class="nm">9</span><span class="op">/</span><span class="nm">5</span> <span class="op">+</span> <span class="nm">32</span>
+
+    <span class="dec">@classmethod</span>
+    <span class="kw">def</span> <span class="fn">from_f</span>(<span class="bi">cls</span>, f):     <span class="cm"># class method</span>
+        <span class="kw">return</span> <span class="bi">cls</span>((f <span class="op">-</span> <span class="nm">32</span>) <span class="op">*</span> <span class="nm">5</span><span class="op">/</span><span class="nm">9</span>)
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">boiling</span>():           <span class="cm"># static method</span>
+        <span class="kw">return</span> <span class="nm">100</span>
+
+t <span class="op">=</span> <span class="bi">Temp</span>(<span class="nm">100</span>)
+<span class="fn">print</span>(t.<span class="fn">to_f</span>())
+<span class="fn">print</span>(<span class="bi">Temp</span>.<span class="fn">from_f</span>(<span class="nm">212</span>).celsius)
+<span class="fn">print</span>(<span class="bi">Temp</span>.<span class="fn">boiling</span>())</pre>
+<div class="out-label">Output</div><pre class="output">212.0
+100.0
+100</pre>
+<div class="example-note">@classmethod receives the class (cls). @staticmethod receives nothing — it's just a function namespaced in the class.</div></div>
+`;}
+  },
+  {
+    id:'inheritance',icon:'🧬',title:'Inheritance & Polymorphism',
+    desc:'Subclasses, super(), method overriding, and duck typing.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧬</span>
+<h2>Inheritance &amp; Polymorphism</h2>
+<p>Inheritance lets a child class reuse and extend a parent class. Polymorphism means different objects can respond to the same method call in different ways.</p></div>
+
+<div class="section-block"><h4>Basic Inheritance</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Animal</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, name):
+        <span class="nm">self</span>.name <span class="op">=</span> name
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">"..."</span>
+
+<span class="kw">class</span> <span class="bi">Cat</span>(<span class="bi">Animal</span>):
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"</span><span class="nm">{self.name}</span><span class="st"> says Meow"</span>
+
+<span class="kw">class</span> <span class="bi">Dog</span>(<span class="bi">Animal</span>):
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"</span><span class="nm">{self.name}</span><span class="st"> says Woof"</span>
+
+<span class="kw">for</span> animal <span class="kw">in</span> [<span class="bi">Cat</span>(<span class="st">"Mimi"</span>), <span class="bi">Dog</span>(<span class="st">"Rex"</span>)]:
+    <span class="fn">print</span>(animal.<span class="fn">speak</span>())</pre>
+<div class="out-label">Output</div><pre class="output">Mimi says Meow
+Rex says Woof</pre>
+<div class="example-note">Both Cat and Dog inherit from Animal. Each overrides speak() with its own behaviour — that IS polymorphism.</div></div>
+
+<div class="section-block"><h4>Polymorphism</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Same function works on any object that has area()</span>
+<span class="kw">class</span> <span class="bi">Circle</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, r): <span class="nm">self</span>.r <span class="op">=</span> r
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="nm">self</span>):
+        <span class="kw">import</span> math; <span class="kw">return</span> <span class="fn">round</span>(math.pi <span class="op">*</span> <span class="nm">self</span>.r<span class="op">**</span><span class="nm">2</span>, <span class="nm">2</span>)
+
+<span class="kw">class</span> <span class="bi">Rectangle</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, w, h): <span class="nm">self</span>.w <span class="op">=</span> w; <span class="nm">self</span>.h <span class="op">=</span> h
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="nm">self</span>.w <span class="op">*</span> <span class="nm">self</span>.h
+
+<span class="kw">class</span> <span class="bi">Triangle</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, b, h): <span class="nm">self</span>.b <span class="op">=</span> b; <span class="nm">self</span>.h <span class="op">=</span> h
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="nm">0.5</span> <span class="op">*</span> <span class="nm">self</span>.b <span class="op">*</span> <span class="nm">self</span>.h
+
+<span class="kw">def</span> <span class="fn">print_area</span>(shape):
+    <span class="fn">print</span>(<span class="st">f"{shape.__class__.__name__}: area = {shape.area()}"</span>)
+
+shapes <span class="op">=</span> [<span class="bi">Circle</span>(<span class="nm">5</span>), <span class="bi">Rectangle</span>(<span class="nm">4</span>, <span class="nm">6</span>), <span class="bi">Triangle</span>(<span class="nm">3</span>, <span class="nm">8</span>)]
+<span class="kw">for</span> s <span class="kw">in</span> shapes:
+    <span class="fn">print_area</span>(s)</pre>
+<div class="out-label">Output</div><pre class="output">Circle: area = 78.54
+Rectangle: area = 24
+Triangle: area = 12.0</pre>
+<div class="example-note">print_area() doesn't care what type of shape it receives — as long as it has area(), it works. This is polymorphism: one interface, many forms.</div></div>
+
+<div class="section-block"><h4>Duck Typing</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># Python doesn't require a shared base class — just the right method</span>
+<span class="kw">class</span> <span class="bi">Dog</span>:
+    <span class="kw">def</span> <span class="fn">sound</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="st">"Woof"</span>
+
+<span class="kw">class</span> <span class="bi">Car</span>:
+    <span class="kw">def</span> <span class="fn">sound</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="st">"Vroom"</span>
+
+<span class="kw">class</span> <span class="bi">Bell</span>:
+    <span class="kw">def</span> <span class="fn">sound</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="st">"Ding"</span>
+
+<span class="kw">for</span> obj <span class="kw">in</span> [<span class="bi">Dog</span>(), <span class="bi">Car</span>(), <span class="bi">Bell</span>()]:
+    <span class="fn">print</span>(obj.<span class="fn">sound</span>())</pre>
+<div class="out-label">Output</div><pre class="output">Woof
+Vroom
+Ding</pre>
+<div class="example-note">"If it walks like a duck and quacks like a duck, it's a duck." No inheritance needed — just the right method name.</div></div>
+
+<div class="section-block"><h4>super()</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Vehicle</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, brand):
+        <span class="nm">self</span>.brand <span class="op">=</span> brand
+
+<span class="kw">class</span> <span class="bi">Car</span>(<span class="bi">Vehicle</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, brand, model):
+        <span class="fn">super</span>().<span class="fn">__init__</span>(brand)
+        <span class="nm">self</span>.model <span class="op">=</span> model
+    <span class="kw">def</span> <span class="fn">info</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"</span><span class="nm">{self.brand}</span><span class="st"> </span><span class="nm">{self.model}</span><span class="st">"</span>
+
+c <span class="op">=</span> <span class="bi">Car</span>(<span class="st">"Toyota"</span>, <span class="st">"Camry"</span>)
+<span class="fn">print</span>(c.<span class="fn">info</span>())
+<span class="fn">print</span>(<span class="fn">isinstance</span>(c, <span class="bi">Vehicle</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Toyota Camry
+True</pre>
+<div class="example-note">super().__init__() calls the parent constructor so you don't repeat parent setup code.</div></div>
+
+<div class="section-block"><h4>Multiple Inheritance</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Flyable</span>:
+    <span class="kw">def</span> <span class="fn">fly</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="st">"I can fly"</span>
+
+<span class="kw">class</span> <span class="bi">Swimmable</span>:
+    <span class="kw">def</span> <span class="fn">swim</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="st">"I can swim"</span>
+
+<span class="kw">class</span> <span class="bi">Duck</span>(<span class="bi">Flyable</span>, <span class="bi">Swimmable</span>):
+    <span class="kw">pass</span>
+
+d <span class="op">=</span> <span class="bi">Duck</span>()
+<span class="fn">print</span>(d.<span class="fn">fly</span>())
+<span class="fn">print</span>(d.<span class="fn">swim</span>())</pre>
+<div class="out-label">Output</div><pre class="output">I can fly
+I can swim</pre></div>
+`;}
+  },
+  {
+    id:'dunder',icon:'✨',title:'Magic / Dunder Methods',
+    desc:'__str__, __repr__, __len__, __eq__, __add__, __getitem__ and more.',
+    content(){return `
+<div class="detail-header"><span class="icon">✨</span>
+<h2>Magic / Dunder Methods</h2>
+<p>Dunder (double-underscore) methods let your classes work with Python's built-in operations like <code>+</code>, <code>len()</code>, <code>print()</code>, and <code>[]</code>.</p></div>
+
+<div class="section-block"><h4>__str__ and __repr__</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Point</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, x, y):
+        <span class="nm">self</span>.x <span class="op">=</span> x; <span class="nm">self</span>.y <span class="op">=</span> y
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"Point(</span><span class="nm">{self.x}</span><span class="st">, </span><span class="nm">{self.y}</span><span class="st">)"</span>
+    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"Point(x=</span><span class="nm">{self.x}</span><span class="st">, y=</span><span class="nm">{self.y}</span><span class="st">)"</span>
+
+p <span class="op">=</span> <span class="bi">Point</span>(<span class="nm">3</span>, <span class="nm">4</span>)
+<span class="fn">print</span>(p)
+<span class="fn">print</span>(<span class="fn">repr</span>(p))</pre>
+<div class="out-label">Output</div><pre class="output">Point(3, 4)
+Point(x=3, y=4)</pre>
+<div class="example-note">__str__ is for human-readable output (used by print). __repr__ is for developer/debug output.</div></div>
+
+<div class="section-block"><h4>__len__, __add__, __eq__</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Vector</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, x, y):
+        <span class="nm">self</span>.x <span class="op">=</span> x; <span class="nm">self</span>.y <span class="op">=</span> y
+    <span class="kw">def</span> <span class="fn">__add__</span>(<span class="nm">self</span>, other):
+        <span class="kw">return</span> <span class="bi">Vector</span>(<span class="nm">self</span>.x <span class="op">+</span> other.x, <span class="nm">self</span>.y <span class="op">+</span> other.y)
+    <span class="kw">def</span> <span class="fn">__eq__</span>(<span class="nm">self</span>, other):
+        <span class="kw">return</span> <span class="nm">self</span>.x <span class="op">==</span> other.x <span class="kw">and</span> <span class="nm">self</span>.y <span class="op">==</span> other.y
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="st">f"({self.x}, {self.y})"</span>
+
+v1 <span class="op">=</span> <span class="bi">Vector</span>(<span class="nm">1</span>, <span class="nm">2</span>); v2 <span class="op">=</span> <span class="bi">Vector</span>(<span class="nm">3</span>, <span class="nm">4</span>)
+<span class="fn">print</span>(v1 <span class="op">+</span> v2)
+<span class="fn">print</span>(v1 <span class="op">==</span> <span class="bi">Vector</span>(<span class="nm">1</span>, <span class="nm">2</span>))</pre>
+<div class="out-label">Output</div><pre class="output">(4, 6)
+True</pre></div>
+
+<div class="section-block"><h4>__getitem__ and __len__</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Shelf</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>):
+        <span class="nm">self</span>.books <span class="op">=</span> []
+    <span class="kw">def</span> <span class="fn">add</span>(<span class="nm">self</span>, book):
+        <span class="nm">self</span>.books.<span class="fn">append</span>(book)
+    <span class="kw">def</span> <span class="fn">__len__</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="fn">len</span>(<span class="nm">self</span>.books)
+    <span class="kw">def</span> <span class="fn">__getitem__</span>(<span class="nm">self</span>, idx):
+        <span class="kw">return</span> <span class="nm">self</span>.books[idx]
+
+s <span class="op">=</span> <span class="bi">Shelf</span>()
+s.<span class="fn">add</span>(<span class="st">"Dune"</span>); s.<span class="fn">add</span>(<span class="st">"1984"</span>)
+<span class="fn">print</span>(<span class="fn">len</span>(s))
+<span class="fn">print</span>(s[<span class="nm">0</span>])</pre>
+<div class="out-label">Output</div><pre class="output">2
+Dune</pre></div>
+`;}
+  },
+  {
+    id:'decorators',icon:'🎀',title:'Decorators',
+    desc:'Function decorators, stacking decorators, functools.wraps, class decorators.',
+    content(){return `
+<div class="detail-header"><span class="icon">🎀</span>
+<h2>Decorators</h2>
+<p>A decorator is a function that wraps another function to add behaviour before/after it runs — without changing its source code. Written with <code>@decorator_name</code>.</p></div>
+
+<div class="section-block"><h4>Basic Decorator</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">shout</span>(func):
+    <span class="kw">def</span> <span class="fn">wrapper</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs):
+        result <span class="op">=</span> <span class="fn">func</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs)
+        <span class="kw">return</span> result.<span class="fn">upper</span>()
+    <span class="kw">return</span> wrapper
+
+<span class="dec">@shout</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="kw">return</span> <span class="st">f"hello, </span><span class="nm">{name}</span><span class="st">"</span>
+
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="st">"ravi"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">HELLO, RAVI</pre>
+<div class="example-note">@shout is syntactic sugar for greet = shout(greet). The wrapper intercepts the call.</div></div>
+
+<div class="section-block"><h4>Timing Decorator with functools.wraps</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> time
+<span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+<span class="kw">def</span> <span class="fn">timer</span>(func):
+    <span class="dec">@wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs):
+        start <span class="op">=</span> time.<span class="fn">time</span>()
+        result <span class="op">=</span> <span class="fn">func</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs)
+        end <span class="op">=</span> time.<span class="fn">time</span>()
+        <span class="fn">print</span>(<span class="st">f"{func.__name__} took {end-start:.4f}s"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">return</span> wrapper
+
+<span class="dec">@timer</span>
+<span class="kw">def</span> <span class="fn">slow</span>():
+    time.<span class="fn">sleep</span>(<span class="nm">0.1</span>)
+    <span class="kw">return</span> <span class="st">"done"</span>
+
+<span class="fn">print</span>(<span class="fn">slow</span>())</pre>
+<div class="out-label">Output</div><pre class="output">slow took 0.1001s
+done</pre>
+<div class="example-note">@wraps preserves the original function's __name__ and __doc__ so introspection still works.</div></div>
+
+<div class="section-block"><h4>Decorator with Arguments</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">repeat</span>(n):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="kw">def</span> <span class="fn">wrapper</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs):
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n):
+                func(<span class="op">*</span>args, <span class="op">**</span>kwargs)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="dec">@repeat</span>(<span class="nm">3</span>)
+<span class="kw">def</span> <span class="fn">hi</span>():
+    <span class="fn">print</span>(<span class="st">"Hello!"</span>)
+
+<span class="fn">hi</span>()</pre>
+<div class="out-label">Output</div><pre class="output">Hello!
+Hello!
+Hello!</pre></div>
+
+<div class="section-block"><h4>Stacking Decorators</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">bold</span>(func):
+    <span class="kw">def</span> <span class="fn">wrapper</span>(<span class="op">*</span>a, <span class="op">**</span>kw): <span class="kw">return</span> <span class="st">"**"</span> <span class="op">+</span> <span class="fn">func</span>(<span class="op">*</span>a, <span class="op">**</span>kw) <span class="op">+</span> <span class="st">"**"</span>
+    <span class="kw">return</span> wrapper
+
+<span class="kw">def</span> <span class="fn">italic</span>(func):
+    <span class="kw">def</span> <span class="fn">wrapper</span>(<span class="op">*</span>a, <span class="op">**</span>kw): <span class="kw">return</span> <span class="st">"_"</span> <span class="op">+</span> <span class="fn">func</span>(<span class="op">*</span>a, <span class="op">**</span>kw) <span class="op">+</span> <span class="st">"_"</span>
+    <span class="kw">return</span> wrapper
+
+<span class="dec">@bold</span>
+<span class="dec">@italic</span>
+<span class="kw">def</span> <span class="fn">text</span>(): <span class="kw">return</span> <span class="st">"hello"</span>
+
+<span class="fn">print</span>(<span class="fn">text</span>())</pre>
+<div class="out-label">Output</div><pre class="output">**_hello_**</pre>
+<div class="example-note">Decorators stack bottom-up: italic wraps text first, then bold wraps the result. @bold @italic text = bold(italic(text)).</div></div>
+`;}
+  },
+  {
+    id:'generators',icon:'⚙️',title:'Iterators & Generators',
+    desc:'__iter__, __next__, yield, generator expressions, and send().',
+    content(){return `
+<div class="detail-header"><span class="icon">⚙️</span>
+<h2>Iterators &amp; Generators</h2>
+<p>An iterator produces values one at a time. A generator is a function that uses <strong>yield</strong> to produce values lazily — only computing the next value when asked.</p></div>
+
+<div class="section-block"><h4>Custom Iterator</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">CountUp</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, limit):
+        <span class="nm">self</span>.limit <span class="op">=</span> limit
+        <span class="nm">self</span>.current <span class="op">=</span> <span class="nm">0</span>
+    <span class="kw">def</span> <span class="fn">__iter__</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="nm">self</span>
+    <span class="kw">def</span> <span class="fn">__next__</span>(<span class="nm">self</span>):
+        <span class="kw">if</span> <span class="nm">self</span>.current <span class="op">&gt;=</span> <span class="nm">self</span>.limit:
+            <span class="kw">raise</span> <span class="bi">StopIteration</span>
+        <span class="nm">self</span>.current <span class="op">+=</span> <span class="nm">1</span>
+        <span class="kw">return</span> <span class="nm">self</span>.current
+
+<span class="kw">for</span> n <span class="kw">in</span> <span class="bi">CountUp</span>(<span class="nm">4</span>):
+    <span class="fn">print</span>(n, end<span class="op">=</span><span class="st">" "</span>)</pre>
+<div class="out-label">Output</div><pre class="output">1 2 3 4 </pre></div>
+
+<div class="section-block"><h4>Generator Function (yield)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">fibonacci</span>(n):
+    a, b <span class="op">=</span> <span class="nm">0</span>, <span class="nm">1</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">yield</span> a
+        a, b <span class="op">=</span> b, a <span class="op">+</span> b
+
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">fibonacci</span>(<span class="nm">8</span>)))</pre>
+<div class="out-label">Output</div><pre class="output">[0, 1, 1, 2, 3, 5, 8, 13]</pre>
+<div class="example-note">yield pauses the function and returns a value. Next call resumes from where it left off — very memory efficient.</div></div>
+
+<div class="section-block"><h4>Generator Expression</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="cm"># List comprehension — creates all at once (memory: all)</span>
+sq_list <span class="op">=</span> [x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)]
+<span class="cm"># Generator expression — lazy (memory: one at a time)</span>
+sq_gen <span class="op">=</span> (x<span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(sq_gen))
+<span class="fn">print</span>(<span class="fn">sum</span>(sq_gen))     <span class="cm"># consume it</span>
+<span class="fn">print</span>(<span class="fn">next</span>(sq_gen) <span class="kw">if</span> <span class="kw">False</span> <span class="kw">else</span> <span class="st">"exhausted"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">&lt;class 'generator'&gt;
+30
+exhausted</pre></div>
+
+<div class="section-block"><h4>Generator send()</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">accumulator</span>():
+    total <span class="op">=</span> <span class="nm">0</span>
+    <span class="kw">while</span> <span class="kw">True</span>:
+        value <span class="op">=</span> <span class="kw">yield</span> total   <span class="cm"># yield sends total out, receives next value</span>
+        <span class="kw">if</span> value <span class="kw">is</span> <span class="kw">None</span>: <span class="kw">break</span>
+        total <span class="op">+=</span> value
+
+gen <span class="op">=</span> <span class="fn">accumulator</span>()
+<span class="fn">next</span>(gen)           <span class="cm"># prime the generator</span>
+<span class="fn">print</span>(gen.<span class="fn">send</span>(<span class="nm">10</span>))
+<span class="fn">print</span>(gen.<span class="fn">send</span>(<span class="nm">20</span>))
+<span class="fn">print</span>(gen.<span class="fn">send</span>(<span class="nm">5</span>))</pre>
+<div class="out-label">Output</div><pre class="output">10
+30
+35</pre>
+<div class="example-note">send(value) resumes the generator AND passes a value back in. The generator must be primed with next() first.</div></div>
+`;}
+  },
+  {
+    id:'closures',icon:'🔐',title:'Closures & Scope',
+    desc:'LEGB rule, nonlocal, closures, and factory functions.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔐</span>
+<h2>Closures &amp; Scope</h2>
+<p>Python resolves names using the <strong>LEGB</strong> rule: Local → Enclosing → Global → Built-in. A closure is a function that remembers variables from its enclosing scope even after that scope has finished.</p></div>
+
+<div class="section-block"><h4>LEGB Scope</h4>
+<div class="code-label">Code</div>
+<pre class="code">x <span class="op">=</span> <span class="st">"global"</span>
+
+<span class="kw">def</span> <span class="fn">outer</span>():
+    x <span class="op">=</span> <span class="st">"enclosing"</span>
+    <span class="kw">def</span> <span class="fn">inner</span>():
+        x <span class="op">=</span> <span class="st">"local"</span>
+        <span class="fn">print</span>(x)
+    <span class="fn">inner</span>()
+    <span class="fn">print</span>(x)
+
+<span class="fn">outer</span>()
+<span class="fn">print</span>(x)</pre>
+<div class="out-label">Output</div><pre class="output">local
+enclosing
+global</pre></div>
+
+<div class="section-block"><h4>Closure — Factory Function</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">make_multiplier</span>(n):
+    <span class="kw">def</span> <span class="fn">multiply</span>(x):
+        <span class="kw">return</span> x <span class="op">*</span> n   <span class="cm"># n is captured from enclosing scope</span>
+    <span class="kw">return</span> multiply
+
+double <span class="op">=</span> <span class="fn">make_multiplier</span>(<span class="nm">2</span>)
+triple <span class="op">=</span> <span class="fn">make_multiplier</span>(<span class="nm">3</span>)
+<span class="fn">print</span>(<span class="fn">double</span>(<span class="nm">5</span>))
+<span class="fn">print</span>(<span class="fn">triple</span>(<span class="nm">5</span>))</pre>
+<div class="out-label">Output</div><pre class="output">10
+15</pre>
+<div class="example-note">multiply "closes over" n — it remembers the value of n even after make_multiplier returns.</div></div>
+
+<div class="section-block"><h4>nonlocal keyword</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">make_counter</span>():
+    count <span class="op">=</span> <span class="nm">0</span>
+    <span class="kw">def</span> <span class="fn">increment</span>():
+        <span class="kw">nonlocal</span> count
+        count <span class="op">+=</span> <span class="nm">1</span>
+        <span class="kw">return</span> count
+    <span class="kw">return</span> increment
+
+c <span class="op">=</span> <span class="fn">make_counter</span>()
+<span class="fn">print</span>(<span class="fn">c</span>(), <span class="fn">c</span>(), <span class="fn">c</span>())</pre>
+<div class="out-label">Output</div><pre class="output">1 2 3</pre>
+<div class="example-note">nonlocal lets you modify an enclosing scope's variable (not just read it).</div></div>
+`;}
+  },
+  {
+    id:'context',icon:'🧹',title:'Context Managers',
+    desc:'with statement, __enter__/__exit__, contextlib.contextmanager.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧹</span>
+<h2>Context Managers</h2>
+<p>Context managers run setup and teardown code around a block. The <strong>with</strong> statement calls <code>__enter__</code> at the start and <code>__exit__</code> at the end — even if an exception occurs.</p></div>
+
+<div class="section-block"><h4>Custom Context Manager Class</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Timer</span>:
+    <span class="kw">import</span> time
+    <span class="kw">def</span> <span class="fn">__enter__</span>(<span class="nm">self</span>):
+        <span class="kw">import</span> time
+        <span class="nm">self</span>.start <span class="op">=</span> time.<span class="fn">time</span>()
+        <span class="kw">return</span> <span class="nm">self</span>
+    <span class="kw">def</span> <span class="fn">__exit__</span>(<span class="nm">self</span>, <span class="op">*</span>args):
+        <span class="kw">import</span> time
+        <span class="nm">self</span>.elapsed <span class="op">=</span> time.<span class="fn">time</span>() <span class="op">-</span> <span class="nm">self</span>.start
+        <span class="fn">print</span>(<span class="st">f"Elapsed: {self.elapsed:.4f}s"</span>)
+
+<span class="kw">with</span> <span class="bi">Timer</span>():
+    total <span class="op">=</span> <span class="fn">sum</span>(<span class="fn">range</span>(<span class="nm">1000000</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Elapsed: 0.0312s</pre></div>
+
+<div class="section-block"><h4>contextlib.contextmanager</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+
+<span class="dec">@contextmanager</span>
+<span class="kw">def</span> <span class="fn">managed_resource</span>(name):
+    <span class="fn">print</span>(<span class="st">f"Opening {name}"</span>)
+    <span class="kw">yield</span> name.<span class="fn">upper</span>()
+    <span class="fn">print</span>(<span class="st">f"Closing {name}"</span>)
+
+<span class="kw">with</span> <span class="fn">managed_resource</span>(<span class="st">"database"</span>) <span class="kw">as</span> res:
+    <span class="fn">print</span>(<span class="st">f"Using {res}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Opening database
+Using DATABASE
+Closing database</pre>
+<div class="example-note">Code before yield is __enter__; code after yield is __exit__. Much simpler than a full class.</div></div>
+`;}
+  },
+  {
+    id:'regex',icon:'🔍',title:'Regular Expressions',
+    desc:'re module: search, match, findall, sub, groups, and common patterns.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔍</span>
+<h2>Regular Expressions</h2>
+<p>Regular expressions (regex) are patterns for matching and manipulating text. Python's <strong>re</strong> module provides full regex support.</p></div>
+
+<div class="section-block"><h4>search and match</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+text <span class="op">=</span> <span class="st">"My phone is 9876543210"</span>
+m <span class="op">=</span> re.<span class="fn">search</span>(<span class="st">r'\d{10}'</span>, text)
+<span class="kw">if</span> m:
+    <span class="fn">print</span>(<span class="st">"Found:"</span>, m.<span class="fn">group</span>())
+    <span class="fn">print</span>(<span class="st">"At position:"</span>, m.<span class="fn">start</span>())</pre>
+<div class="out-label">Output</div><pre class="output">Found: 9876543210
+At position: 12</pre></div>
+
+<div class="section-block"><h4>findall and sub</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+text <span class="op">=</span> <span class="st">"Apples: 5, Bananas: 12, Grapes: 7"</span>
+numbers <span class="op">=</span> re.<span class="fn">findall</span>(<span class="st">r'\d+'</span>, text)
+<span class="fn">print</span>(numbers)
+
+cleaned <span class="op">=</span> re.<span class="fn">sub</span>(<span class="st">r'\d+'</span>, <span class="st">'#'</span>, text)
+<span class="fn">print</span>(cleaned)</pre>
+<div class="out-label">Output</div><pre class="output">['5', '12', '7']
+Apples: #, Bananas: #, Grapes: #</pre></div>
+
+<div class="section-block"><h4>Groups and Named Groups</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+
+email <span class="op">=</span> <span class="st">"user@example.com"</span>
+m <span class="op">=</span> re.<span class="fn">match</span>(<span class="st">r'(?P&lt;user&gt;\w+)@(?P&lt;domain&gt;[\w.]+)'</span>, email)
+<span class="kw">if</span> m:
+    <span class="fn">print</span>(m.<span class="fn">group</span>(<span class="st">'user'</span>))
+    <span class="fn">print</span>(m.<span class="fn">group</span>(<span class="st">'domain'</span>))</pre>
+<div class="out-label">Output</div><pre class="output">user
+example.com</pre></div>
+
+<div class="section-block"><h4>Common Patterns</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> re
+tests <span class="op">=</span> [
+    (<span class="st">r'^\d+$'</span>,       <span class="st">"12345"</span>,        <span class="st">"digits only"</span>),
+    (<span class="st">r'^[a-zA-Z]+$'</span>, <span class="st">"Hello"</span>,        <span class="st">"letters only"</span>),
+    (<span class="st">r'^\S+@\S+\.\S+'</span>,<span class="st">"a@b.com"</span>,     <span class="st">"email"</span>),
+]
+<span class="kw">for</span> pat, val, label <span class="kw">in</span> tests:
+    ok <span class="op">=</span> <span class="st">"✓"</span> <span class="kw">if</span> re.<span class="fn">match</span>(pat, val) <span class="kw">else</span> <span class="st">"✗"</span>
+    <span class="fn">print</span>(<span class="st">f"{ok} {label}: {val}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">✓ digits only: 12345
+✓ letters only: Hello
+✓ email: a@b.com</pre></div>
+`;}
+  },
+  {
+    id:'typehints',icon:'🏷️',title:'Type Hints & Annotations',
+    desc:'Function annotations, variable hints, Optional, Union, List, Dict, typing module.',
+    content(){return `
+<div class="detail-header"><span class="icon">🏷️</span>
+<h2>Type Hints &amp; Annotations</h2>
+<p>Type hints (Python 3.5+) let you annotate variables and function signatures with expected types. They don't enforce types at runtime but improve readability and enable static analysis tools like mypy.</p></div>
+
+<div class="section-block"><h4>Function Annotations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">add</span>(a: <span class="bi">int</span>, b: <span class="bi">int</span>) <span class="op">-&gt;</span> <span class="bi">int</span>:
+    <span class="kw">return</span> a <span class="op">+</span> b
+
+<span class="kw">def</span> <span class="fn">greet</span>(name: <span class="bi">str</span>, loud: <span class="bi">bool</span> <span class="op">=</span> <span class="kw">False</span>) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    msg <span class="op">=</span> <span class="st">f"Hello, {name}"</span>
+    <span class="kw">return</span> msg.<span class="fn">upper</span>() <span class="kw">if</span> loud <span class="kw">else</span> msg
+
+<span class="fn">print</span>(<span class="fn">add</span>(<span class="nm">3</span>, <span class="nm">4</span>))
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="st">"Ravi"</span>, loud<span class="op">=</span><span class="kw">True</span>))</pre>
+<div class="out-label">Output</div><pre class="output">7
+HELLO, RAVI</pre></div>
+
+<div class="section-block"><h4>typing module</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> typing <span class="kw">import</span> List, Dict, Optional, Union, Tuple
+
+<span class="kw">def</span> <span class="fn">process</span>(names: List[<span class="bi">str</span>]) <span class="op">-&gt;</span> Dict[<span class="bi">str</span>, <span class="bi">int</span>]:
+    <span class="kw">return</span> {name: <span class="fn">len</span>(name) <span class="kw">for</span> name <span class="kw">in</span> names}
+
+<span class="kw">def</span> <span class="fn">find</span>(val: Optional[<span class="bi">str</span>] <span class="op">=</span> <span class="kw">None</span>) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    <span class="kw">return</span> val <span class="kw">if</span> val <span class="kw">else</span> <span class="st">"not found"</span>
+
+<span class="fn">print</span>(<span class="fn">process</span>([<span class="st">"Ana"</span>, <span class="st">"Bob"</span>]))
+<span class="fn">print</span>(<span class="fn">find</span>())
+<span class="fn">print</span>(<span class="fn">find</span>(<span class="st">"hello"</span>))</pre>
+<div class="out-label">Output</div><pre class="output">{'Ana': 3, 'Bob': 3}
+not found
+hello</pre></div>
+
+<div class="section-block"><h4>Union, Tuple &amp; Variable Hints</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> typing <span class="kw">import</span> Union, Tuple
+
+<span class="kw">def</span> <span class="fn">stringify</span>(val: Union[<span class="bi">int</span>, <span class="bi">float</span>, <span class="bi">str</span>]) <span class="op">-&gt;</span> <span class="bi">str</span>:
+    <span class="kw">return</span> <span class="bi">str</span>(val)
+
+<span class="kw">def</span> <span class="fn">divmod_typed</span>(a: <span class="bi">int</span>, b: <span class="bi">int</span>) <span class="op">-&gt;</span> Tuple[<span class="bi">int</span>, <span class="bi">int</span>]:
+    <span class="kw">return</span> a <span class="op">//</span> b, a <span class="op">%</span> b
+
+<span class="cm"># Variable annotations</span>
+name: <span class="bi">str</span> <span class="op">=</span> <span class="st">"Ravi"</span>
+scores: list[<span class="bi">int</span>] <span class="op">=</span> [<span class="nm">85</span>, <span class="nm">90</span>]
+
+<span class="fn">print</span>(<span class="fn">stringify</span>(<span class="nm">3.14</span>))
+<span class="fn">print</span>(<span class="fn">divmod_typed</span>(<span class="nm">17</span>, <span class="nm">5</span>))</pre>
+<div class="out-label">Output</div><pre class="output">3.14
+(3, 2)</pre>
+<div class="example-note">Union[int, float] means "either type". Tuple[int, int] specifies exact element types. Variable annotations don't enforce — they're hints only.</div></div>
+`;}
+  },
+  {
+    id:'dataclasses',icon:'📐',title:'Dataclasses',
+    desc:'@dataclass, fields, defaults, post_init, frozen, and comparison.',
+    content(){return `
+<div class="detail-header"><span class="icon">📐</span>
+<h2>Dataclasses</h2>
+<p>The <strong>@dataclass</strong> decorator (Python 3.7+) auto-generates __init__, __repr__, and __eq__ from class-level field annotations — eliminating boilerplate.</p></div>
+
+<div class="section-block"><h4>Basic Dataclass</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+
+<span class="dec">@dataclass</span>
+<span class="kw">class</span> <span class="bi">Point</span>:
+    x: <span class="bi">float</span>
+    y: <span class="bi">float</span>
+
+p <span class="op">=</span> <span class="bi">Point</span>(<span class="nm">1.5</span>, <span class="nm">2.5</span>)
+<span class="fn">print</span>(p)
+<span class="fn">print</span>(p.x)
+<span class="fn">print</span>(<span class="bi">Point</span>(<span class="nm">1.5</span>, <span class="nm">2.5</span>) <span class="op">==</span> p)</pre>
+<div class="out-label">Output</div><pre class="output">Point(x=1.5, y=2.5)
+1.5
+True</pre></div>
+
+<div class="section-block"><h4>Defaults and __post_init__</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+
+<span class="dec">@dataclass</span>
+<span class="kw">class</span> <span class="bi">Student</span>:
+    name: <span class="bi">str</span>
+    grades: list <span class="op">=</span> <span class="fn">field</span>(default_factory<span class="op">=</span>list)
+    average: <span class="bi">float</span> <span class="op">=</span> <span class="nm">0.0</span>
+
+    <span class="kw">def</span> <span class="fn">__post_init__</span>(<span class="nm">self</span>):
+        <span class="kw">if</span> <span class="nm">self</span>.grades:
+            <span class="nm">self</span>.average <span class="op">=</span> <span class="fn">sum</span>(<span class="nm">self</span>.grades)<span class="op">/</span><span class="fn">len</span>(<span class="nm">self</span>.grades)
+
+s <span class="op">=</span> <span class="bi">Student</span>(<span class="st">"Ana"</span>, grades<span class="op">=</span>[<span class="nm">85</span>, <span class="nm">90</span>, <span class="nm">78</span>])
+<span class="fn">print</span>(s)
+<span class="fn">print</span>(s.average)</pre>
+<div class="out-label">Output</div><pre class="output">Student(name='Ana', grades=[85, 90, 78], average=84.33333333333333)
+84.33333333333333</pre></div>
+
+<div class="section-block"><h4>Frozen Dataclass (Immutable)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+<span class="dec">@dataclass</span>(frozen<span class="op">=</span><span class="kw">True</span>)
+<span class="kw">class</span> <span class="bi">Config</span>:
+    host: <span class="bi">str</span>
+    port: <span class="bi">int</span>
+
+cfg <span class="op">=</span> <span class="bi">Config</span>(<span class="st">"localhost"</span>, <span class="nm">8080</span>)
+<span class="fn">print</span>(cfg)
+<span class="kw">try</span>:
+    cfg.port <span class="op">=</span> <span class="nm">9090</span>
+<span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="st">f"Error: {e}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Config(host='localhost', port=8080)
+Error: cannot assign to field 'port'</pre></div>
+`;}
+  },
+  {
+    id:'collections',icon:'🗃️',title:'Collections Module',
+    desc:'Counter, defaultdict, OrderedDict, deque, namedtuple.',
+    content(){return `
+<div class="detail-header"><span class="icon">🗃️</span>
+<h2>Collections Module</h2>
+<p>The <strong>collections</strong> module provides specialized container datatypes that extend Python's built-in dict, list, set, and tuple.</p></div>
+
+<div class="section-block"><h4>Counter</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> collections <span class="kw">import</span> Counter
+
+words <span class="op">=</span> [<span class="st">"apple"</span>,<span class="st">"banana"</span>,<span class="st">"apple"</span>,<span class="st">"cherry"</span>,<span class="st">"banana"</span>,<span class="st">"apple"</span>]
+c <span class="op">=</span> <span class="bi">Counter</span>(words)
+<span class="fn">print</span>(c)
+<span class="fn">print</span>(c.<span class="fn">most_common</span>(<span class="nm">2</span>))
+<span class="fn">print</span>(c[<span class="st">"apple"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">Counter({'apple': 3, 'banana': 2, 'cherry': 1})
+[('apple', 3), ('banana', 2)]
+3</pre></div>
+
+<div class="section-block"><h4>defaultdict</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+groups <span class="op">=</span> <span class="bi">defaultdict</span>(list)
+data <span class="op">=</span> [(<span class="st">"fruit"</span>,<span class="st">"apple"</span>),(<span class="st">"veg"</span>,<span class="st">"carrot"</span>),(<span class="st">"fruit"</span>,<span class="st">"mango"</span>)]
+<span class="kw">for</span> cat, item <span class="kw">in</span> data:
+    groups[cat].<span class="fn">append</span>(item)
+<span class="fn">print</span>(<span class="fn">dict</span>(groups))</pre>
+<div class="out-label">Output</div><pre class="output">{'fruit': ['apple', 'mango'], 'veg': ['carrot']}</pre>
+<div class="example-note">defaultdict never raises KeyError — missing keys get a default value from the factory function.</div></div>
+
+<div class="section-block"><h4>deque and namedtuple</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> collections <span class="kw">import</span> deque, namedtuple
+
+dq <span class="op">=</span> <span class="bi">deque</span>([<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>])
+dq.<span class="fn">appendleft</span>(<span class="nm">0</span>); dq.<span class="fn">append</span>(<span class="nm">4</span>)
+<span class="fn">print</span>(dq)
+dq.<span class="fn">rotate</span>(<span class="nm">1</span>)
+<span class="fn">print</span>(dq)
+
+<span class="bi">Point</span> <span class="op">=</span> <span class="fn">namedtuple</span>(<span class="st">"Point"</span>, [<span class="st">"x"</span>,<span class="st">"y"</span>])
+p <span class="op">=</span> <span class="bi">Point</span>(<span class="nm">3</span>, <span class="nm">4</span>)
+<span class="fn">print</span>(p.x, p.y)</pre>
+<div class="out-label">Output</div><pre class="output">deque([0, 1, 2, 3, 4])
+deque([4, 0, 1, 2, 3])
+3 4</pre></div>
+
+<div class="section-block"><h4>OrderedDict</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> collections <span class="kw">import</span> OrderedDict
+
+od <span class="op">=</span> <span class="bi">OrderedDict</span>()
+od[<span class="st">"one"</span>] <span class="op">=</span> <span class="nm">1</span>
+od[<span class="st">"two"</span>] <span class="op">=</span> <span class="nm">2</span>
+od[<span class="st">"three"</span>] <span class="op">=</span> <span class="nm">3</span>
+<span class="fn">print</span>(<span class="fn">list</span>(od.<span class="fn">keys</span>()))
+
+od.<span class="fn">move_to_end</span>(<span class="st">"one"</span>)
+<span class="fn">print</span>(<span class="fn">list</span>(od.<span class="fn">keys</span>()))
+
+<span class="cm"># Two OrderedDicts equal only if order also matches</span>
+od1 <span class="op">=</span> <span class="bi">OrderedDict</span>([(<span class="st">"a"</span>, <span class="nm">1</span>), (<span class="st">"b"</span>, <span class="nm">2</span>)])
+od2 <span class="op">=</span> <span class="bi">OrderedDict</span>([(<span class="st">"b"</span>, <span class="nm">2</span>), (<span class="st">"a"</span>, <span class="nm">1</span>)])
+<span class="fn">print</span>(od1 <span class="op">==</span> od2)</pre>
+<div class="out-label">Output</div><pre class="output">['one', 'two', 'three']
+['two', 'three', 'one']
+False</pre>
+<div class="example-note">In Python 3.7+ regular dicts preserve insertion order too, but OrderedDict additionally supports move_to_end() and order-sensitive equality.</div></div>
+`;}
+  },
+  {
+    id:'itertools',icon:'🔗',title:'itertools Module',
+    desc:'chain, cycle, islice, product, permutations, combinations, groupby.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔗</span>
+<h2>itertools Module</h2>
+<p>itertools provides fast, memory-efficient tools for working with iterators. All return lazy iterators — they generate values on demand.</p></div>
+
+<div class="section-block"><h4>chain and cycle</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> itertools <span class="kw">import</span> chain, cycle, islice
+
+merged <span class="op">=</span> <span class="fn">list</span>(<span class="fn">chain</span>([<span class="nm">1</span>,<span class="nm">2</span>], [<span class="nm">3</span>,<span class="nm">4</span>], [<span class="nm">5</span>]))
+<span class="fn">print</span>(merged)
+
+repeating <span class="op">=</span> <span class="fn">islice</span>(<span class="fn">cycle</span>([<span class="st">"R"</span>,<span class="st">"G"</span>,<span class="st">"B"</span>]), <span class="nm">7</span>)
+<span class="fn">print</span>(<span class="fn">list</span>(repeating))</pre>
+<div class="out-label">Output</div><pre class="output">[1, 2, 3, 4, 5]
+['R', 'G', 'B', 'R', 'G', 'B', 'R']</pre></div>
+
+<div class="section-block"><h4>product, permutations, combinations</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> itertools <span class="kw">import</span> product, permutations, combinations
+
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">product</span>([<span class="nm">0</span>,<span class="nm">1</span>], repeat<span class="op">=</span><span class="nm">2</span>)))
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">permutations</span>(<span class="st">"ABC"</span>, <span class="nm">2</span>)))
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">combinations</span>(<span class="st">"ABC"</span>, <span class="nm">2</span>)))</pre>
+<div class="out-label">Output</div><pre class="output">[(0, 0), (0, 1), (1, 0), (1, 1)]
+[('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'C'), ('C', 'A'), ('C', 'B')]
+[('A', 'B'), ('A', 'C'), ('B', 'C')]</pre></div>
+
+<div class="section-block"><h4>groupby</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> itertools <span class="kw">import</span> groupby
+
+data <span class="op">=</span> [(<span class="st">"A"</span>,<span class="nm">1</span>),(<span class="st">"A"</span>,<span class="nm">2</span>),(<span class="st">"B"</span>,<span class="nm">3</span>),(<span class="st">"B"</span>,<span class="nm">4</span>),(<span class="st">"C"</span>,<span class="nm">5</span>)]
+<span class="kw">for</span> key, group <span class="kw">in</span> <span class="fn">groupby</span>(data, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="nm">0</span>]):
+    <span class="fn">print</span>(key, <span class="fn">list</span>(group))</pre>
+<div class="out-label">Output</div><pre class="output">A [('A', 1), ('A', 2)]
+B [('B', 3), ('B', 4)]
+C [('C', 5)]</pre></div>
+`;}
+  },
+  {
+    id:'functools',icon:'🔧',title:'functools Module',
+    desc:'partial, reduce, lru_cache, wraps, total_ordering.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔧</span>
+<h2>functools Module</h2>
+<p>functools provides higher-order functions — functions that act on or return other functions. Essential tools for functional-style Python.</p></div>
+
+<div class="section-block"><h4>partial</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> functools <span class="kw">import</span> partial
+
+<span class="kw">def</span> <span class="fn">power</span>(base, exp):
+    <span class="kw">return</span> base <span class="op">**</span> exp
+
+square <span class="op">=</span> <span class="fn">partial</span>(power, exp<span class="op">=</span><span class="nm">2</span>)
+cube   <span class="op">=</span> <span class="fn">partial</span>(power, exp<span class="op">=</span><span class="nm">3</span>)
+<span class="fn">print</span>(<span class="fn">square</span>(<span class="nm">4</span>))
+<span class="fn">print</span>(<span class="fn">cube</span>(<span class="nm">3</span>))</pre>
+<div class="out-label">Output</div><pre class="output">16
+27</pre>
+<div class="example-note">partial creates a new function with some arguments pre-filled — great for callbacks and configuration.</div></div>
+
+<div class="section-block"><h4>reduce</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> functools <span class="kw">import</span> reduce
+
+product <span class="op">=</span> <span class="fn">reduce</span>(<span class="kw">lambda</span> a, b: a <span class="op">*</span> b, [<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>])
+<span class="fn">print</span>(product)
+
+<span class="cm"># Find max manually</span>
+mx <span class="op">=</span> <span class="fn">reduce</span>(<span class="kw">lambda</span> a, b: a <span class="kw">if</span> a <span class="op">&gt;</span> b <span class="kw">else</span> b, [<span class="nm">3</span>,<span class="nm">1</span>,<span class="nm">7</span>,<span class="nm">2</span>])
+<span class="fn">print</span>(mx)</pre>
+<div class="out-label">Output</div><pre class="output">120
+7</pre></div>
+
+<div class="section-block"><h4>lru_cache (Memoization)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> functools <span class="kw">import</span> lru_cache
+
+<span class="dec">@lru_cache</span>(maxsize<span class="op">=</span><span class="kw">None</span>)
+<span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">if</span> n <span class="op">&lt;</span> <span class="nm">2</span>: <span class="kw">return</span> n
+    <span class="kw">return</span> <span class="fn">fib</span>(n<span class="op">-</span><span class="nm">1</span>) <span class="op">+</span> <span class="fn">fib</span>(n<span class="op">-</span><span class="nm">2</span>)
+
+<span class="fn">print</span>([<span class="fn">fib</span>(i) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>)])
+<span class="fn">print</span>(<span class="fn">fib</span>.<span class="fn">cache_info</span>())</pre>
+<div class="out-label">Output</div><pre class="output">[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+CacheInfo(hits=16, misses=10, maxsize=None, currsize=10)</pre>
+<div class="example-note">lru_cache caches results — fib(5) is computed once and reused. Turns exponential recursion into linear.</div></div>
+
+<div class="section-block"><h4>total_ordering</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> functools <span class="kw">import</span> total_ordering
+
+<span class="dec">@total_ordering</span>
+<span class="kw">class</span> <span class="bi">Version</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, major, minor):
+        <span class="nm">self</span>.major <span class="op">=</span> major; <span class="nm">self</span>.minor <span class="op">=</span> minor
+    <span class="kw">def</span> <span class="fn">__eq__</span>(<span class="nm">self</span>, other):
+        <span class="kw">return</span> (<span class="nm">self</span>.major, <span class="nm">self</span>.minor) <span class="op">==</span> (other.major, other.minor)
+    <span class="kw">def</span> <span class="fn">__lt__</span>(<span class="nm">self</span>, other):
+        <span class="kw">return</span> (<span class="nm">self</span>.major, <span class="nm">self</span>.minor) <span class="op">&lt;</span> (other.major, other.minor)
+
+v1, v2 <span class="op">=</span> <span class="bi">Version</span>(<span class="nm">1</span>, <span class="nm">9</span>), <span class="bi">Version</span>(<span class="nm">2</span>, <span class="nm">0</span>)
+<span class="fn">print</span>(v1 <span class="op">&lt;</span> v2)
+<span class="fn">print</span>(v1 <span class="op">&gt;</span> v2)
+<span class="fn">print</span>(v1 <span class="op">&lt;=</span> v2)</pre>
+<div class="out-label">Output</div><pre class="output">True
+False
+True</pre>
+<div class="example-note">Define only __eq__ and __lt__, and @total_ordering fills in >, >=, <= automatically.</div></div>
+`;}
+  },
+  {
+    id:'json',icon:'📄',title:'JSON Handling',
+    desc:'json.dumps, json.loads, json.dump, json.load, and custom encoders.',
+    content(){return `
+<div class="detail-header"><span class="icon">📄</span>
+<h2>JSON Handling</h2>
+<p>JSON (JavaScript Object Notation) is the most common data exchange format. Python's built-in <strong>json</strong> module makes serializing and deserializing JSON trivial.</p></div>
+
+<div class="section-block"><h4>dumps and loads (strings)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json
+
+data <span class="op">=</span> {<span class="st">"name"</span>: <span class="st">"Ravi"</span>, <span class="st">"age"</span>: <span class="nm">25</span>, <span class="st">"tags"</span>: [<span class="st">"python"</span>, <span class="st">"dev"</span>]}
+
+<span class="cm"># Python dict → JSON string</span>
+js <span class="op">=</span> json.<span class="fn">dumps</span>(data, indent<span class="op">=</span><span class="nm">2</span>)
+<span class="fn">print</span>(js)
+
+<span class="cm"># JSON string → Python dict</span>
+back <span class="op">=</span> json.<span class="fn">loads</span>(js)
+<span class="fn">print</span>(back[<span class="st">"name"</span>])</pre>
+<div class="out-label">Output</div><pre class="output">{
+  "name": "Ravi",
+  "age": 25,
+  "tags": [
+    "python",
+    "dev"
+  ]
+}
+Ravi</pre></div>
+
+<div class="section-block"><h4>dump and load (files)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json
+
+data <span class="op">=</span> {<span class="st">"score"</span>: <span class="nm">99</span>, <span class="st">"passed"</span>: <span class="kw">True</span>}
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"data.json"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    json.<span class="fn">dump</span>(data, f, indent<span class="op">=</span><span class="nm">2</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"data.json"</span>) <span class="kw">as</span> f:
+    loaded <span class="op">=</span> json.<span class="fn">load</span>(f)
+
+<span class="fn">print</span>(loaded)
+<span class="fn">print</span>(<span class="fn">type</span>(loaded[<span class="st">"passed"</span>]))</pre>
+<div class="out-label">Output</div><pre class="output">{'score': 99, 'passed': True}
+&lt;class 'bool'&gt;</pre></div>
+
+<div class="section-block"><h4>Custom JSON Encoder</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="kw">class</span> <span class="bi">CustomEncoder</span>(json.<span class="bi">JSONEncoder</span>):
+    <span class="kw">def</span> <span class="fn">default</span>(<span class="nm">self</span>, obj):
+        <span class="kw">if</span> <span class="fn">isinstance</span>(obj, date):
+            <span class="kw">return</span> obj.<span class="fn">isoformat</span>()
+        <span class="kw">return</span> <span class="fn">super</span>().<span class="fn">default</span>(obj)
+
+data <span class="op">=</span> {<span class="st">"name"</span>: <span class="st">"Ravi"</span>, <span class="st">"joined"</span>: date(<span class="nm">2024</span>, <span class="nm">1</span>, <span class="nm">15</span>)}
+<span class="fn">print</span>(json.<span class="fn">dumps</span>(data, cls<span class="op">=</span><span class="bi">CustomEncoder</span>))</pre>
+<div class="out-label">Output</div><pre class="output">{"name": "Ravi", "joined": "2024-01-15"}</pre>
+<div class="example-note">By default json.dumps can't handle date objects. Override default() in a custom encoder to handle any type.</div></div>
+`;}
+  },
+  {
+    id:'csv',icon:'📊',title:'CSV Handling',
+    desc:'csv.reader, csv.writer, csv.DictReader, csv.DictWriter.',
+    content(){return `
+<div class="detail-header"><span class="icon">📊</span>
+<h2>CSV Handling</h2>
+<p>CSV (Comma-Separated Values) is a simple format for tabular data. Python's <strong>csv</strong> module handles reading and writing with proper quoting and escaping.</p></div>
+
+<div class="section-block"><h4>Writing CSV</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+
+rows <span class="op">=</span> [
+    [<span class="st">"Name"</span>, <span class="st">"Age"</span>, <span class="st">"City"</span>],
+    [<span class="st">"Ravi"</span>, <span class="nm">25</span>, <span class="st">"Hyderabad"</span>],
+    [<span class="st">"Ana"</span>,  <span class="nm">30</span>, <span class="st">"Mumbai"</span>],
+]
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"people.csv"</span>, <span class="st">"w"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="kw">as</span> f:
+    writer <span class="op">=</span> csv.<span class="fn">writer</span>(f)
+    writer.<span class="fn">writerows</span>(rows)
+<span class="fn">print</span>(<span class="st">"Written"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Written</pre></div>
+
+<div class="section-block"><h4>Reading with DictReader</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"people.csv"</span>) <span class="kw">as</span> f:
+    reader <span class="op">=</span> csv.<span class="fn">DictReader</span>(f)
+    <span class="kw">for</span> row <span class="kw">in</span> reader:
+        <span class="fn">print</span>(<span class="st">f"{row['Name']} ({row['Age']}) - {row['City']}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Ravi (25) - Hyderabad
+Ana (30) - Mumbai</pre>
+<div class="example-note">DictReader automatically uses the first row as column names — each row is a dict.</div></div>
+
+<div class="section-block"><h4>DictWriter</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> csv
+
+fields <span class="op">=</span> [<span class="st">"Name"</span>, <span class="st">"Score"</span>, <span class="st">"Grade"</span>]
+rows <span class="op">=</span> [
+    {<span class="st">"Name"</span>: <span class="st">"Ravi"</span>,  <span class="st">"Score"</span>: <span class="nm">92</span>, <span class="st">"Grade"</span>: <span class="st">"A"</span>},
+    {<span class="st">"Name"</span>: <span class="st">"Ana"</span>,   <span class="st">"Score"</span>: <span class="nm">85</span>, <span class="st">"Grade"</span>: <span class="st">"B"</span>},
+]
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"grades.csv"</span>, <span class="st">"w"</span>, newline<span class="op">=</span><span class="st">""</span>) <span class="kw">as</span> f:
+    writer <span class="op">=</span> csv.<span class="bi">DictWriter</span>(f, fieldnames<span class="op">=</span>fields)
+    writer.<span class="fn">writeheader</span>()
+    writer.<span class="fn">writerows</span>(rows)
+<span class="fn">print</span>(<span class="bi">open</span>(<span class="st">"grades.csv"</span>).<span class="fn">read</span>())</pre>
+<div class="out-label">Output</div><pre class="output">Name,Score,Grade
+Ravi,92,A
+Ana,85,B</pre>
+<div class="example-note">DictWriter takes a list of field names and writes dicts as rows — writeheader() writes the column names automatically.</div></div>
+`;}
+  },
+  {
+    id:'exceptions2',icon:'⚠️',title:'Advanced Exceptions',
+    desc:'Custom exception classes, exception chaining, and re-raising.',
+    content(){return `
+<div class="detail-header"><span class="icon">⚠️</span>
+<h2>Advanced Exceptions</h2>
+<p>Beyond basic try/except: create domain-specific exception hierarchies, chain exceptions to preserve context, and use __cause__ for clear error messages.</p></div>
+
+<div class="section-block"><h4>Custom Exception Classes</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">AppError</span>(<span class="bi">Exception</span>):
+    <span class="kw">pass</span>
+
+<span class="kw">class</span> <span class="bi">ValidationError</span>(<span class="bi">AppError</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, field, msg):
+        <span class="nm">self</span>.field <span class="op">=</span> field
+        <span class="fn">super</span>().<span class="fn">__init__</span>(<span class="st">f"[{field}] {msg}"</span>)
+
+<span class="kw">try</span>:
+    <span class="kw">raise</span> <span class="bi">ValidationError</span>(<span class="st">"email"</span>, <span class="st">"invalid format"</span>)
+<span class="kw">except</span> <span class="bi">ValidationError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="st">f"Field: {e.field}")
+    <span class="fn">print</span>(<span class="st">f"Error: {e}"</span>)</span></pre>
+<div class="out-label">Output</div><pre class="output">Field: email
+Error: [email] invalid format</pre></div>
+
+<div class="section-block"><h4>Exception Chaining (raise from)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">def</span> <span class="fn">load_config</span>(path):
+    <span class="kw">try</span>:
+        <span class="fn">open</span>(path)
+    <span class="kw">except</span> <span class="bi">FileNotFoundError</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="bi">RuntimeError</span>(<span class="st">f"Config missing: {path}"</span>) <span class="kw">from</span> e
+
+<span class="kw">try</span>:
+    <span class="fn">load_config</span>(<span class="st">"config.yaml"</span>)
+<span class="kw">except</span> <span class="bi">RuntimeError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(e)
+    <span class="fn">print</span>(<span class="st">"Caused by:"</span>, e.__cause__)</pre>
+<div class="out-label">Output</div><pre class="output">Config missing: config.yaml
+Caused by: [Errno 2] No such file or directory: 'config.yaml'</pre>
+<div class="example-note">raise X from Y links the original exception as the cause — helpful for debugging layered code.</div></div>
+`;}
+  },
+  {
+    id:'properties',icon:'🔑',title:'Properties & Encapsulation',
+    desc:'@property, @setter, @deleter, private attributes, and slots.',
+    content(){return `
+<div class="detail-header"><span class="icon">🔑</span>
+<h2>Properties &amp; Encapsulation</h2>
+<p>Properties let you add getter/setter logic behind clean attribute access. Use a single underscore for "private by convention" and name mangling (__) for stronger privacy.</p></div>
+
+<div class="section-block"><h4>@property and @setter</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Temperature</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, celsius):
+        <span class="nm">self</span>._celsius <span class="op">=</span> celsius
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">celsius</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="nm">self</span>._celsius
+
+    <span class="dec">@celsius.setter</span>
+    <span class="kw">def</span> <span class="fn">celsius</span>(<span class="nm">self</span>, val):
+        <span class="kw">if</span> val <span class="op">&lt;</span> <span class="op">-</span><span class="nm">273.15</span>:
+            <span class="kw">raise</span> <span class="bi">ValueError</span>(<span class="st">"Below absolute zero!"</span>)
+        <span class="nm">self</span>._celsius <span class="op">=</span> val
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">fahrenheit</span>(<span class="nm">self</span>):
+        <span class="kw">return</span> <span class="nm">self</span>._celsius <span class="op">*</span> <span class="nm">9</span><span class="op">/</span><span class="nm">5</span> <span class="op">+</span> <span class="nm">32</span>
+
+t <span class="op">=</span> <span class="bi">Temperature</span>(<span class="nm">25</span>)
+<span class="fn">print</span>(t.celsius)
+<span class="fn">print</span>(t.fahrenheit)
+t.celsius <span class="op">=</span> <span class="nm">30</span>
+<span class="fn">print</span>(t.fahrenheit)</pre>
+<div class="out-label">Output</div><pre class="output">25
+77.0
+86.0</pre>
+<div class="example-note">Access t.celsius reads it; assigning t.celsius = 30 calls the setter. Looks like a plain attribute to callers.</div></div>
+
+<div class="section-block"><h4>@deleter &amp; Name Mangling</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Person</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, name):
+        <span class="nm">self</span>.__name <span class="op">=</span> name   <span class="cm"># __ = name mangling → _Person__name</span>
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">name</span>(<span class="nm">self</span>): <span class="kw">return</span> <span class="nm">self</span>.__name
+
+    <span class="dec">@name.deleter</span>
+    <span class="kw">def</span> <span class="fn">name</span>(<span class="nm">self</span>):
+        <span class="fn">print</span>(<span class="st">"Name deleted"</span>)
+        <span class="kw">del</span> <span class="nm">self</span>.__name
+
+p <span class="op">=</span> <span class="bi">Person</span>(<span class="st">"Ravi"</span>)
+<span class="fn">print</span>(p.name)
+<span class="kw">del</span> p.name
+<span class="fn">print</span>(<span class="fn">hasattr</span>(p, <span class="st">'_Person__name'</span>))</pre>
+<div class="out-label">Output</div><pre class="output">Ravi
+Name deleted
+False</pre></div>
+
+<div class="section-block"><h4>__slots__</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">class</span> <span class="bi">Point</span>:
+    __slots__ <span class="op">=</span> [<span class="st">"x"</span>, <span class="st">"y"</span>]   <span class="cm"># only these attrs allowed</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, x, y):
+        <span class="nm">self</span>.x <span class="op">=</span> x; <span class="nm">self</span>.y <span class="op">=</span> y
+
+p <span class="op">=</span> <span class="bi">Point</span>(<span class="nm">1</span>, <span class="nm">2</span>)
+<span class="fn">print</span>(p.x, p.y)
+<span class="kw">try</span>:
+    p.z <span class="op">=</span> <span class="nm">3</span>
+<span class="kw">except</span> <span class="bi">AttributeError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(e)</pre>
+<div class="out-label">Output</div><pre class="output">1 2
+'Point' object has no attribute 'z'</pre>
+<div class="example-note">__slots__ prevents adding arbitrary attributes and reduces memory — useful for classes with millions of instances.</div></div>
+`;}
+  },
+  {
+    id:'abstract',icon:'🧱',title:'Abstract Classes & Interfaces',
+    desc:'ABC, @abstractmethod, enforcing method contracts in subclasses.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧱</span>
+<h2>Abstract Classes &amp; Interfaces</h2>
+<p>The <strong>abc</strong> module lets you define abstract base classes — classes that enforce that subclasses implement specific methods, acting as an interface contract.</p></div>
+
+<div class="section-block"><h4>Abstract Base Class</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> abc <span class="kw">import</span> ABC, abstractmethod
+
+<span class="kw">class</span> <span class="bi">Shape</span>(<span class="bi">ABC</span>):
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="nm">self</span>) <span class="op">-&gt;</span> <span class="bi">float</span>: <span class="op">...</span>
+
+    <span class="dec">@abstractmethod</span>
+    <span class="kw">def</span> <span class="fn">perimeter</span>(<span class="nm">self</span>) <span class="op">-&gt;</span> <span class="bi">float</span>: <span class="op">...</span>
+
+<span class="kw">class</span> <span class="bi">Circle</span>(<span class="bi">Shape</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="nm">self</span>, r):
+        <span class="nm">self</span>.r <span class="op">=</span> r
+    <span class="kw">def</span> <span class="fn">area</span>(<span class="nm">self</span>):
+        <span class="kw">import</span> math; <span class="kw">return</span> math.pi <span class="op">*</span> <span class="nm">self</span>.r<span class="op">**</span><span class="nm">2</span>
+    <span class="kw">def</span> <span class="fn">perimeter</span>(<span class="nm">self</span>):
+        <span class="kw">import</span> math; <span class="kw">return</span> <span class="nm">2</span> <span class="op">*</span> math.pi <span class="op">*</span> <span class="nm">self</span>.r
+
+c <span class="op">=</span> <span class="bi">Circle</span>(<span class="nm">5</span>)
+<span class="fn">print</span>(<span class="st">f"Area: {c.area():.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Perimeter: {c.perimeter():.2f}"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Area: 78.54
+Perimeter: 31.42</pre>
+<div class="example-note">You cannot instantiate Shape directly — trying raises TypeError. All abstract methods must be implemented.</div></div>
+`;}
+  },
+  {
+    id:'threading',icon:'🧵',title:'Threading & Concurrency',
+    desc:'threading.Thread, locks, and the concurrent.futures module.',
+    content(){return `
+<div class="detail-header"><span class="icon">🧵</span>
+<h2>Threading &amp; Concurrency</h2>
+<p>Threads let your program do multiple things at once. Python threads share memory and are best for I/O-bound tasks. The <strong>concurrent.futures</strong> module provides a high-level API.</p></div>
+
+<div class="section-block"><h4>Creating Threads</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> threading, time
+
+<span class="kw">def</span> <span class="fn">worker</span>(name, delay):
+    time.<span class="fn">sleep</span>(delay)
+    <span class="fn">print</span>(<span class="st">f"Worker {name} done"</span>)
+
+t1 <span class="op">=</span> threading.<span class="bi">Thread</span>(target<span class="op">=</span>worker, args<span class="op">=</span>(<span class="st">"A"</span>, <span class="nm">0.1</span>))
+t2 <span class="op">=</span> threading.<span class="bi">Thread</span>(target<span class="op">=</span>worker, args<span class="op">=</span>(<span class="st">"B"</span>, <span class="nm">0.05</span>))
+t1.<span class="fn">start</span>(); t2.<span class="fn">start</span>()
+t1.<span class="fn">join</span>(); t2.<span class="fn">join</span>()
+<span class="fn">print</span>(<span class="st">"All done"</span>)</pre>
+<div class="out-label">Output</div><pre class="output">Worker B done
+Worker A done
+All done</pre>
+<div class="example-note">B finishes first because it has a shorter delay. join() waits for a thread to complete.</div></div>
+
+<div class="section-block"><h4>ThreadPoolExecutor</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+
+<span class="kw">def</span> <span class="fn">square</span>(n):
+    <span class="kw">return</span> n <span class="op">**</span> <span class="nm">2</span>
+
+<span class="kw">with</span> <span class="bi">ThreadPoolExecutor</span>(max_workers<span class="op">=</span><span class="nm">4</span>) <span class="kw">as</span> exe:
+    results <span class="op">=</span> <span class="fn">list</span>(exe.<span class="fn">map</span>(square, <span class="fn">range</span>(<span class="nm">6</span>)))
+
+<span class="fn">print</span>(results)</pre>
+<div class="out-label">Output</div><pre class="output">[0, 1, 4, 9, 16, 25]</pre>
+<div class="example-note">ThreadPoolExecutor distributes work across a pool and collects results in order — great for parallel I/O.</div></div>
+
+<div class="section-block"><h4>Lock (Thread Safety)</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">import</span> threading
+
+counter <span class="op">=</span> <span class="nm">0</span>
+lock <span class="op">=</span> threading.<span class="bi">Lock</span>()
+
+<span class="kw">def</span> <span class="fn">increment</span>(n):
+    <span class="kw">global</span> counter
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(n):
+        <span class="kw">with</span> lock:        <span class="cm"># acquire → do work → release</span>
+            counter <span class="op">+=</span> <span class="nm">1</span>
+
+threads <span class="op">=</span> [threading.<span class="bi">Thread</span>(target<span class="op">=</span>increment, args<span class="op">=</span>(<span class="nm">1000</span>,)) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)]
+<span class="kw">for</span> t <span class="kw">in</span> threads: t.<span class="fn">start</span>()
+<span class="kw">for</span> t <span class="kw">in</span> threads: t.<span class="fn">join</span>()
+<span class="fn">print</span>(counter)</pre>
+<div class="out-label">Output</div><pre class="output">5000</pre>
+<div class="example-note">Without a lock, multiple threads reading and writing counter simultaneously would produce a wrong total (race condition). Lock ensures only one thread modifies it at a time.</div></div>
+`;}
+  },
+  {
+    id:'pathlib',icon:'📂',title:'pathlib & os',
+    desc:'Path objects, directory traversal, glob, mkdir, stat, and shutil.',
+    content(){return `
+<div class="detail-header"><span class="icon">📂</span>
+<h2>pathlib &amp; os</h2>
+<p><strong>pathlib</strong> (Python 3.4+) provides an OOP interface for filesystem paths — much cleaner than old-style os.path string manipulation.</p></div>
+
+<div class="section-block"><h4>Path Basics</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+p <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"."</span>)
+<span class="fn">print</span>(p.<span class="fn">resolve</span>())
+<span class="fn">print</span>(p.<span class="fn">is_dir</span>())
+
+f <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"demo.txt"</span>)
+<span class="fn">print</span>(f.name)
+<span class="fn">print</span>(f.suffix)
+<span class="fn">print</span>(f.stem)</pre>
+<div class="out-label">Output</div><pre class="output">/home/user/project
+True
+demo.txt
+.txt
+demo</pre></div>
+
+<div class="section-block"><h4>Reading, Writing, Glob</h4>
+<div class="code-label">Code</div>
+<pre class="code"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+p <span class="op">=</span> <span class="bi">Path</span>(<span class="st">"note.txt"</span>)
+p.<span class="fn">write_text</span>(<span class="st">"Hello pathlib!"</span>)
+<span class="fn">print</span>(p.<span class="fn">read_text</span>())
+
+<span class="cm"># list all .html files in current dir</span>
+<span class="kw">for</span> f <span class="kw">in</span> <span class="bi">Path</span>(<span class="st">"."</span>).<span class="fn">glob</span>(<span class="st">"*.html"</span>):
+    <span class="fn">print</span>(f.name)</pre>
+<div class="out-label">Output</div><pre class="output">Hello pathlib!
+index.html
+app.html</pre>
+<div class="example-note">write_text / read_text replace open() for simple string files. glob() returns a generator of matching paths.</div></div>
+`;}
+  },
+];
+
+const grid = document.getElementById('cardsGrid');
+topics.forEach(t=>{
+  const card = document.createElement('div');
+  card.className = 'topic-card';
+  card.innerHTML = `<span class="icon">${t.icon}</span><h3>${t.title}</h3><p>${t.desc}</p><div class="open-hint">Tap to open →</div>`;
+  card.addEventListener('click', ()=>showDetail(t));
+  grid.appendChild(card);
+});
+
+function showDetail(t){
+  document.getElementById('gridView').style.display='none';
+  document.getElementById('detailView').style.display='block';
+  document.getElementById('detailContent').innerHTML=t.content();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showGrid(){
+  document.getElementById('detailView').style.display='none';
+  document.getElementById('gridView').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
