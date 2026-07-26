@@ -7,25 +7,99 @@
   "orientation": "portrait-primary",
   "background_color": "#f5f5f7",
   "theme_color": "#007aff",
-  "lang": "en",
-  "scope": ".",
+  "lang": "en-US",
+  "scope": "./",
   "categories": ["education", "developer tools"],
   "icons": [
-    { "src": "icons/icon-72.png",  "sizes": "72x72",   "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-96.png",  "sizes": "96x96",   "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-128.png", "sizes": "128x128", "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-152.png", "sizes": "152x152", "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "maskable any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable any" }
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
     {
       "name": "Python Basics",
       "short_name": "Basics",
+      "description": "Python fundamentals — variables, functions, OOP",
       "url": "index.html",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Intermediate",
+      "short_name": "OOP",
+      "description": "OOP, decorators, generators, regex",
+      "url": "python-intermediate-tutorial.html",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Python AWS",
+      "short_name": "AWS",
+      "description": "boto3, S3, Lambda, EKS, Terraform",
+      "url": "python-aws-tutorial.html",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Linux & Bash",
+      "short_name": "Linux",
+      "description": "Linux, Bash scripting for DevOps",
+      "url": "python-linux-bash.html",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ]
 }
