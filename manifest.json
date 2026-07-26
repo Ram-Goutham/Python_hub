@@ -2,7 +2,7 @@
   "name": "Python Learning Hub",
   "short_name": "PyHub",
   "description": "Complete Python + Cloud Engineer learning path — Basics to AWS, Kubernetes and DevOps",
-  "start_url": "python-hub.html",
+  "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f5f5f7",
@@ -24,90 +24,7 @@
     {
       "name": "Python Basics",
       "short_name": "Basics",
-      "url": "python-hub.html#basics",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "AWS Tutorial",
-      "short_name": "AWS",
-      "url": "python-hub.html#aws",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
-    }
-  ]
-}
-
-  "icons": [
-    {
-      "src": "icons/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshots/home.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Home screen"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Python Basics",
-      "short_name": "Basics",
-      "description": "Open Python Basics tutorial",
-      "url": "/python-hub.html?page=basics",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "AWS Tutorial",
-      "short_name": "AWS",
-      "description": "Open Python + AWS tutorial",
-      "url": "/python-hub.html?page=aws",
+      "url": "index.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     }
   ]

@@ -1,10 +1,10 @@
-const CACHE_NAME = 'pyhub-v1';
+const CACHE_NAME = 'pyhub-v2';
 
 // Use relative paths — works in any subfolder on GitHub Pages
 const CORE_FILES = [
   'python-hub.html',
+  'index.html',
   'manifest.json',
-  'python-basics-tutorial.html',
   'python-intermediate-tutorial.html',
   'python-advanced-tutorial.html',
   'python-aiml-tutorial.html',
