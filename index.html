@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Python Basics</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007aff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PyHub">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="description" content="Complete Python and Cloud Engineer learning path from Basics to AWS Kubernetes and DevOps">
 <style>
 :root{
   --bg:#f5f5f7;--surface:#ffffff;--surface-2:#f2f2f7;
@@ -1599,6 +1609,17 @@ function showGrid(){
   document.getElementById('detailView').style.display = 'none';
   document.getElementById('gridView').style.display = 'block';
   window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swPath = new URL('sw.js', window.location.href).pathname;
+    const scope = new URL('./', window.location.href).pathname;
+    navigator.serviceWorker.register(swPath, { scope })
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
 }
 </script>
 </body>
