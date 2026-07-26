@@ -2,18 +2,23 @@
   "name": "Python Learning Hub",
   "short_name": "PyHub",
   "description": "Complete Python and Cloud Engineer learning path from Basics to AWS Kubernetes and DevOps",
+  "id": "/Python_hub/",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait-primary",
   "background_color": "#f5f5f7",
   "theme_color": "#007aff",
   "lang": "en",
   "dir": "ltr",
   "categories": ["education"],
-  "iarc_rating_id": "",
-  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "prefer_related_applications": false,
+  "related_applications": [],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "icons": [
     {
       "src": "icons/icon-72.png",
@@ -70,7 +75,15 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Python Learning Hub Home"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Python Basics",
