@@ -2,13 +2,18 @@
   "name": "Python Learning Hub",
   "short_name": "PyHub",
   "description": "Complete Python and Cloud Engineer learning path from Basics to AWS Kubernetes and DevOps",
-  "start_url": "index.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f5f5f7",
   "theme_color": "#007aff",
-  "lang": "en-US",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education"],
+  "iarc_rating_id": "",
+  "related_applications": [],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icons/icon-72.png",
@@ -65,33 +70,34 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [],
   "shortcuts": [
     {
       "name": "Python Basics",
       "short_name": "Basics",
       "description": "Python fundamentals",
-      "url": "index.html",
+      "url": "./index.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Intermediate",
       "short_name": "OOP",
-      "description": "OOP, decorators, generators",
-      "url": "python-intermediate-tutorial.html",
+      "description": "OOP decorators generators",
+      "url": "./python-intermediate-tutorial.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Python AWS",
       "short_name": "AWS",
-      "description": "boto3, S3, Lambda, EKS",
-      "url": "python-aws-tutorial.html",
+      "description": "boto3 S3 Lambda EKS",
+      "url": "./python-aws-tutorial.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Linux and Bash",
       "short_name": "Linux",
       "description": "Linux and Bash for DevOps",
-      "url": "python-linux-bash.html",
+      "url": "./python-linux-bash.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ]
