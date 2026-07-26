@@ -1,15 +1,14 @@
 {
   "name": "Python Learning Hub",
   "short_name": "PyHub",
-  "description": "Complete Python + Cloud Engineer learning path — Basics to AWS, Kubernetes and DevOps",
+  "description": "Complete Python and Cloud Engineer learning path from Basics to AWS Kubernetes and DevOps",
   "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#f5f5f7",
   "theme_color": "#007aff",
   "lang": "en-US",
-  "scope": "./",
-  "categories": ["education", "developer tools"],
   "icons": [
     {
       "src": "icons/icon-72.png",
@@ -54,12 +53,6 @@
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
@@ -76,28 +69,28 @@
     {
       "name": "Python Basics",
       "short_name": "Basics",
-      "description": "Python fundamentals — variables, functions, OOP",
+      "description": "Python fundamentals",
       "url": "index.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Intermediate",
       "short_name": "OOP",
-      "description": "OOP, decorators, generators, regex",
+      "description": "OOP, decorators, generators",
       "url": "python-intermediate-tutorial.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Python AWS",
       "short_name": "AWS",
-      "description": "boto3, S3, Lambda, EKS, Terraform",
+      "description": "boto3, S3, Lambda, EKS",
       "url": "python-aws-tutorial.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
-      "name": "Linux & Bash",
+      "name": "Linux and Bash",
       "short_name": "Linux",
-      "description": "Linux, Bash scripting for DevOps",
+      "description": "Linux and Bash for DevOps",
       "url": "python-linux-bash.html",
       "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
